@@ -26,6 +26,6 @@ Route::get('/header/logout', function () {
 
 // item（商品詳細）
 Route::get('/item', function () {
-  return view('item', ['headerType' => 'onlyLogo']);
+  return view('item', ['headerType' => 'logOut']);
 });
 
