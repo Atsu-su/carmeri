@@ -1,0 +1,596 @@
+@charset "UTF-8";
+
+/* =========================== */
+/*
+/* リセット
+/*
+/* =========================== */
+
+/* reset */
+html {
+  color: #000;
+  background: var(--color-button-white);
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+input,
+textarea,
+p,
+blockquote,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+fieldset,
+img {
+  border: 0;
+}
+
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+  font-style: normal;
+  font-weight: normal;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+caption,
+th {
+  text-align: left;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 100%;
+  font-weight: normal;
+}
+
+q:before,
+q:after {
+  content: "";
+}
+
+abbr,
+acronym {
+  border: 0;
+  font-variant: normal;
+}
+
+sup {
+  vertical-align: text-top;
+}
+
+sub {
+  vertical-align: text-bottom;
+}
+
+input,
+textarea,
+select,
+button {
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  /* line-height: inherit; */
+  line-height: normal;
+  font-size: 100%;
+  border-radius: 5px;
+  border: 1px solid var(--color-text-dark);
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: inherit;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+textarea {
+  resize: vertical;
+  display: block;
+}
+
+button {
+  padding: 0;
+  cursor: pointer;
+}
+
+legend {
+  color: #000;
+}
+
+main {
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  vertical-align: bottom;
+}
+
+svg {
+  display: block;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+iframe {
+  vertical-align: bottom;
+}
+
+/* =========================== */
+/*
+/* 共通定数
+/*
+/* =========================== */
+
+/* color */
+:root {
+  --color-bg-btn-white: #fff;
+  --color-bg-btn-red: #FF5555;
+  --color-bg-header: #000;
+  --color-bg-img: #D9D9D9;
+  --color-bg-input: #fff;
+  --color-bg-select: #B1B1B1
+  --color-font-base: #000;
+  --color-font-blue: #0073CC;
+  --color-font-gray: #5F5F5F;
+  --color-font-red: #FF5555;
+  --color-font-white: #fff;
+  --color-border-black: #000;
+  --color-border-gray: #5F5F5F;
+  --color-border-red: #FF5555;
+}
+
+/* content-width */
+:root {
+}
+
+/* font */
+:root {
+  --font-family-jp: "Noto Sans JP", sans-serif;
+  /* --font-family-en: "Montserrat", sans-serif; */
+}
+
+/* img */
+:root {
+}
+
+/* =========================== */
+/*
+/* ユーティリティ
+/*
+/* =========================== */
+
+.u-visually-hidden {
+  position: absolute !important;
+  white-space: nowrap !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  padding: 0 !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  margin: -1px !important;
+}
+
+/* =========================== */
+/*
+/* レイアウト
+/*
+/* =========================== */
+
+/* container */
+.l-container-70 {
+  margin: 0 auto;
+  width: calc(100% - 70px);
+}
+
+/* =========================== */
+/*
+/* CSSコンポーネント
+/*
+/* =========================== */
+
+/* ボタン */
+.c-btn {
+  padding-bottom: 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+}
+
+.c-btn:hover {
+  opacity: 0.8;
+}
+
+.c-btn--header {
+  width: 100px;
+  height: 50px;
+  color: var(--color-font-base);
+  background-color: var(--color-bg-btn-white);
+}
+
+.c-btn--item {
+  width: 100%;
+  height:56px;
+  color: var(--color-font-white);
+  background-color: var(--color-bg-btn-red);
+}
+
+.c-btn a:hover {
+  opacity: 0.3;
+}
+
+.c-btn a {
+  display: block;
+}
+
+/* 商品紹介（写真＋商品名） */
+.c-item {
+  width: 290px;
+}
+
+.c-item img {
+  object-fit: cover;
+}
+
+/* 削除する */
+.c-item .temp-img {
+  width: 100%;
+  height: 281px;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+  background-color: var(--color-bg-img);
+}
+
+.c-item p {
+  margin-top: 8px;
+  font-size: 25px;
+  line-height: 1;
+}
+
+/* =========================== */
+/*
+/* js用クラス
+/*
+/* =========================== */
+
+.js-hidden {
+  display: none !important;
+}
+
+.js-active-title {
+  color: var(--color-font-red);
+}
+
+/* =========================== */
+/*
+/* bodyタグ
+/*
+/* =========================== */
+
+body {
+  font-family: var(--font-family-jp);
+  line-height: 1.8;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--color-font-base);
+  letter-spacing: 0.08em;
+}
+
+/* =========================== */
+/*
+/* bladeレイアウト
+/*
+/* =========================== */
+
+
+/* =========================== */
+/*
+/* bladeコンポーネント
+/*
+/* =========================== */
+
+/* header_logged_in.blade.php */
+/* header_logged_out.blade.php */
+/* header_only_logo.blade.php */
+#header {
+  padding: 0 40px;
+  width: 100%;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg-header);
+}
+
+#header .logo {
+  width: 370px;
+}
+
+#header .search-input {
+  padding-left: 30px;
+  width: 500px;
+  height: 50px;
+  background-color: var(--color-bg-input);
+}
+
+#header .search-input::placeholder {
+  color: var(--color-font-base);
+}
+
+#header .nav {
+  display: flex;
+  gap: 20px;
+}
+
+#header .nav-link {
+  color: var(--color-font-white);
+}
+
+/* error
+   → エラーはc-へ移動
+*/
+.error-box {
+  padding: 14px;
+  border: 1px solid var(--color-border-light-red);
+  border-radius: 5px;
+}
+
+.error-box li {
+  padding-left: 32px;
+  position: relative;
+  font-weight: bold;
+}
+
+.error-box li:before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  background-image: var(--img-exclaimation);
+  background-size: contain;
+}
+
+.error-box li + li {
+  margin-top: 5px;
+}
+
+/* =========================== */
+/*
+/* 個別ページ
+/*
+/* =========================== */
+
+/* index.blade.php */
+#items {
+  margin-top: 50px;
+}
+
+#items .titles {
+  margin-bottom: 76px;
+  width: 100%;
+  border-bottom: 2px solid var(--color-border-gray);
+}
+
+@media screen and (max-width: 900px) {
+  #items .titles {
+    display: flex;
+    justify-content: center;
+    gap: 75px;
+  }
+}
+
+#items .title {
+  padding-bottom: 5px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+#items .title-recommend {
+  margin-left: 150px;
+}
+
+@media screen and (max-width: 900px) {
+  #items .title-recommend {
+    margin-left: 0;
+  }
+}
+
+#items .title-mylist {
+  margin-left: 75px;
+}
+
+@media screen and (max-width: 900px) {
+  #items .title-mylist {
+    margin-left: 0;
+  }
+}
+
+#items .mylist-tab {
+  display: none;
+}
+
+#items .recommend-tab,
+#items .mylist-tab {
+  margin: 0 auto 50px;
+  width: calc(100% - 70px);
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: calc((100% - 290px * 4) / 3);
+  row-gap: 76px;
+}
+
+@media screen and (max-width: 1280px) {
+  #items .recommend-tab,
+  #items .mylist-tab {
+    column-gap: calc((100% - 290px * 3) / 2)
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  #items .recommend-tab,
+  #items .mylist-tab {
+    width: calc(100% - 250px);
+    column-gap: calc((100% - 290px * 2))
+  }
+}
+
+@media screen and (max-width: 900px) {
+  #items .recommend-tab,
+  #items .mylist-tab {
+    justify-content: center;
+  }
+}
+
+/* item.blade.php */
+#item {
+  margin: 90px auto;
+  width: 90%;
+  display: flex;
+}
+
+#item .item-img {
+  padding: 36px 45px;
+  width: 50%;
+}
+
+/* imgタグを有効にしたのち有効 */
+/* #item .item-img img {
+  padding: 36px 45px 0;
+  width: 100%;
+} */
+
+/* imgタグを有効にしたのち削除 */
+#item .item-img .img {
+  padding-top: 100%;
+  width: 100%;
+  background-color: var(--color-bg-img);
+}
+
+#item .item-detail {
+  width: 50%;
+}
+
+#item .item-detail-title-name {
+  font-size: 45px;
+  font-weight: 700;
+}
+
+#item .item-detail-brand {
+  margin-bottom: 28px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+#item .item-detail-price {
+  margin-bottom: 28px;
+  font-size: 30px;
+  line-height: 1;
+}
+
+#item .item-detail-icons {
+  margin-left: 45px;
+  display: flex;
+  gap: 64px;
+}
+
+#item .item-detail-icons-icon {
+  margin-bottom: 45px;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  background-size: cover;
+}
+
+#item .item-detail-icons-icon span {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#item .item-detail-icons-like {
+  background-image: url(../img/icon_like.jpg);
+}
+
+#item .item-detail-icons-comment {
+  background-image: url(../img/icon_comment.jpg);
+}
+
+#item .item-detail-btn {
+  margin-bottom: 36px;
+}
+
+#item .item-detail-title-about {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+}

@@ -1,0 +1,44 @@
+@startuml achievement_test
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "users" as users {
+  id
+  --
+  name
+  email
+  password
+  created_at
+  updated_at
+}
+
+entity "categories" as categories {
+  id
+  --
+  content
+  created_at
+  updated_at
+}
+
+entity "contacts" as contacts {
+  id
+  --
+  category_id<<FK>>
+  first_name
+  last_name
+  gender
+  email
+  tel
+  address
+  building
+  detail
+  created_at
+  updated_at
+}
+
+categories ||--o{ contacts
+
+@enduml
