@@ -26,6 +26,15 @@ Route::get('/header/logout', function () {
 
 // item（商品詳細）
 Route::get('/item', function () {
-  return view('item', ['headerType' => 'logOut']);
+  return view('item', ['headerType' => 'logIn']);
 });
 
+// register（会員登録）
+Route::get('/register', function () {
+  return view('auth.register', ['headerType' => '']);
+});
+
+// profile（プロフィール入力）
+Route::get('/profile', function () {
+  return view('auth.profile', ['headerType' => 'logIn']);
+});

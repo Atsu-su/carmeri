@@ -1,12 +1,12 @@
 @extends('layouts.base')
-@section('title', '')
+@section('title', 'Carmeri')
 @section('header')
-@if (isset($headerType) && $headerType === 'logIn')
+  @if (isset($headerType) && $headerType === 'logIn')
     {{-- ログインのボタンのヘッダー --}}
-    @include('components.header_log_in')
+    @include('components.header', ['type' => 'ログイン'])
   @elseif (isset($headerType) && $headerType === 'logOut')
     {{-- ログアウトのボタンのヘッダー --}}
-    @include('components.header_log_out')
+    @include('components.header', ['type' => 'ログアウト'])
   @else
     {{-- ロゴのみのヘッダー --}}
     @include('components.header_only_logo')
