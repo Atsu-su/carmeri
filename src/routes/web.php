@@ -38,3 +38,18 @@ Route::get('/register', function () {
 Route::get('/profile', function () {
   return view('auth.profile', ['headerType' => 'logIn']);
 });
+
+// login（ログイン画面）
+Route::get('/login', function () {
+  return view('auth.login', ['headerType' => '']);
+});
+
+// address（住所変更画面）
+Route::get('/address', function () {
+  return view('address', ['headerType' => 'logOut']);
+});
+
+// profile_view（プロフィール表示画面）
+Route::get('/profile_view', function () {
+  return view('profile_view', ['headerType' => 'logOut']);
+});

@@ -186,9 +186,9 @@ iframe {
 :root {
   --color-bg-btn-white: #fff;
   --color-bg-btn-red: #FF5555;
-  --color-bg-category-gray: #D9D9D9; 
-  --color-bg-category-red: #FF5555; 
-  --color-bg-comment: #D9D9D9; 
+  --color-bg-category-gray: #D9D9D9;
+  --color-bg-category-red: #FF5555;
+  --color-bg-comment: #D9D9D9;
   --color-bg-header: #000;
   --color-bg-img: #D9D9D9;
   --color-bg-input: #fff;
@@ -259,12 +259,15 @@ html {
 /*
 /* =========================== */
 
-/* ボタン */
+/* ---------------------- */
+/* 通常のボタン
+/* ---------------------- */
 .c-btn {
   padding-bottom: 5px;
   display: grid;
   place-items: center;
   border-radius: 4px;
+  cursor: pointer;
 }
 
 .c-btn:hover {
@@ -304,7 +307,48 @@ html {
   display: block;
 }
 
-/* 商品紹介（写真＋商品名） */
+/* ---------------------- */
+/* プロフィール画像選択用のボタン
+/* ---------------------- */
+.c-btn-img-select {
+  padding-bottom: 5px;
+  display: grid;
+  place-items: center;
+  color: var(--color-font-red);
+  border: 2px solid var(--color-border-red);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.c-btn-img-select:hover {
+  opacity: 0.8;
+}
+
+.c-btn-img-reset {
+  padding-bottom: 5px;
+  display: grid;
+  place-items: center;
+  color: var(--color-font-gray);
+  cursor: pointer;
+}
+
+.c-btn-img-reset:hover {
+  opacity: 0.8;
+}
+
+.c-btn-img-select--profile {
+  width: 180px;
+  height: 50px;
+  font-size: 20px;
+}
+
+.c-btn-img-reset--profile {
+  font-size: 20px;
+}
+
+/* ---------------------- */
+/* 商品紹介（写真＋商品名）
+/* ---------------------- */
 .c-item {
   width: 290px;
 }
@@ -329,7 +373,9 @@ html {
   line-height: 1;
 }
 
-/* カテゴリのラベル */
+/* ---------------------- */
+/* カテゴリのラベル
+/* ---------------------- */
 .c-label-category {
   padding: 4px 5%;
   display: inline-block;
@@ -342,11 +388,57 @@ html {
   background-color: var(--color-bg-category-gray)
 }
 
+/* あとで作成予定 */
 .c-label-category--red {
 }
 
-.c-label-profile {
+/* ---------------------- */
+/* デフォルトのフォーム
+/* ---------------------- */
+.c-default-form {
+  margin: 96px auto 114px;
+  width: 680px;
+  line-height: 1;
 }
+
+.c-default-form .title {
+  margin-bottom: 54px;
+  font-size: 1.5rem;  /* 36px */
+  font-weight: 700;
+  text-align: center;
+}
+
+.c-default-form .form-title {
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.c-default-form .form-input {
+  padding-left: 20px;
+  width: 100%;
+  height: 59px;
+  font-size: 20px;
+  border: 1px solid var(--color-border-gray)
+}
+
+.c-default-form .form-input:not(:last-of-type) {
+  margin-bottom: 38px;
+}
+
+.c-default-form .form-input:last-of-type {
+  margin-bottom: 67px;
+}
+
+.c-default-form .form-btn {
+  margin-bottom: 35px;
+}
+
+.c-default-form .login-link {
+  display: block;
+  color: var(--color-font-blue);
+  text-align: center;
+}
+
 
 /* =========================== */
 /*
@@ -831,95 +923,52 @@ body {
 /* ----------------------- */
 /* register.blade.php
 /* ユーザ登録ページ（#register）
+/* c-default-formを使用
 /* ----------------------- */
-#register {
-  margin: 96px auto 114px;
-  width: 680px;
-  line-height: 1;
-}
-
-#register .title {
-  margin-bottom: 54px;
-  font-size: 1.5rem;  /* 36px */
-  font-weight: 700;
-  text-align: center;
-}
-
-#register .form-title {
-  margin-bottom: 8px;
-  font-weight: 700;
-}
-
-#register .form-input {
-  padding-left: 20px;
-  width: 100%;
-  height: 59px;
-  font-size: 20px;
-  border: 1px solid var(--color-border-gray)
-}
-
-#register .form-input:not(:last-of-type) {
-  margin-bottom: 38px;
-}
-
-#register .form-input:last-of-type {
-  margin-bottom: 116px;
-}
-
-#register .form-btn {
-  margin-bottom: 35px;
-}
-
-#register .login-link {
-  display: block;
-  color: var(--color-font-blue);
-  text-align: center;
-}
 
 /* ----------------------- */
 /* profile.blade.php
 /* ユーザ登録ページ（#profile）
+/* c-default-formを使用
 /* ----------------------- */
-#profile {
-  margin: 96px auto 114px;
-  width: 680px;
-  line-height: 1;
+#profile .form {
+  position: relative;
 }
 
-#profile .title {
-  margin-bottom: 54px;
-  font-size: 1.5rem;  /* 36px */
-  font-weight: 700;
-  text-align: center;
+#profile .img-upload {
+  margin-bottom: 76px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
 }
 
-#profile .form-title {
-  margin-bottom: 8px;
-  font-weight: 700;
+#profile .img-upload-preview {
+  width: 150px;
+  height: 150px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-border-gray);
+  border-radius: 50%;
+  background-color: var(--color-bg-img);
 }
 
-#profile .form-input {
-  padding-left: 20px;
-  width: 100%;
-  height: 59px;
-  font-size: 20px;
-  border: 1px solid var(--color-border-gray)
+#profile .img-upload-preview img {
+  width: 104px;   /* 半径75pxの円に接する正方形（少し小さめ） */
+  height: 104px;
+  object-fit: contain;
+  display: none;
 }
 
-#profile .form-input:not(:last-of-type) {
-  margin-bottom: 38px;
+#profile .img-upload-file-name {
+  position: absolute;
+  top: 120px;
+  left: 195px;
 }
 
-#profile .form-input:last-of-type {
-  margin-bottom: 116px;
+#profile .img-upload-input {
+  display: none;
 }
 
-#profile .form-btn {
-  margin-bottom: 35px;
-}
-
-#profile .login-link {
-  display: block;
-  color: var(--color-font-blue);
-  text-align: center;
+#profile .img-upload-reset {
+  display: none;
 }
