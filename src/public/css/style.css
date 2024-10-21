@@ -296,7 +296,15 @@ html {
 }
 
 .c-btn--item {
-  height:56px;
+  height: 56px;
+}
+
+.c-btn--profile-edit {
+  width: 310px;
+  height: 60px;
+  color: var(--color-font-red);
+  border: 2px solid var(--color-border-red);
+  border-radius: 10px;
 }
 
 .c-btn a:hover {
@@ -439,6 +447,88 @@ html {
   text-align: center;
 }
 
+/* ---------------------- */
+/* 商品一覧
+/* ---------------------- */
+/* .c-items {
+  margin-top: 50px;
+} */
+
+.c-items .titles {
+  margin-bottom: 76px;
+  width: 100%;
+  border-bottom: 2px solid var(--color-border-gray);
+}
+
+@media screen and (max-width: 900px) {
+  .c-items .titles {
+    display: flex;
+    justify-content: center;
+    gap: 75px;
+  }
+}
+
+.c-items .title {
+  padding-bottom: 5px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.c-items .title-recommend {
+  margin-left: 150px;
+}
+
+@media screen and (max-width: 900px) {
+  .c-items .title-recommend {
+    margin-left: 0;
+  }
+}
+
+.c-items .title-mylist {
+  margin-left: 75px;
+}
+
+@media screen and (max-width: 900px) {
+  .c-items .title-mylist {
+    margin-left: 0;
+  }
+}
+
+.c-items .second-tab {
+  display: none;
+}
+
+.c-items .first-tab,
+.c-items .second-tab {
+  margin: 0 auto 50px;
+  width: calc(100% - 70px);
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: calc((100% - 290px * 4) / 3);
+  row-gap: 76px;
+}
+
+@media screen and (max-width: 1280px) {
+  .c-items .first-tab,
+  .c-items .second-tab {
+    column-gap: calc((100% - 290px * 3) / 2)
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .c-items .first-tab,
+  .c-items .second-tab {
+    width: calc(100% - 250px);
+    column-gap: calc((100% - 290px * 2))
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .c-items .first-tab,
+  .c-items .second-tab {
+    justify-content: center;
+  }
+}
 
 /* =========================== */
 /*
@@ -614,85 +704,10 @@ body {
 /* ----------------------- */
 /* index.blade.php
 /* 商品一覧ページ（#items）
+/* c-itemsを使用
 /* ----------------------- */
-#items {
+#index {
   margin-top: 50px;
-}
-
-#items .titles {
-  margin-bottom: 76px;
-  width: 100%;
-  border-bottom: 2px solid var(--color-border-gray);
-}
-
-@media screen and (max-width: 900px) {
-  #items .titles {
-    display: flex;
-    justify-content: center;
-    gap: 75px;
-  }
-}
-
-#items .title {
-  padding-bottom: 5px;
-  display: inline-block;
-  cursor: pointer;
-}
-
-#items .title-recommend {
-  margin-left: 150px;
-}
-
-@media screen and (max-width: 900px) {
-  #items .title-recommend {
-    margin-left: 0;
-  }
-}
-
-#items .title-mylist {
-  margin-left: 75px;
-}
-
-@media screen and (max-width: 900px) {
-  #items .title-mylist {
-    margin-left: 0;
-  }
-}
-
-#items .mylist-tab {
-  display: none;
-}
-
-#items .recommend-tab,
-#items .mylist-tab {
-  margin: 0 auto 50px;
-  width: calc(100% - 70px);
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: calc((100% - 290px * 4) / 3);
-  row-gap: 76px;
-}
-
-@media screen and (max-width: 1280px) {
-  #items .recommend-tab,
-  #items .mylist-tab {
-    column-gap: calc((100% - 290px * 3) / 2)
-  }
-}
-
-@media screen and (max-width: 1000px) {
-  #items .recommend-tab,
-  #items .mylist-tab {
-    width: calc(100% - 250px);
-    column-gap: calc((100% - 290px * 2))
-  }
-}
-
-@media screen and (max-width: 900px) {
-  #items .recommend-tab,
-  #items .mylist-tab {
-    justify-content: center;
-  }
 }
 
 /* ----------------------- */
@@ -927,7 +942,7 @@ body {
 /* ----------------------- */
 
 /* ----------------------- */
-/* profile.blade.php
+/* profile_input.blade.php
 /* ユーザ登録ページ（#profile）
 /* c-default-formを使用
 /* ----------------------- */
@@ -971,4 +986,83 @@ body {
 
 #profile .img-upload-reset {
   display: none;
+}
+
+/* ----------------------- */
+/* profile_view.blade.php
+/* プロフィール閲覧画面（#profile_view）
+/* c-itemsを使用
+/* ----------------------- */
+#profile_view {
+  margin-top: 50px;
+}
+
+#profile_view .user {
+  margin: 78px auto 78px 20%;
+  width: 67%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media screen and (max-width: 1100px) {
+  #profile_view .user {
+    margin: 78px auto 78px;
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 870px) {
+  #profile_view .user {
+    width: 90%;
+  }
+}
+
+#profile_view .user-info {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+}
+
+@media screen and (max-width: 1100px) {
+  #profile_view .user-info {
+    gap: 50px;
+  }
+}
+
+@media screen and (max-width: 870px) {
+  #profile_view .user-info {
+    gap: 30px;
+  }
+}
+
+#profile_view .user-info-icon {
+  width: 150px;
+  height: 150px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-border-gray);
+  border-radius: 50%;
+  background-color: transparent;
+}
+
+#profile_view .user-info-icon img {
+  width: 104px;   /* 半径75pxの円に接する正方形（少し小さめ） */
+  height: 104px;
+  object-fit: contain;
+}
+
+#profile_view .user-info-name {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ----------------------- */
+/* home.blade.php
+/* ログイン後画面（#home）
+/* c-itemsを使用
+/* ----------------------- */
+#home {
+  margin-top: 50px;
 }

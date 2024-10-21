@@ -36,12 +36,17 @@ Route::get('/register', function () {
 
 // profile（プロフィール入力）
 Route::get('/profile', function () {
-  return view('auth.profile', ['headerType' => 'logIn']);
+  return view('auth.profile_input', ['headerType' => 'logIn']);
 });
 
 // login（ログイン画面）
 Route::get('/login', function () {
   return view('auth.login', ['headerType' => '']);
+});
+
+// ログイン後の画面
+Route::get('/home', function () {
+  return view('home', ['headerType' => 'LogOut']);
 });
 
 // address（住所変更画面）
@@ -52,4 +57,9 @@ Route::get('/address', function () {
 // profile_view（プロフィール表示画面）
 Route::get('/profile_view', function () {
   return view('profile_view', ['headerType' => 'logOut']);
+});
+
+// item_input（商品入力画面）
+Route::get('/item_input', function () {
+  return view('item_input', ['headerType' => 'logOut']);
 });

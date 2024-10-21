@@ -1,5 +1,5 @@
 @extends('layouts.base')
-@section('title', 'Carmeri')
+@section('title', 'HOME')
 @section('header')
   @if (isset($headerType) && $headerType === 'logIn')
     {{-- ログインのボタンのヘッダー --}}
@@ -13,7 +13,7 @@
   @endif
 @endsection
 @section('content')
-  <div class="c-items" id="index">
+  <div class="c-items" id="home">
     <div class="titles">
       <h2 class="title title-recommend js-active-title" data-tab="first-tab">おすすめ</h2>
       <h2 class="title title-mylist" data-tab="second-tab">マイリスト</h2>

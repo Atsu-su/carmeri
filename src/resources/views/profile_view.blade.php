@@ -1,5 +1,5 @@
 @extends('layouts.base')
-@section('title', 'Carmeri')
+@section('title', 'プロフィール')
 @section('header')
   @if (isset($headerType) && $headerType === 'logIn')
     {{-- ログインのボタンのヘッダー --}}
@@ -13,62 +13,74 @@
   @endif
 @endsection
 @section('content')
-  <div id="items">
-    <div class="titles">
-      {{-- first-tab, second-tabとする（index.blade.phpも修正、CSSも修正） --}}
-      <h2 class="title title-recommend js-active-title" data-tab="my-offer-tab">出品した商品</h2>
-      <h2 class="title title-mylist" data-tab="purchased-items-tab">購入した商品</h2>
+  <div id="profile_view">
+    <div class="user">
+      <div class="user-info">
+        <div class="user-info-icon">
+          <img src="" width="100" height="100">
+        </div>
+        <p class="user-info-name">ユーザ名</p>
+      </div>
+      <a class="c-btn c-btn--profile-edit" href="">プロフィールを編集</a>
     </div>
-    <div class="tab my-offer-tab">
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
+    <div class="c-items">
+      <div class="titles">
+        <h2 class="title title-recommend js-active-title" data-tab="first-tab">出品した商品</h2>
+        <h2 class="title title-mylist" data-tab="second-tab">購入した商品</h2>
       </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
+      <div class="tab first-tab">
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像</div>
+          <p>商品名</p>
+        </div>
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像</div>
+          <p>商品名</p>
+        </div>
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像</div>
+          <p>商品名</p>
+        </div>
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像</div>
+          <p>商品名</p>
+        </div>
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像</div>
+          <p>商品名</p>
+        </div>
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像</div>
+          <p>商品名</p>
+        </div>
       </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-    </div>
-    <div class="tab purchased-items-tab js-hidden">
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像2</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像2</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像2</div>
-        <p>商品名</p>
+      <div class="tab second-tab js-hidden">
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像2</div>
+          <p>商品名</p>
+        </div>
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像2</div>
+          <p>商品名</p>
+        </div>
+        <div class="c-item">
+          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
+          <div class="temp-img">商品画像2</div>
+          <p>商品名</p>
+        </div>
       </div>
     </div>
   </div>
+
+  {{-- タブ切り替え --}}
   <script>
     const titles = document.querySelectorAll('.title');
     const tabs = document.querySelectorAll('.tab');

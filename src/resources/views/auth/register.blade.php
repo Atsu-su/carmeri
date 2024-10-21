@@ -1,5 +1,5 @@
 @extends('layouts.base')
-@section('title', '')
+@section('title', 'ユーザ登録')
 @section('header')
   @if (isset($headerType) && $headerType === 'logIn')
     {{-- ログインのボタンのヘッダー --}}

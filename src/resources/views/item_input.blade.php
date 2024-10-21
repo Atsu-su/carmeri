@@ -13,7 +13,7 @@
   @endif
 @endsection
 @section('content')
-  <div id="profile" class="c-default-form">
+  <div id="profile">
     {{--
     @ifで分岐する（初回と編集）
     $referer =  $request->headers->get('referer');で取得して、
@@ -24,7 +24,6 @@
     {{-- ここまで --}}
     <form class="form" action="" method="post" enctype="multipart/form-data">
       @csrf
-      {{-- c-default影響範囲外 ここから --}}
       <div class="img-upload">
         <div id="background" class="img-upload-preview">
           <img id="preview" src="" width="100" height="100">
@@ -35,17 +34,18 @@
         <input class="img-upload-input" id="img-input" type="file" name="image" accept="image/*" style="display: none"/>
         <button class="img-upload-reset c-btn-img-reset c-btn-img-reset--profile" id="reset-btn" type="button">画像を削除</button>
       </div>
-      {{-- ここまで c-default影響範囲外 --}}
       <span class="img-upload-file-name" id="file-name"></span>
-      <h2 class="form-title">ユーザー名</h2>
-      <input class="form-input" type="text">
-      <h2 class="form-title">郵便番号</h2>
-      <input class="form-input" type="text">
-      <h2 class="form-title">住所</h2>
-      <input class="form-input" type="text">
-      <h2 class="form-title">建物名</h2>
-      <input class="form-input" type="text">
-      <button class="form-btn c-btn c-btn--red" type="submit">登録する</button>
+      <div class="c-default-form">
+        <h2 class="form-title">ユーザー名</h2>
+        <input class="form-input" type="text">
+        <h2 class="form-title">郵便番号</h2>
+        <input class="form-input" type="text">
+        <h2 class="form-title">住所</h2>
+        <input class="form-input" type="text">
+        <h2 class="form-title">建物名</h2>
+        <input class="form-input" type="text">
+        <button class="form-btn c-btn c-btn--red" type="submit">登録する</button>
+      </div>
     </form>
   </div>
   {{-- 画像プレビュー --}}
