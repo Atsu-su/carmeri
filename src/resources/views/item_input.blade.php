@@ -13,39 +13,35 @@
   @endif
 @endsection
 @section('content')
-  <div id="profile">
-    {{--
-    @ifで分岐する（初回と編集）
-    $referer =  $request->headers->get('referer');で取得して、
-    遷移元のページによって分岐させる
-    --}}
-    <h1 class="title">プロフィール設定</h1>
-    <h1 class="title" style="display: none">プロフィール編集</h1>
-    {{-- ここまで --}}
+  <div id="item-input">
+    <h1 class="title">商品の出品</h1>
     <form class="form" action="" method="post" enctype="multipart/form-data">
       @csrf
       <div class="img-upload">
-        <div id="background" class="img-upload-preview">
-          <img id="preview" src="" width="100" height="100">
+        <h2 class="img-upload-title">商品の画像</h2>
+        <div class="img-upload-container">
+          <div id="background" class="img-upload-preview">
+            <img id="preview" src="" width="100" height="100">
+          </div>
+          <label class="img-upload-img-select c-btn-img-select c-btn-img-select--profile" for="img-input">
+            画像を選択する
+          </label>
+          <input class="img-upload-input" id="img-input" type="file" name="image" accept="image/*" style="display: none"/>
+          <button class="img-upload-reset c-btn-img-reset c-btn-img-reset--profile" id="reset-btn" type="button">画像を削除</button>
         </div>
-        <label class="c-btn-img-select c-btn-img-select--profile" for="img-input">
-          画像を選択する
-        </label>
-        <input class="img-upload-input" id="img-input" type="file" name="image" accept="image/*" style="display: none"/>
-        <button class="img-upload-reset c-btn-img-reset c-btn-img-reset--profile" id="reset-btn" type="button">画像を削除</button>
+        <span class="img-upload-file-name" id="file-name"></span>
       </div>
-      <span class="img-upload-file-name" id="file-name"></span>
-      <div class="c-default-form">
-        <h2 class="form-title">ユーザー名</h2>
-        <input class="form-input" type="text">
-        <h2 class="form-title">郵便番号</h2>
-        <input class="form-input" type="text">
-        <h2 class="form-title">住所</h2>
-        <input class="form-input" type="text">
-        <h2 class="form-title">建物名</h2>
-        <input class="form-input" type="text">
-        <button class="form-btn c-btn c-btn--red" type="submit">登録する</button>
-      </div>
+      <h2 class="form-title">商品の詳細</h2>
+      <h3 class="form-name">カテゴリ</h3>
+      <h3 class="form-name">商品の状態</h3>
+      <h2 class="form-title">商品名と説明</h2>
+      <h3 class="form-name">商品名</h3>
+      <input class="form-input" type="text">
+      <h3 class="form-name">商品の説明</h3>
+      <textarea name="" id=""></textarea>
+      <h3 class="form-name">販売価格</h3>
+      <input class="form-input" type="text">
+      <button class="form-btn c-btn c-btn--red" type="submit">登録する</button>
     </form>
   </div>
   {{-- 画像プレビュー --}}

@@ -404,7 +404,7 @@ html {
 /* デフォルトのフォーム
 /* ---------------------- */
 .c-default-form {
-  margin: 96px auto 114px;
+  margin: 50px auto 114px;
   width: 680px;
   line-height: 1;
 }
@@ -450,10 +450,6 @@ html {
 /* ---------------------- */
 /* 商品一覧
 /* ---------------------- */
-/* .c-items {
-  margin-top: 50px;
-} */
-
 .c-items .titles {
   margin-bottom: 76px;
   width: 100%;
@@ -1065,4 +1061,106 @@ body {
 /* ----------------------- */
 #home {
   margin-top: 50px;
+}
+
+/* ----------------------- */
+/* item_input.blade.php
+/* 商品出品画面（#item-input）
+/* c-default-formを使用
+/* ----------------------- */
+#item-input {
+  margin: 50px auto 114px;
+  width: 680px;
+  line-height: 1;
+}
+
+#item-input .title {
+  margin-bottom: 54px;
+  font-size: 1.5rem;  /* 36px */
+  font-weight: 700;
+  text-align: center;
+}
+
+#item-input .img-upload {
+  margin-bottom: 76px;
+}
+
+#item-input .img-upload-title {
+  margin-bottom: 5px;
+}
+
+#item-input .img-upload-container {
+  width: 100%;
+  height: 150px;
+  position: relative;
+  border: 1px dotted var(--color-border-gray);
+  border-radius: 4px;
+}
+
+#item-input .img-upload-preview {
+}
+
+#item-input .img-upload-preview img {
+  display: none;
+}
+
+#item-input .img-upload-img-select {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#item-input .img-upload-file-name {
+  position: absolute;
+  top: 120px;
+  left: 195px;
+}
+
+#item-input .img-upload-input {
+  display: none;
+}
+
+#item-input .img-upload-reset {
+  display: none;
+}
+
+#item-input .form-title {
+  padding-bottom: 12px;
+  margin-bottom: 36px;
+  color: var(--color-font-gray);
+  font-size: 30px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--color-border-gray);
+}
+
+#item-input .form-name {
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+#item-input .form-input {
+  padding-left: 20px;
+  width: 100%;
+  height: 45px;
+  font-size: 20px;
+  border: 1px solid var(--color-border-gray)
+}
+
+#item-input .form-input:not(:last-of-type) {
+  margin-bottom: 38px;
+}
+
+#item-input .form-input:last-of-type {
+  margin-bottom: 67px;
+}
+
+#item-input .form-btn {
+  margin-bottom: 35px;
+}
+
+#item-input .login-link {
+  display: block;
+  color: var(--color-font-blue);
+  text-align: center;
 }

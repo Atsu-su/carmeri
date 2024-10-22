@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 // index（商品一覧）
 Route::get('/', function () {
-    return view('index', ['headerType' => 'onlyLogo']);
+    return view('index', ['headerType' => 'logOut']);
 });
 Route::get('/header/login', function () {
   return view('index', ['headerType' => 'logIn']);
