@@ -1090,31 +1090,28 @@ body {
 }
 
 #item-input .img-upload-container {
+  margin-bottom: 10px;
+  padding: 20px 0;
   width: 100%;
-  height: 150px;
-  position: relative;
+  min-height: 150px;
+  display: grid;
+  place-items: center;
   border: 1px dotted var(--color-border-gray);
   border-radius: 4px;
 }
 
-#item-input .img-upload-preview {
-}
-
-#item-input .img-upload-preview img {
+#item-input .img-upload-background {
   display: none;
 }
 
-#item-input .img-upload-img-select {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+#item-input .img-upload-background img {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
 }
 
 #item-input .img-upload-file-name {
-  position: absolute;
-  top: 120px;
-  left: 195px;
+  text-align: center;
 }
 
 #item-input .img-upload-input {
@@ -1122,14 +1119,16 @@ body {
 }
 
 #item-input .img-upload-reset {
+  margin: 5px auto 0;
   display: none;
+  text-align: center;
 }
 
 #item-input .form-title {
   padding-bottom: 12px;
   margin-bottom: 36px;
   color: var(--color-font-gray);
-  font-size: 30px;
+  font-size: 1.25rem;
   font-weight: 700;
   border-bottom: 1px solid var(--color-border-gray);
 }
@@ -1143,7 +1142,7 @@ body {
   padding-left: 20px;
   width: 100%;
   height: 45px;
-  font-size: 20px;
+  font-size: 1rem;
   border: 1px solid var(--color-border-gray)
 }
 
@@ -1163,4 +1162,147 @@ body {
   display: block;
   color: var(--color-font-blue);
   text-align: center;
+}
+
+#item-input .form-name-category {
+  margin-bottom: 31px;
+}
+
+#item-input .form-category {
+  margin-bottom: 65px;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 36px;
+  column-gap: 10px;
+}
+
+#item-input .form-category input {
+  display: none;
+}
+
+#item-input .form-category label {
+  padding: 5px 20px 8px;
+  color: var(--color-font-red);
+  font-size: 15px;
+  line-height: 1;
+  border: 2px solid var(--color-border-red);
+  border-radius: 200px;
+  cursor: pointer;
+}
+
+#item-input .form-category input:checked + label {
+  color: var(--color-font-white);
+  background-color: var(--color-bg-category-red);
+}
+
+#item-input .form-name-condition {
+  margin-bottom: 19px;
+}
+
+#item-input .form-condition-wrapper {
+  position: relative;
+}
+
+#item-input .form-condition-wrapper::after {
+  content: "";
+  width: 16px;
+  height: 14px;
+  display: block;
+  position: absolute;
+  top: 14px;
+  right: 24px;
+  border-top: 16px solid var(--color-border-gray);
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+}
+
+#item-input .form-condition {
+  margin-bottom: 60px;
+  padding-left: 28px;
+  width: 100%;
+  height: 45px;
+  border: 1px solid var(--color-border-gray);
+  border-radius: 4px;
+}
+
+#item-input .form-condition option {
+  font-size: 14px;
+}
+
+#item-input .form-textarea {
+  margin-bottom: 38px;
+  padding: 10px;
+  width: 100%;
+  height: 125px;
+  font-size: 1rem;
+  border: 1px solid var(--color-border-gray);
+  border-radius: 4px;
+}
+
+#item-input .form-price-wrapper {
+  position: relative;
+}
+
+#item-input .form-price-wrapper::before {
+  content: "¥";
+  position: absolute;
+  top: 20px;
+  left: 10px;
+  transform: translateY(-50%);
+  font-weight: 700;
+  z-index: 10
+}
+
+#item-input .form-input-price {
+  padding-left: 50px;
+}
+
+/* ----------------------- */
+/* purchase.blade.php
+/* 商品購入画面（#purchase）
+/* ----------------------- */
+#purchase {
+  margin: 93px auto 174px;
+  width: 89.41%;
+  display: flex;
+  justify-content: space-between;
+}
+
+#purchase .info {
+  margin-bottom: 52px;
+  width: 53%;
+}
+
+#purchase .info-item {
+  padding-bottom: 52px;
+  margin-bottom: 32px;
+  display: flex;
+  gap: 55px;
+  border-bottom: 1px solid var(--color-border-gray);
+}
+
+#purchase .info-item-img {
+  width: 177px;
+  height: 177px;
+  background-color: var(--color-bg-img);
+}
+
+#purchase .info-item-value-name {
+  font-size: 1.25rem;  /* 30px */
+  font-weight: 700;
+}
+
+#purchase .info-item-value-price {
+  font-size: 1.25rem;  /* 30px */
+}
+
+#purchase .info-payment-title {
+  margin-left: 35px;
+  margin-bottom: 32px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+#purchase .summary {
+  width: 29%;
 }

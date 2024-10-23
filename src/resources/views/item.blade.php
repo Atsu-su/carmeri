@@ -76,7 +76,7 @@
       <div class="item-detail-comment-form">
         <form action="" method="post">
           <textarea name="comment" id="comment" cols="30" rows="10"></textarea>
-          <button class="c-btn c-btn--item" type="submit">コメントを送信する</button>
+          <button class="c-btn c-btn--item c-btn--red" type="submit">コメントを送信する</button>
         </form>
       </div>
     </div>

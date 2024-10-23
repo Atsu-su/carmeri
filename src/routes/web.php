@@ -63,3 +63,8 @@ Route::get('/profile_view', function () {
 Route::get('/item_input', function () {
   return view('item_input', ['headerType' => 'logOut']);
 });
+
+// item_input（購入画面）
+Route::get('/purchase', function () {
+  return view('purchase', ['headerType' => 'logOut']);
+});
