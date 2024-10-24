@@ -659,38 +659,6 @@ body {
   }
 }
 
-/* error
-   → エラーはc-へ移動
-*/
-.error-box {
-  padding: 14px;
-  border: 1px solid var(--color-border-light-red);
-  border-radius: 5px;
-}
-
-.error-box li {
-  padding-left: 32px;
-  position: relative;
-  font-weight: bold;
-}
-
-.error-box li:before {
-  content: "";
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  background-image: var(--img-exclaimation);
-  background-size: contain;
-}
-
-.error-box li + li {
-  margin-top: 5px;
-}
-
 /* =========================== */
 /*
 /* 個別ページ
@@ -1268,9 +1236,21 @@ body {
   justify-content: space-between;
 }
 
+@media screen and (max-width: 1300px) {
+  #purchase {
+    width: 680px;
+    flex-direction: column;
+  }
+}
 #purchase .info {
-  margin-bottom: 52px;
   width: 53%;
+}
+
+@media screen and (max-width: 1300px) {
+  #purchase .info {
+    margin-bottom: 66px;
+    width: 100%;
+  }
 }
 
 #purchase .info-item {
@@ -1296,13 +1276,77 @@ body {
   font-size: 1.25rem;  /* 30px */
 }
 
+#purchase .info-payment {
+  margin-bottom: 52px;
+  border-bottom: 1px solid var(--color-border-gray);
+}
+
 #purchase .info-payment-title {
   margin-left: 35px;
-  margin-bottom: 32px;
-  font-size: 20px;
+  margin-bottom: 30px;
+  font-size: calc(20 / 24 * 1rem);
   font-weight: 700;
+}
+
+#purchase .info-payment-type {
+  margin-left: 96px;
+  margin-bottom: 63px;
+  padding: 0 0 5px 10px;
+  width: 265px;
+  height: 30px;
+  border: 1px solid var(--color-border-gray);
+  border-radius: 4px;
+}
+
+#purchase .info-delivery-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+#purchase .info-delivery-header-title {
+  margin-left: 35px;
+  margin-bottom: 30px;
+  font-size: calc(20 / 24 * 1rem);
+  font-weight: 700;
+}
+
+#purchase .info-delivery-header-link {
+  color: var(--color-font-blue);
+  font-size: calc(20 / 24 * 1rem);
+}
+
+#purchase .info-delivery-main {
+  margin-left: 35px;
 }
 
 #purchase .summary {
   width: 29%;
+}
+
+@media screen and (max-width: 1300px) {
+  #purchase .summary {
+    width: 100%;
+  }
+}
+
+#purchase .summary table {
+  margin-bottom: 66px;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--color-border-black);
+}
+
+#purchase .summary table th, 
+#purchase .summary table td {
+  padding: 48px 0;
+  width: 50%;
+  text-align: center;
+}
+
+#purchase .summary table tr:first-child {
+  border-bottom: 1px solid var(--color-border-black);
+}
+
+#purchase .summary table th {
+  font-size: 20px;
 }

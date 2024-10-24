@@ -35,19 +35,21 @@
         <h2 class="info-delivery-header-title">配送先</h2>
         <a class="info-delivery-header-link" href="">変更する</a>
       </div>
-      <p class="info-delivery-postal-code">〒XXX-XXXX</p>
-      <p class="info-delivery-address">ここに住所が入ります</p>
+      <div class="info-delivery-main">
+        <p class="info-delivery-postal-code">〒XXX-XXXX</p>
+        <p class="info-delivery-address">ここに住所が入ります</p>
+      </div>
     </div>
   </div>
   <div class="summary">
     <table>
-      <tr>
+      <tr class="summary-price">
         <th>商品代金</th>
         <td>¥ 47,000</td>
       </tr>
-      <tr>
+      <tr class="summary-payment-type">
         <th>支払方法</th>
-        <td>コンビニ支払い</td>
+        <td>コンビニ払い</td>
       </tr>
     </table>
     <button class="c-btn c-btn--item c-btn--red" type="submit">購入する</button>
