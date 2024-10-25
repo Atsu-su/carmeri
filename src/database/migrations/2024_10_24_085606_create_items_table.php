@@ -16,12 +16,12 @@ class CreateItemsTable extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('seller_id');
+            $table->boolean('on_sale')->default(true)->comment('1: on sale, 0: sold out');
             $table->string('name');
             $table->unsignedBigInteger('price');
-            $table->string('description');
             $table->string('brand');
             $table->unsignedBigInteger('condition_id');
-            $table->boolean('on_sale')->default(true)->comment('1: on sale, 0: sold out');
+            $table->string('description');
             $table->string('image');
             $table->timestamps();
 
