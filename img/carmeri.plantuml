@@ -1,4 +1,4 @@
-@startuml achievement_test
+@startuml carmeri
 ' hide the spot
 hide circle
 
@@ -9,8 +9,12 @@ entity "users" as users {
   id
   --
   name
+  nickname
   email
   password
+  image
+  postal_code
+  address
   created_at
   updated_at
 }
@@ -18,27 +22,82 @@ entity "users" as users {
 entity "categories" as categories {
   id
   --
-  content
+  category
   created_at
   updated_at
 }
 
-entity "contacts" as contacts {
+entity "conditions" as conditions {
+  id
+  --
+  condition
+  created_at
+  updated_at
+}
+
+entity "category_item" as category_item {
   id
   --
   category_id<<FK>>
-  first_name
-  last_name
-  gender
-  email
-  tel
-  address
-  building
-  detail
+  item_id<<FK>>
   created_at
   updated_at
 }
 
-categories ||--o{ contacts
+entity "items" as items {
+  id
+  --
+  seller_id<<FK>>
+  category_id<<FK>>
+  name
+  price
+  is_sold
+  image
+  brand
+  condition
+  description
+  created_at
+  updated_at
+}
+
+entity "purchases" as purchases {
+  id
+  --
+  buyer_id<<FK>>
+  item_id<<FK>>
+  created_at
+  updated_at
+}
+
+entity "likes" as likes {
+  id
+  --
+  user_id<<FK>>
+  item_id<<FK>>
+  created_at
+  updated_at
+}
+
+entity "reviews" as reviews {
+  id
+  --
+  user_id<<FK>>
+  item_id<<FK>>
+  comment
+  created_at
+  updated_at
+}
+
+categories ||--{ category_item
+conditions ||--o{ items
+items ||--{ category_item
+items ||--o{ likes
+items ||--|| purchases
+items ||--o{ reviews
+items }o--|| users
+users ||--o{ purchases
+users ||--o{ likes
+users ||--o{ reviews
+
 
 @enduml
