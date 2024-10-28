@@ -13,6 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        // 実行順序を制御できます
+        $this->call([
+          CategorySeeder::class,
+          ConditionSeeder::class,
+          UserSeeder::class,
+          ItemSeeder::class,
+          CategoryItemSeeder::class,
+          PurchaseSeeder::class,
+          ReviewSeeder::class,
+          LikeSeeder::class,
+      ]);
     }
 }
