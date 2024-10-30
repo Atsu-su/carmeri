@@ -22,6 +22,7 @@ class PurchaseSeeder extends Seeder
             Purchase::create([
                 'item_id' => $i + 10,
                 'buyer_id' => $faker->numberBetween(1, 10),
+                'payment_method_id' => $faker->numberBetween(1, 2),
         ]);}
     }
 }

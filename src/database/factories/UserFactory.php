@@ -24,6 +24,7 @@ class UserFactory extends Factory
             'nickname' => $this->faker->userName(),
             'postal_code' => $this->faker->postcode(),
             'address' => $this->faker->address(),
+            'building_name' => $this->faker->secondaryAddress(),
             // 'remember_token' => Str::random(10),
         ];
     }

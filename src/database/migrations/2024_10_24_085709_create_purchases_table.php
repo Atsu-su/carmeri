@@ -17,6 +17,7 @@ class CreatePurchasesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('item_id')->unique();
             $table->unsignedBigInteger('buyer_id');
+            $table->unsignedBigInteger('payment_method_id');
             $table->timestamps();
 
             $table->foreign('buyer_id')->references('id')->on('users');

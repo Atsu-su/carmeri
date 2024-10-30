@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\DB;
 
-class ReviewSeeder extends Seeder
+class CommentSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -19,10 +19,10 @@ class ReviewSeeder extends Seeder
 
       foreach (range(1, 5) as $index) {
           for ($i = 0; $i < 3; ++$i) {
-              DB::table('reviews')->insert([
+              DB::table('comments')->insert([
                   'item_id' => $index,
                   'user_id' => $i + $index,
-                  'review' => $faker->realText(100),
+                  'comment' => $faker->realText(100),
               ]);
           }
       }

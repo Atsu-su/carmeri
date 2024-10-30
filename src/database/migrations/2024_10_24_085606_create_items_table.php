@@ -19,7 +19,7 @@ class CreateItemsTable extends Migration
             $table->boolean('on_sale')->default(true)->comment('1: on sale, 0: sold out');
             $table->string('name');
             $table->unsignedBigInteger('price');
-            $table->string('brand');
+            $table->string('brand')->nullable();
             $table->unsignedBigInteger('condition_id');
             $table->string('description');
             $table->string('image');

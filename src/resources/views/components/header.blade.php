@@ -29,3 +29,6 @@
     }
   });
 </script>
+<script>
+  // エンターを押すとsubmitされる機能を実装
+</script>

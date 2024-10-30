@@ -20,8 +20,9 @@ class DatabaseSeeder extends Seeder
           UserSeeder::class,
           ItemSeeder::class,
           CategoryItemSeeder::class,
+          PaymentMethodSeeder::class,
           PurchaseSeeder::class,
-          ReviewSeeder::class,
+          CommentSeeder::class,
           LikeSeeder::class,
       ]);
     }

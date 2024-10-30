@@ -13,6 +13,11 @@ class ItemFactory extends Factory
      */
     public function definition()
     {
+        /*
+        * category_idはcategory_itemテーブルに登録されて
+        * いるため不要
+        */
+
         return [
             'seller_id' => $this->faker->numberBetween(1, 10),
             'on_sale' => true,
@@ -21,7 +26,8 @@ class ItemFactory extends Factory
             'brand' => $this->faker->word,
             'condition_id' => $this->faker->numberBetween(1, 4),
             'description' => $this->faker->sentence(20),
-            'image' => $this->faker->imageUrl(320, 240, 'fashion', true),
+            'image' => 'image.jpg',
+            // 'image' => $this->faker->imageUrl(320, 240, 'fashion', true),
         ];
     }
 

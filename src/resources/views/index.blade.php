@@ -1,16 +1,7 @@
 @extends('layouts.base')
 @section('title', 'Carmeri')
 @section('header')
-  @if (isset($headerType) && $headerType === 'logIn')
-    {{-- ログインのボタンのヘッダー --}}
-    @include('components.header', ['type' => 'ログイン'])
-  @elseif (isset($headerType) && $headerType === 'logOut')
-    {{-- ログアウトのボタンのヘッダー --}}
-    @include('components.header', ['type' => 'ログアウト'])
-  @else
-    {{-- ロゴのみのヘッダー --}}
-    @include('components.header_only_logo')
-  @endif
+  @include('components.header_switcher', ['headerType' => request()->headerType])
 @endsection
 @section('content')
   <div class="c-items" id="index">
@@ -18,54 +9,37 @@
       <h2 class="title title-recommend js-active-title" data-tab="first-tab">おすすめ</h2>
       <h2 class="title title-mylist" data-tab="second-tab">マイリスト</h2>
     </div>
+
+    {{-- おすすめ --}}
     <div class="tab first-tab">
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像</div>
-        <p>商品名</p>
-      </div>
+      @foreach ($items as $item)
+        <a class="c-item" href="{{ route('item', $item->id) }}">
+          @if ($item->image && Storage::disk('public')->exists('item_images/'.$item->image))
+            <img src="{{ asset('storage/item_images/'.$item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
+          @else
+            <img class="no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+          @endif
+          <p>{{ $item->name }}</p>
+        </a>
+      @endforeach
     </div>
+
+    {{-- マイリスト --}}
     <div class="tab second-tab js-hidden">
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像2</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像2</div>
-        <p>商品名</p>
-      </div>
-      <div class="c-item">
-        {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-        <div class="temp-img">商品画像2</div>
-        <p>商品名</p>
-      </div>
+      @if (auth()->check())
+        @foreach ($likedItems as $like)
+          <a class="c-item" href="{{ route('item', $item->id) }}">
+            @if ($like->item->image && Storage::disk('public')->exists('item_images/'.$like->item->image))
+              <img src="{{ asset('storage/item_images/'.$like->item->image) }}" width="290" height="281" alt="【商品名】の画像">
+            @else
+              <img class="no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+            @endif
+            <p>{{ $like->item->name }}</p>
+          </a>
+        @endforeach
+      @else
+        <p class="second-tab-login"><a href="{{ route('login') }}">ログイン</a>後に表示されます</p>
+      @endif
     </div>
   </div>
   <script>

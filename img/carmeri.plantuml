@@ -60,6 +60,14 @@ entity "items" as items {
   updated_at
 }
 
+entity "payment_methods" as payment_methods {
+  id
+  --
+  payment_method
+  created_at
+  updated_at
+}
+
 entity "purchases" as purchases {
   id
   --
@@ -78,7 +86,7 @@ entity "likes" as likes {
   updated_at
 }
 
-entity "reviews" as reviews {
+entity "comments" as comments {
   id
   --
   user_id<<FK>>
@@ -93,11 +101,11 @@ conditions ||--o{ items
 items ||--{ category_item
 items ||--o{ likes
 items ||--|| purchases
-items ||--o{ reviews
+items ||--o{ comments
 items }o--|| users
 users ||--o{ purchases
 users ||--o{ likes
-users ||--o{ reviews
-
+users ||--o{ comments
+purchases }--|| payment_methods
 
 @enduml

@@ -1,16 +1,7 @@
 @extends('layouts.base')
 @section('title', 'HOME')
 @section('header')
-  @if (isset($headerType) && $headerType === 'logIn')
-    {{-- ログインのボタンのヘッダー --}}
-    @include('components.header', ['type' => 'ログイン'])
-  @elseif (isset($headerType) && $headerType === 'logOut')
-    {{-- ログアウトのボタンのヘッダー --}}
-    @include('components.header', ['type' => 'ログアウト'])
-  @else
-    {{-- ロゴのみのヘッダー --}}
-    @include('components.header_only_logo')
-  @endif
+  @include('components.header_switcher', ['headerType' => 'logOut'])
 @endsection
 @section('content')
   <div class="c-items" id="home">

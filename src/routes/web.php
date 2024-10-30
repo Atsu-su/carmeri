@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,58 +14,76 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::middleware('header')->group(function () {
+    Route::get('/', [HomeController::class, 'index']);
+
+    // 仮の商品詳細ページ
+    Route::get('/guest/item/{id}', function ($id) {
+        $item = App\Models\Item::findOrFail($id);
+        return view('item', ['item' => $item]);
+    })->name('item');
+
+    Route::middleware('auth')->group(function () {
+        Route::get('/home', function () {
+            return view('home');
+        });
+    });
+
+});
+
+// -------------------------------------------------------------------------
+
 // index（商品一覧）
-Route::get('/', function () {
-    return view('index', ['headerType' => 'logOut']);
-});
-Route::get('/header/login', function () {
-  return view('index', ['headerType' => 'logIn']);
-});
-Route::get('/header/logout', function () {
-  return view('index', ['headerType' => 'logOut']);
-});
+// Route::get('/', [HomeController::class, 'index'])->middleware('header');
 
-// item（商品詳細）
-Route::get('/item', function () {
-  return view('item', ['headerType' => 'logIn']);
-});
+// Route::get('/header/login', function () {
+//   return view('index', ['headerType' => 'logIn']);
+// });
+// Route::get('/header/logout', function () {
+//   return view('index', ['headerType' => 'logOut']);
+// });
 
-// register（会員登録）
-Route::get('/register', function () {
-  return view('auth.register', ['headerType' => '']);
-});
+// // item（商品詳細）
+// Route::get('/item', function () {
+//   return view('item', ['headerType' => 'logIn']);
+// });
 
-// profile（プロフィール入力）
-Route::get('/profile', function () {
-  return view('auth.profile_input', ['headerType' => 'logIn']);
-});
+// // register（会員登録）
+// Route::get('/register', function () {
+//   return view('auth.register', ['headerType' => '']);
+// });
 
-// login（ログイン画面）
-Route::get('/login', function () {
-  return view('auth.login', ['headerType' => '']);
-});
+// // profile（プロフィール入力）
+// Route::get('/profile', function () {
+//   return view('auth.profile_input', ['headerType' => 'logIn']);
+// });
 
-// ログイン後の画面
-Route::get('/home', function () {
-  return view('home', ['headerType' => 'LogOut']);
-});
+// // login（ログイン画面）
+// Route::get('/login', function () {
+//   return view('auth.login', ['headerType' => '']);
+// });
 
-// address（住所変更画面）
-Route::get('/address', function () {
-  return view('address', ['headerType' => 'logOut']);
-});
+// // ログイン後の画面
+// Route::get('/home', function () {
+//   return view('home', ['headerType' => 'LogOut']);
+// });
 
-// profile_view（プロフィール表示画面）
-Route::get('/profile_view', function () {
-  return view('profile_view', ['headerType' => 'logOut']);
-});
+// // address（住所変更画面）
+// Route::get('/address', function () {
+//   return view('address', ['headerType' => 'logOut']);
+// });
 
-// item_input（商品入力画面）
-Route::get('/item_input', function () {
-  return view('item_input', ['headerType' => 'logOut']);
-});
+// // profile_view（プロフィール表示画面）
+// Route::get('/profile_view', function () {
+//   return view('profile_view', ['headerType' => 'logOut']);
+// });
 
-// item_input（購入画面）
-Route::get('/purchase', function () {
-  return view('purchase', ['headerType' => 'logOut']);
-});
+// // item_input（商品入力画面）
+// Route::get('/item_input', function () {
+//   return view('item_input', ['headerType' => 'logOut']);
+// });
+
+// // item_input（購入画面）
+// Route::get('/purchase', function () {
+//   return view('purchase', ['headerType' => 'logOut']);
+// });
