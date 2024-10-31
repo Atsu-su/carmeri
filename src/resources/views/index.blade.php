@@ -17,9 +17,13 @@
           @if ($item->image && Storage::disk('public')->exists('item_images/'.$item->image))
             <img src="{{ asset('storage/item_images/'.$item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
           @else
-            <img class="no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+            <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
           @endif
-          <p>{{ $item->name }}</p>
+          @if ($item->on_sale)
+            <p>{{ $item->name }}</p>
+          @else
+            <p class="sold">{{ $item->name }}</p>
+          @endif
         </a>
       @endforeach
     </div>
@@ -32,7 +36,7 @@
             @if ($like->item->image && Storage::disk('public')->exists('item_images/'.$like->item->image))
               <img src="{{ asset('storage/item_images/'.$like->item->image) }}" width="290" height="281" alt="【商品名】の画像">
             @else
-              <img class="no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+              <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
             @endif
             <p>{{ $like->item->name }}</p>
           </a>

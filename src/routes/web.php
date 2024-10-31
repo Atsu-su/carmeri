@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,14 +18,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('header')->group(function () {
     Route::get('/', [HomeController::class, 'index']);
-
-    // 仮の商品詳細ページ
-    Route::get('/guest/item/{id}', function ($id) {
-        $item = App\Models\Item::findOrFail($id);
-        return view('item', ['item' => $item]);
-    })->name('item');
+    Route::get('/guest/item/{item_id}', [ItemController::class, 'show'])->name('item.show');
 
     Route::middleware('auth')->group(function () {
+        Route::get('/purchase/address/{item_id}', [AddressController::class, 'edit'])->name('address.edit');
+        Route::post('/purchase/address/{item_id}/update', [AddressController::class, 'update'])->name('address.update');
+
+        // 仮のルート
+        Route::get('/purchase/{item_id}', function ($item_id) {
+            $item = App\Models\Item::findOrFail($item_id);
+            return view('purchase', ['item' => $item]);
+        })->name('purchase');
         Route::get('/home', function () {
             return view('home');
         });

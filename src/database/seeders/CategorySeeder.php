@@ -17,60 +17,60 @@ class CategorySeeder extends Seeder
         if (! Category::exists()) {
             Category::insert([
                 [
-                    'category_name' => 'ファッション',
+                    'category' => 'ファッション',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],
                 [
-                    'category_name' => '家電',
+                    'category' => '家電',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'インテリア',
+                    'category' => 'インテリア',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'レディース',
+                    'category' => 'レディース',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'メンズ',
+                    'category' => 'メンズ',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'コスメ',
+                    'category' => 'コスメ',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => '本',
+                    'category' => '本',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'ゲーム',
+                    'category' => 'ゲーム',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'スポーツ',
+                    'category' => 'スポーツ',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'キッチン',
+                    'category' => 'キッチン',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'ハンドメイド',
+                    'category' => 'ハンドメイド',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'アクセサリー',
+                    'category' => 'アクセサリー',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'おもちゃ',
+                    'category' => 'おもちゃ',
                     'created_at' => now(),
                     'updated_at' => now(),],
                 [
-                    'category_name' => 'ベビー・キッズ',
+                    'category' => 'ベビー・キッズ',
                     'created_at' => now(),
                     'updated_at' => now(),],
             ]);

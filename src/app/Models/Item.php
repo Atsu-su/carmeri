@@ -23,7 +23,12 @@ class Item extends Model
 
     public function comments()
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Comment::class);
+    }
+
+    public function condition()
+    {
+        return $this->belongsTo(Condition::class);
     }
 
     public function likes()
