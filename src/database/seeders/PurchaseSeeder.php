@@ -20,7 +20,7 @@ class PurchaseSeeder extends Seeder
 
         for ($i = 1; $i <= 10; ++$i) {
             Purchase::create([
-                'item_id' => $i + 10,
+                'item_id' => $i,
                 'buyer_id' => $faker->numberBetween(1, 10),
                 'payment_method_id' => $faker->numberBetween(1, 2),
         ]);}

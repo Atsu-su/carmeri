@@ -11,6 +11,11 @@ class Item extends Model
 
     protected $guarded = ['id'];
 
+    public function isOnSale()
+    {
+        return $this->on_sale;
+    }
+
     public function categoryItems()
     {
         return $this->hasMany(CategoryItem::class);

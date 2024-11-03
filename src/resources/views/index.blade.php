@@ -13,7 +13,7 @@
     {{-- おすすめ --}}
     <div class="tab first-tab">
       @foreach ($items as $item)
-        <a class="c-item" href="{{ route('item', $item->id) }}">
+        <a class="c-item" href="{{ route('item.show', $item->id) }}">
           @if ($item->image && Storage::disk('public')->exists('item_images/'.$item->image))
             <img src="{{ asset('storage/item_images/'.$item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
           @else
@@ -30,9 +30,9 @@
 
     {{-- マイリスト --}}
     <div class="tab second-tab js-hidden">
-      @if (auth()->check())
+      @if (!auth()->check())
         @foreach ($likedItems as $like)
-          <a class="c-item" href="{{ route('item', $item->id) }}">
+          <a class="c-item" href="{{ route('item.show', $item->id) }}">
             @if ($like->item->image && Storage::disk('public')->exists('item_images/'.$like->item->image))
               <img src="{{ asset('storage/item_images/'.$like->item->image) }}" width="290" height="281" alt="【商品名】の画像">
             @else

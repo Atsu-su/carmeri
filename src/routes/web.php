@@ -3,6 +3,7 @@
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\PurchaseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,24 +17,27 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/test/index',[HomeController::class, 'index']);
+
 Route::middleware('header')->group(function () {
-    Route::get('/', [HomeController::class, 'index']);
+    Route::get('/', [HomeController::class, 'index'])->name('index');
     Route::get('/guest/item/{item_id}', [ItemController::class, 'show'])->name('item.show');
 
     Route::middleware('auth')->group(function () {
         Route::get('/purchase/address/{item_id}', [AddressController::class, 'edit'])->name('address.edit');
         Route::post('/purchase/address/{item_id}/update', [AddressController::class, 'update'])->name('address.update');
+        Route::get('/purchase/{item_id}', [PurchaseController::class, 'index'])->name('purchase');
+        Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('purchase.store');
 
         // 仮のルート
-        Route::get('/purchase/{item_id}', function ($item_id) {
-            $item = App\Models\Item::findOrFail($item_id);
-            return view('purchase', ['item' => $item]);
-        })->name('purchase');
-        Route::get('/home', function () {
-            return view('home');
-        });
-    });
+        // Route::get('/purchase/{item_id}', function ($item_id) {
+        //     $item = App\Models\Item::findOrFail($item_id);
+        //     return view('purchase', ['item' => $item]);
+        // })->name('purchase');
 
+        // 仮のルート
+        Route::get('/home',[PurchaseController::class, 'tmpHomeView'])->name('home');
+    });
 });
 
 // -------------------------------------------------------------------------

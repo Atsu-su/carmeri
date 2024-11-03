@@ -21,11 +21,11 @@ class ItemFactory extends Factory
         return [
             'seller_id' => $this->faker->numberBetween(1, 10),
             'on_sale' => true,
-            'name' => $this->faker->word,
+            'name' => $this->faker->word(),
             'price' => $this->faker->numberBetween(100, 10000),
-            'brand' => $this->faker->word,
+            'brand' => $this->faker->word(),
             'condition_id' => $this->faker->numberBetween(1, 4),
-            'description' => $this->faker->sentence(20),
+            'description' => $this->faker->realText(50),
             'image' => 'image.jpg',
             // 'image' => $this->faker->imageUrl(320, 240, 'fashion', true),
         ];

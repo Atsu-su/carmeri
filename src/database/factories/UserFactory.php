@@ -7,6 +7,14 @@ use Illuminate\Support\Str;
 
 class UserFactory extends Factory
 {
+    protected $images = [
+        'hatsune.jpeg',
+        'list-pochacco.png',
+        'mario.webp',
+        'test.jpg',
+        'test2.jpg',
+    ];
+
     /**
      * Define the model's default state.
      *
@@ -20,7 +28,7 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'image' => $this->faker->imageUrl(320, 240, 'people', true),
+            'image' => $this->faker->randomElement($this->images),
             'nickname' => $this->faker->userName(),
             'postal_code' => $this->faker->postcode(),
             'address' => $this->faker->address(),
