@@ -5,6 +5,16 @@
 @endsection
 @section('content')
 <div id="purchase">
+
+  {{-- 一旦コメントアウト（最終的にはモーダルにすると思われる）
+  @if (session('error_message'))
+  <div style= "border: 1px solid black; padding: 30px; margin-top: 30px">
+    <p>{{ session('error_message.title') }}</p>
+    <p>{{ session('error_message.content') }}</p>
+  </div>
+  @endif
+   --}}
+
   <form action="{{ route('purchase.store', $item->id) }}" method="post">
     @csrf
     <div class="info">
@@ -21,16 +31,21 @@
       </div>
       <div class="info-payment">
         <h2 class="info-payment-title">支払方法</h2>
-        <select id="select" class="info-payment-type" name="payment">
-          <option value="" selected>未選択</option>
-          <option value="1">コンビニ払い</option>
-          <option value="2">カード払い</option>
-        </select>
+        <div class="info-payment-type">
+          <select id="select" name="payment_method_id">
+            <option value="" selected>未選択</option>
+            <option value="1">コンビニ払い</option>
+            <option value="2">カード払い</option>
+          </select>
+          @error('payment_method_id')
+            <p class="c-error-message">{{ $message }}</p>
+          @enderror
+        </div>
       </div>
       <div class="info-delivery">
         <div class="info-delivery-header">
           <h2 class="info-delivery-header-title">配送先</h2>
-          <a class="info-delivery-header-link" href="{{ route('address.edit', $item->id) }}">変更する<</a>
+          <a class="info-delivery-header-link" href="{{ route('address.edit', $item->id) }}">変更する</a>
         </div>
         <div class="info-delivery-main">
           <p>〒{{ $user->postal_code }}</p>

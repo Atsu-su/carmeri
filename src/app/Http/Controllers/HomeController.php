@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Like;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -14,7 +15,8 @@ class HomeController extends Controller
 
         if (auth()->check()) {
             $user = auth()->user();
-            $likedItems = Like::with('item')
+            $likedItems = Like::query()
+                ->with('item')
                 ->where('user_id', $user->id)
                 ->get();
 
@@ -23,5 +25,25 @@ class HomeController extends Controller
         } else {
             return view('index', compact('items'));
         }
+    }
+
+    public function myPageIndex()
+    {
+        $user = auth()->user();
+        $listedItems = Item::query()
+            ->where('seller_id', $user->id)
+            ->get();
+        $purchasedItems = Purchase::query()
+            ->with('item:id,name,image')
+            ->where('buyer_id', $user->id)
+            ->get();
+
+        return view('profile_view', compact('user', 'listedItems', 'purchasedItems'));
+    }
+
+    public function myPageProfileEdit()
+    {
+        $user = auth()->user();
+        return view('profile_input', compact('user'));
     }
 }

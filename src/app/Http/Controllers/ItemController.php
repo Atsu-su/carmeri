@@ -12,7 +12,8 @@ class ItemController extends Controller
 {
     public function show($item_id)
     {
-        $item = Item::with(['categoryItems.category', 'condition', 'comments.user'])
+        $item = Item::query()
+            ->with(['categoryItems.category', 'condition', 'comments.user'])
             ->withCount('likes')
             ->withCount('comments')
             ->find($item_id);

@@ -1,18 +1,23 @@
 @extends('layouts.base')
 @section('title', 'プロフィール')
 @section('header')
-  @include('components.header_switcher', ['headerType' => 'logOut'])
+  @include('components.header_switcher', ['headerType' => request()->headerType])
 @endsection
 @section('content')
   <div id="profile_view">
     <div class="user">
       <div class="user-info">
         <div class="user-info-icon">
-          <img src="" width="100" height="100">
+          @if ($user->image && Storage::disk('public')->exists('profile_images/'.$user->image))
+            <img src="{{ asset('storage/profile_images/'.$user->image) }}" alt="プロフィールの画像">
+          @else
+            <p>NO</p>
+            <p>IMAGE</p>
+          @endif
         </div>
-        <p class="user-info-name">ユーザ名</p>
+        <p class="user-info-name">{{ $user->name }}</p>
       </div>
-      <a class="c-btn c-btn--profile-edit" href="">プロフィールを編集</a>
+      <a class="c-btn c-btn--profile-edit" href="{{ route('mypage.profile.edit')}}">プロフィールを編集</a>
     </div>
     <div class="c-items">
       <div class="titles">
@@ -20,53 +25,40 @@
         <h2 class="title title-mylist" data-tab="second-tab">購入した商品</h2>
       </div>
       <div class="tab first-tab">
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像</div>
-          <p>商品名</p>
-        </div>
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像</div>
-          <p>商品名</p>
-        </div>
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像</div>
-          <p>商品名</p>
-        </div>
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像</div>
-          <p>商品名</p>
-        </div>
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像</div>
-          <p>商品名</p>
-        </div>
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像</div>
-          <p>商品名</p>
-        </div>
+        @if ($listedItems->isEmpty())
+          <p class="no-listed-item">出品された商品はありません</p>
+        @else
+          @foreach ($listedItems as $item)
+            <a class="c-item" href="{{ route('item.show', $item->id) }}">
+              @if ($item->image && Storage::disk('public')->exists('item_images/'.$item->image))
+                <img src="{{ asset('storage/item_images/'.$item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
+              @else
+                <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+              @endif
+              @if ($item->on_sale)
+                <p>{{ $item->name }}</p>
+              @else
+                <p class="sold">{{ $item->name }}</p>
+              @endif
+            </a>
+          @endforeach
+        @endif
       </div>
       <div class="tab second-tab js-hidden">
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像2</div>
-          <p>商品名</p>
-        </div>
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像2</div>
-          <p>商品名</p>
-        </div>
-        <div class="c-item">
-          {{-- <img src="" width="290" height="281" alt="【商品名】の画像"> --}}
-          <div class="temp-img">商品画像2</div>
-          <p>商品名</p>
-        </div>
+        @if ($purchasedItems->isEmpty())
+          <p class="no-purchased-item">購入された商品はありません</p>
+        @else
+          @foreach ($purchasedItems as $item)
+            <a class="c-item" href="{{ route('item.show', $item->id) }}">
+              @if ($item->image && Storage::disk('public')->exists('item_images/'.$item->image))
+                <img src="{{ asset('storage/item_images/'.$item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
+              @else
+                <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+              @endif
+              <p>{{ $item->item->name }}</p>
+            </a>
+          @endforeach
+        @endif
       </div>
     </div>
   </div>

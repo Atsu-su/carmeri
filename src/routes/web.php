@@ -28,6 +28,8 @@ Route::middleware('header')->group(function () {
         Route::post('/purchase/address/{item_id}/update', [AddressController::class, 'update'])->name('address.update');
         Route::get('/purchase/{item_id}', [PurchaseController::class, 'index'])->name('purchase');
         Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('purchase.store');
+        Route::get('/mypage', [HomeController::class, 'myPageIndex'])->name('mypage');
+        Route::get('/mypage/profile', [HomeController::class, 'myPageProfileEdit'])->name('mypage.profile.edit');
 
         // 仮のルート
         // Route::get('/purchase/{item_id}', function ($item_id) {

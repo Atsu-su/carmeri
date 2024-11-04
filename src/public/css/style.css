@@ -560,6 +560,11 @@ html {
   }
 }
 
+.c-items .no-listed-item,
+.c-items .no-purchased-item {
+  margin: 0 auto;
+}
+
 /* ---------------------- */
 /* エラーメッセージ
 /* ---------------------- */
@@ -567,6 +572,7 @@ html {
   margin-top: 8px;
   color: var(--color-font-red);
   font-size: 0.75rem;
+  line-height: 1;
 }
 
 /* ---------------------- */
@@ -1122,6 +1128,21 @@ body {
   object-fit: contain;
 }
 
+#profile_view .user-info-icon p {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+}
+
+#profile_view .user-info-icon p:first-child {
+  padding-top: 30px;
+}
+
+#profile_view .user-info-icon p:nth-child(2) {
+  padding-bottom: 30px;
+}
+
 #profile_view .user-info-name {
   font-size: 36px;
   font-weight: 700;
@@ -1400,11 +1421,16 @@ body {
 #purchase .info-payment-type {
   margin-left: 96px;
   margin-bottom: 63px;
+
+}
+
+#purchase .info-payment-type select {
   padding: 0 0 5px 10px;
   width: 265px;
   height: 30px;
+  line-height: 1;
   border: 1px solid var(--color-border-gray);
-  border-radius: 4px;
+  border-radius: 4px;;
 }
 
 #purchase .info-delivery-header {

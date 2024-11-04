@@ -30,7 +30,7 @@
 
     {{-- マイリスト --}}
     <div class="tab second-tab js-hidden">
-      @if (!auth()->check())
+      @if (auth()->check())
         @foreach ($likedItems as $like)
           <a class="c-item" href="{{ route('item.show', $item->id) }}">
             @if ($like->item->image && Storage::disk('public')->exists('item_images/'.$like->item->image))

@@ -9,7 +9,7 @@
     <form class="form" action="{{ route('login') }}" method="post">
       @csrf
       <h2 class="form-title">メールアドレス</h2>
-      <input class="form-input" type="text" name="email" value="sasada.yoko@example.com">
+      <input class="form-input" type="text" name="email" value="{{ \App\Models\User::query()->where('id', 1)->select('email')->first()->email }}">
       <h2 class="form-title">パスワード</h2>
       <input class="form-input" type="password" name="password" value="password">
       <button class="form-btn c-btn c-btn--red" type="submit">ログインする</button>
