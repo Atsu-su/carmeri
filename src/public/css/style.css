@@ -714,6 +714,7 @@ body {
     background-color: var(--color-bg-header);
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
     border: 3px solid var(--color-border-gray);
     border-bottom-left-radius: 5px;
@@ -813,6 +814,22 @@ body {
   font-weight: 700;
 }
 
+#item .item-detail-title.sold::before {
+  content: "Sold";
+  margin-right: 10px;
+  padding: 3px 8px;
+  display: inline-block;
+  position: relative;
+  top: -3px;
+  color: var(--color-font-red);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  background-color: var(--color-border-white);
+  border: 3px solid var(--color-border-red);
+  border-radius: 5px;
+}
+
 @media screen and (max-width: 1000px) {
   #item .item-detail-title {
     text-align: center;
@@ -885,11 +902,8 @@ body {
   background-image: url(../img/icon_comment.jpg);
 }
 
-#item .item-detail-btn {
-  margin-bottom: 40px;
-}
-
 #item .item-detail-title-about {
+  margin-top: 40px; /* 上のボタンがon_saleの状態によって表示されないため */
   font-size: 1.5rem;  /* 36px */
   font-weight: 700;
   line-height: 1;
@@ -1161,7 +1175,6 @@ body {
 /* ----------------------- */
 /* item_input.blade.php
 /* 商品出品画面（#item-input）
-/* c-default-formを使用
 /* ----------------------- */
 #item-input {
   margin: 50px auto 114px;
@@ -1197,6 +1210,8 @@ body {
 
 #item-input .img-upload-background {
   display: none;
+  background-color: transparent !important;
+  border: 1px dotted var(--color-border-gray);
 }
 
 #item-input .img-upload-background img {
@@ -1245,11 +1260,8 @@ body {
   margin-bottom: 38px;
 }
 
-#item-input .form-input:last-of-type {
-  margin-bottom: 67px;
-}
-
 #item-input .form-btn {
+  margin-top: 118px;
   margin-bottom: 35px;
 }
 
@@ -1265,7 +1277,7 @@ body {
 }
 
 #item-input .form-category {
-  margin-bottom: 65px;
+  margin-bottom: 30px;
   display: flex;
   flex-wrap: wrap;
   row-gap: 36px;
@@ -1292,6 +1304,7 @@ body {
 }
 
 #item-input .form-name-condition {
+  margin-top: 65px;
   margin-bottom: 19px;
 }
 
@@ -1313,7 +1326,6 @@ body {
 }
 
 #item-input .form-condition {
-  margin-bottom: 60px;
   padding-left: 28px;
   width: 100%;
   height: 45px;
@@ -1325,14 +1337,25 @@ body {
   font-size: 14px;
 }
 
+#item-input .form-title-detail {
+  margin-top: 60px;
+}
+
+#item-input .form-name-description {
+  margin-top: 36px;
+}
+
 #item-input .form-textarea {
-  margin-bottom: 38px;
   padding: 10px;
   width: 100%;
   height: 125px;
   font-size: 1rem;
   border: 1px solid var(--color-border-gray);
   border-radius: 4px;
+}
+
+#item-input .form-name-price {
+  margin-top: 36px;
 }
 
 #item-input .form-price-wrapper {

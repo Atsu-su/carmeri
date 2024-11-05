@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', '住所変更')
 @section('header')
-  @include('components.header_switcher', ['headerType' => 'logOut'])
+  @include('components.header')
 @endsection
 @section('content')
   <div class="c-default-form" id="login">

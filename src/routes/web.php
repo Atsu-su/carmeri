@@ -21,15 +21,18 @@ Route::get('/test/index',[HomeController::class, 'index']);
 
 Route::middleware('header')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('index');
-    Route::get('/guest/item/{item_id}', [ItemController::class, 'show'])->name('item.show');
+    Route::get('/item/{item_id}', [ItemController::class, 'show'])->name('item.show');
 
     Route::middleware('auth')->group(function () {
+        Route::get('/sell', [ItemController::class, 'create'])->name('sell.create');
+        Route::post('/sell/store', [ItemController::class, 'store'])->name('sell.store');
         Route::get('/purchase/address/{item_id}', [AddressController::class, 'edit'])->name('address.edit');
         Route::post('/purchase/address/{item_id}/update', [AddressController::class, 'update'])->name('address.update');
         Route::get('/purchase/{item_id}', [PurchaseController::class, 'index'])->name('purchase');
         Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('purchase.store');
         Route::get('/mypage', [HomeController::class, 'myPageIndex'])->name('mypage');
         Route::get('/mypage/profile', [HomeController::class, 'myPageProfileEdit'])->name('mypage.profile.edit');
+
 
         // 仮のルート
         // Route::get('/purchase/{item_id}', function ($item_id) {
@@ -38,7 +41,7 @@ Route::middleware('header')->group(function () {
         // })->name('purchase');
 
         // 仮のルート
-        Route::get('/home',[PurchaseController::class, 'tmpHomeView'])->name('home');
+        // Route::get('/home',[PurchaseController::class, 'tmpHomeView'])->name('home');
     });
 });
 

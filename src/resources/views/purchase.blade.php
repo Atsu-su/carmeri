@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', '商品購入')
 @section('header')
-  @include('components.header_switcher', ['headerType' => 'logOut'])
+  @include('components.header')
 @endsection
 @section('content')
 <div id="purchase">
@@ -69,7 +69,7 @@
         <button class="c-btn c-btn--red" type="submit">購入する</button>
       @else
         <p class="c-btn c-btn--disabled">売り切れ</p>
-        <a class="summary-link" href="{{ route('home') }}">商品一覧に戻る</a>
+        <a class="summary-link" href="{{ route('index') }}">商品一覧に戻る</a>
       @endif
     </div>
   </form>

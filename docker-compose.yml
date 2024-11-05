@@ -16,7 +16,7 @@ services:
     volumes:
       - ./src:/var/www/
       - ./docker/php/.bashrc:/root/.bashrc
-
+      - ./docker/php/.bashrc:/etc/bash.bashrc
 
   mysql:
     image: mysql:8.0.26

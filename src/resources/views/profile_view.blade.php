@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', 'プロフィール')
 @section('header')
-  @include('components.header_switcher', ['headerType' => request()->headerType])
+  @include('components.header')
 @endsection
 @section('content')
   <div id="profile_view">

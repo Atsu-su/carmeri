@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', 'HOME')
 @section('header')
-  @include('components.header_switcher', ['headerType' => 'logOut'])
+  @include('components.header')
 @endsection
 @section('content')
   <div class="c-items" id="home">

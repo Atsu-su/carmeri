@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', 'プロフィール入力')
 @section('header')
-  @include('components.header_switcher', ['headerType' => 'logOut'])
+  @include('components.header')
 @endsection
 @section('content')
   <div id="profile" class="c-default-form">

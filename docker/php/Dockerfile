@@ -10,4 +10,8 @@ RUN curl -sS https://getcomposer.org/installer | php \
   && mv composer.phar /usr/local/bin/composer \
   && composer self-update
 
+RUN groupadd -g 1000 user \
+  && useradd -u 1000 -g user user \
+  && chown -R user:user /var/www
+
 WORKDIR /var/www

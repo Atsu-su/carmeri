@@ -11,14 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class PurchaseController extends Controller
 {
-    const LOCK_TIMEOUT = 5;
-
-    // 削除すること
-    public function tmpHomeView()
-    {
-        return view('home');
-    }
-
     public function index($item_id)
     {
         $user = auth()->user();
@@ -70,7 +62,7 @@ class PurchaseController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('home')
+                ->route('index')
                 ->with([
                     'message', '購入処理が完了しました',
                     'item', $item->toArray()

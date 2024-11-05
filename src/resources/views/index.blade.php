@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', 'Carmeri')
 @section('header')
-  @include('components.header_switcher', ['headerType' => request()->headerType])
+  @include('components.header')
 @endsection
 @section('content')
   <div class="c-items" id="index">

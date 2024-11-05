@@ -30,7 +30,7 @@ class HeaderType
         */
         if (auth()->check()) {
             // 認証済の場合、ログアウトボタンを表示
-            return 'loigOut';
+            return 'logOut';
         } else {
             // 未認証の場合、ログインボタンを表示
             return 'logIn';

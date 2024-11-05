@@ -13,7 +13,7 @@ class ExhibitionRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -25,7 +25,8 @@ class ExhibitionRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:30',
-            'category_id' => 'required',
+            'category_id' => 'required|array',
+            'category_id.*' => 'required|integer',
             'price' => 'required|integer|min:0',
             'image' => 'required|image|mimes:jpeg,png,jpg|max:3072',
             'condition' => 'required',

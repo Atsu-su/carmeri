@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', '商品詳細')
 @section('header')
-  @include('components.header_switcher', ['headerType' => request()->headerType])
+  @include('components.header')
 @endsection
 @section('content')
 <div id="item">
@@ -13,8 +13,12 @@
     @endif
   </div>
   <div class="item-detail">
-    <h1 class="item-detail-title">{{ $item->name }}</h1>
-    <p class="item-detail-brand">{{ $item->brand }}</p>
+    @if ($item->isOnSale())
+      <h1 class="item-detail-title">{{ $item->name }}</h1>
+    @else
+      <h1 class="sold item-detail-title">{{ $item->name }}</h1>
+    @endif
+    <p class="item-detail-brand">{{ $item->brand ?? '' }}</p>
     <p class="item-detail-price">¥<span>{{ number_format($item->price) }}</span> (税込)</p>
     <div class="item-detail-icons">
       <div class="item-detail-icons-icon item-detail-icons-like">
@@ -24,7 +28,9 @@
         <span>{{ $item->comments_count }}</span>
       </div>
     </div>
-    <a href="" class="item-detail-btn c-btn c-btn--red c-btn--item">href-notyet 購入手続きへ</a>
+    @if ($item->isOnSale())
+      <a class="item-detail-btn c-btn c-btn--red c-btn--item" href="{{ route('purchase', $item->id) }}">購入手続きへ</a>
+    @endif
     <h2 class="item-detail-title-about">商品説明</h2>
     <pre class="c-pre item-detail-about">{{ $item->description }}</pre>
     <h2 class="item-detail-title-general">商品の情報</h2>
