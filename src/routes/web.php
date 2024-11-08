@@ -3,6 +3,7 @@
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +32,8 @@ Route::middleware('header')->group(function () {
         Route::get('/purchase/{item_id}', [PurchaseController::class, 'index'])->name('purchase');
         Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('purchase.store');
         Route::get('/mypage', [HomeController::class, 'myPageIndex'])->name('mypage');
-        Route::get('/mypage/profile', [HomeController::class, 'myPageProfileEdit'])->name('mypage.profile.edit');
+        Route::get('/mypage/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('/mypage/profile/store', [ProfileController::class, 'store'])->name('profile.store');
 
 
         // 仮のルート

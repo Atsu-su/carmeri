@@ -4,20 +4,22 @@
   @include('components.header')
 @endsection
 @section('content')
-  <div id="profile_view">
+  <div id="mypage">
     <div class="user">
       <div class="user-info">
-        <div class="user-info-icon">
+        <div class="c-profile-outer-frame user-info-icon">
           @if ($user->image && Storage::disk('public')->exists('profile_images/'.$user->image))
-            <img src="{{ asset('storage/profile_images/'.$user->image) }}" alt="プロフィールの画像">
+            <img class="c-profile-inner-frame" src="{{ asset('storage/profile_images/'.$user->image) }}" alt="プロフィールの画像">
           @else
-            <p>NO</p>
-            <p>IMAGE</p>
+            <div class="c-profile-no-image">
+              <p>NO</p>
+              <p>IMAGE</p>
+            </div>
           @endif
         </div>
         <p class="user-info-name">{{ $user->name }}</p>
       </div>
-      <a class="c-btn c-btn--profile-edit" href="{{ route('mypage.profile.edit')}}">プロフィールを編集</a>
+      <a class="c-btn c-btn--profile-edit" href="{{ route('profile.edit')}}">プロフィールを編集</a>
     </div>
     <div class="c-items">
       <div class="titles">

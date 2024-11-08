@@ -38,12 +38,6 @@ class HomeController extends Controller
             ->where('buyer_id', $user->id)
             ->get();
 
-        return view('profile_view', compact('user', 'listedItems', 'purchasedItems'));
-    }
-
-    public function myPageProfileEdit()
-    {
-        $user = auth()->user();
-        return view('profile_input', compact('user'));
+        return view('mypage', compact('user', 'listedItems', 'purchasedItems'));
     }
 }
