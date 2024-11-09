@@ -37,13 +37,15 @@
   const svg = document.getElementById('svg');
   const menu = document.getElementById('menu');
 
-  svg.addEventListener('click', () => {
-    if (menu.classList.contains('js-hidden')) {
-      menu.classList.remove('js-hidden');
-    } else {
-      menu.classList.add('js-hidden');
-    }
-  });
+  if (svg) {
+    svg.addEventListener('click', () => {
+      if (menu.classList.contains('js-hidden')) {
+        menu.classList.remove('js-hidden');
+      } else {
+        menu.classList.add('js-hidden');
+      }
+    });
+  }
 </script>
 <script>
   // エンターを押すとsubmitされる機能を実装

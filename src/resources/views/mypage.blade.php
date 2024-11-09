@@ -51,9 +51,9 @@
           <p class="no-purchased-item">購入された商品はありません</p>
         @else
           @foreach ($purchasedItems as $item)
-            <a class="c-item" href="{{ route('item.show', $item->id) }}">
-              @if ($item->image && Storage::disk('public')->exists('item_images/'.$item->image))
-                <img src="{{ asset('storage/item_images/'.$item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
+            <a class="c-item" href="{{ route('item.show', $item->item->id) }}">
+              @if ($item->item->image && Storage::disk('public')->exists('item_images/'.$item->item->image))
+                <img src="{{ asset('storage/item_images/'.$item->item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
               @else
                 <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
               @endif

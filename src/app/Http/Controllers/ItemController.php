@@ -15,12 +15,20 @@ class ItemController extends Controller
 {
     public function show($item_id)
     {
+        $user = auth()->user();
+
         $item = Item::query()
             ->with(['categoryItems.category', 'condition', 'comments.user'])
             ->withCount('likes')
             ->withCount('comments')
             ->find($item_id);
-        return view('item', compact('item'));
+
+        $like = Like::query()
+            ->where('item_id', $item_id)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        return view('item', compact('item', 'like'));
     }
 
     public function create()

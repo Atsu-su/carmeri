@@ -651,6 +651,14 @@ html {
   color: var(--color-font-red);
 }
 
+.js-processing {
+  opacity: 0.5;
+}
+
+.js-processing:hover {
+  cursor: not-allowed;
+}
+
 /* =========================== */
 /*
 /* bodyタグ
@@ -935,11 +943,19 @@ body {
 }
 
 #item .item-detail-icons-like {
-  background-image: url(../img/icon_like.jpg);
+  background-image: url(../img/icon_like.svg);
+}
+
+#item .item-detail-icons-like.filled {
+  background-image: url(../img/icon_like_filled.svg);
 }
 
 #item .item-detail-icons-comment {
   background-image: url(../img/icon_comment.jpg);
+}
+
+#item .item-detail-btn {
+  max-width: 500px;
 }
 
 #item .item-detail-title-about {
@@ -1046,15 +1062,19 @@ body {
 }
 
 #item .item-detail-comment-form textarea {
-  margin-bottom: 48px;
   padding: 15px;
   width: 100%;
+  max-width: 500px;
   border: 1.5px solid var(--color-border-gray);
 }
 
 #item .item-detail-comment-form textarea:focus {
   outline: none;
   border: 2px solid var(--color-border-black);
+}
+
+#item .item-detail-comment-form button {
+  margin-top: 48px;
 }
 
 #item .item-detail-comment-login {

@@ -6,15 +6,28 @@
 @section('content')
   <div class="c-default-form" id="register">
     <h1 class="title">会員登録</h1>
-    <form class="form" action="post">
+    <form class="form" action="{{ route('register') }}" method="post">
+      @csrf
       <h2 class="form-title">ユーザ名</h2>
-      <input class="form-input" type="text">
+      <input class="form-input" type="text" name="name" value="{{ old('name') }}">
+      @error('name')
+        <p class="c-error-message">{{ $message }}</p>
+      @enderror
       <h2 class="form-title">メールアドレス</h2>
-      <input class="form-input" type="text" name="email">
+      <input class="form-input" type="text" name="email" value="{{ old('email') }}">
+      @error('email')
+        <p class="c-error-message">{{ $message }}</p>
+      @enderror
       <h2 class="form-title">パスワード</h2>
       <input class="form-input" type="password" name="password">
+      @error('password')
+        <p class="c-error-message">{{ $message }}</p>
+      @enderror
       <h2 class="form-title">確認用パスワード</h2>
       <input class="form-input" type="password" name="confirm_password">
+      @error('confirm_password')
+        <p class="c-error-message">{{ $message }}</p>
+      @enderror
       <button class="form-btn c-btn c-btn--red" type="submit">登録する</button>
     </form>
     <a class="login-link u-opacity-08" href="">ログインはこちら</a>

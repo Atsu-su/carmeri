@@ -38,6 +38,7 @@ class HomeController extends Controller
             ->where('buyer_id', $user->id)
             ->get();
 
+
         return view('mypage', compact('user', 'listedItems', 'purchasedItems'));
     }
 }
