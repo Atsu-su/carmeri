@@ -20,6 +20,6 @@
       @enderror
       <button class="form-btn c-btn c-btn--red" type="submit">ログインする</button>
     </form>
-    <a class="login-link u-opacity-08" href="">会員登録はこちら</a>
+    <a class="login-link u-opacity-08" href="{{ route('register') }}">会員登録はこちら</a>
   </div>
 @endsection

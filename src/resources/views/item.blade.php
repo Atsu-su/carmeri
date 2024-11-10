@@ -86,6 +86,7 @@
       </div>
     </div>
   </div>
+  @if (auth()->check())
   <script>
     function toggleLike(itemId, url) {
       // 重複処理抑止用1
@@ -128,4 +129,5 @@
       });
     }
   </script>
+  @endif
 @endsection

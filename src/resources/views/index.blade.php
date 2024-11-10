@@ -32,7 +32,7 @@
     <div class="tab second-tab js-hidden">
       @if (auth()->check())
         @foreach ($likedItems as $like)
-          <a class="c-item" href="{{ route('item.show', $item->id) }}">
+          <a class="c-item" href="{{ route('item.show', $like->item_id) }}">
             @if ($like->item->image && Storage::disk('public')->exists('item_images/'.$like->item->image))
               <img src="{{ asset('storage/item_images/'.$like->item->image) }}" width="290" height="281" alt="【商品名】の画像">
             @else

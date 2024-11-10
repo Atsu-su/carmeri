@@ -11,6 +11,9 @@ class HomeController extends Controller
 {
     public function index()
     {
+        // ログインしているユーザが出品した商品は非表示
+        // SQL: WHERE status != 'active'
+        // User::where('status', '!=', 'active')->get();
         $items = Item::orderBy('id', 'desc')->get();
 
         if (auth()->check()) {

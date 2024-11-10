@@ -16,7 +16,7 @@ class ProfileController extends Controller
     }
 
     public function store(ProfileRequest $request){
-        /* 
+        /*
         * 流れ
         * 1. リクエストから画像を取得
         * 2. 画像がある場合、画像を保存（アップデート）
@@ -44,7 +44,7 @@ class ProfileController extends Controller
 
         if ($user->wasChanged('image') && $currentImage) {
             // 画像が変更された場合、古い画像を削除
-            Storage::delete('public/item_images/' . $currentImage);
+            Storage::delete('public/profile_images/' . $currentImage);
         }
 
         return redirect()->route('mypage');

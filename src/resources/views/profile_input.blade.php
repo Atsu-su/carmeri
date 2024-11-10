@@ -99,7 +99,7 @@
             // 画像を表示するためのimg要素を生成
             preview = document.createElement('img');
             preview.id = 'preview';
-            preview.className = 'img-upload-preview-prev';
+            preview.className = 'c-profile-inner-frame';
             preview.alt = 'プロフィールの画像';
 
             // 背景要素に追加
@@ -140,7 +140,7 @@
       if (!noImage) {
         noImage = document.createElement('div');
         noImage.id = 'no-image';
-        noImage.className = 'img-upload-preview-no-image';
+        noImage.className = 'c-profile-no-image';
         noImage.innerHTML = '<p>NO</p><p>IMAGE</p>';
         background.appendChild(noImage);
       } else {
