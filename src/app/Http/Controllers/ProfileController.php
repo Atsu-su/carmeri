@@ -15,7 +15,7 @@ class ProfileController extends Controller
         return view('profile_input', compact('user'));
     }
 
-    public function store(ProfileRequest $request){
+    public function update(ProfileRequest $request){
         /*
         * 流れ
         * 1. リクエストから画像を取得

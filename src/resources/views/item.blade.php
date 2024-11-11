@@ -77,7 +77,7 @@
             @error('comment')
               <p class="c-error-message">{{ $message }}</p>
             @enderror
-            <button class="c-btn c-btn--item c-btn--red" type="submit">コメントを送信する</button>
+            <button class="item-detail-comment-form-btn c-btn c-btn--item c-btn--red" type="submit">コメントを送信する</button>
           </form>
         </div>
         @else

@@ -26,7 +26,7 @@ Route::middleware('header')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('/mypage', [HomeController::class, 'myPageIndex'])->name('mypage');
         Route::get('/mypage/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::post('/mypage/profile/store', [ProfileController::class, 'store'])->name('profile.store');
+        Route::post('/mypage/profile/update', [ProfileController::class, 'update'])->name('profile.update');
         Route::post('/item/{item_id}/like', [LikeController::class, 'toggleLike'])->name('like');
         Route::post('/item/{item_id}/comment/store', [CommentController::class, 'store'])->name('comment.store');
         Route::get('/purchase/address/{item_id}', [AddressController::class, 'edit'])->name('address.edit');

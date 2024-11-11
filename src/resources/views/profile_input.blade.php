@@ -18,7 +18,7 @@
       <h1 class="title">プロフィール編集</h1>
     @endif
     {{-- ここまで --}}
-    <form class="form" action="{{ route('profile.store') }}" method="post" enctype="multipart/form-data">
+    <form class="form" action="{{ route('profile.update') }}" method="post" enctype="multipart/form-data">
       @csrf
       {{-- c-default影響範囲外 ここから --}}
 

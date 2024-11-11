@@ -1075,6 +1075,7 @@ body {
 
 #item .item-detail-comment-form button {
   margin-top: 48px;
+  max-width: 500px;
 }
 
 #item .item-detail-comment-login {

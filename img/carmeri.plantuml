@@ -8,13 +8,15 @@ skinparam linetype ortho
 entity "users" as users {
   id
   --
+  is_active
   name
-  nickname
   email
+  email_verified_at
   password
   image
   postal_code
   address
+  building_name
   created_at
   updated_at
 }
