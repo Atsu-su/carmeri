@@ -5,6 +5,10 @@
 @endsection
 @section('content')
   <div id="profile" class="c-default-form">
+
+    @error('is_changed')
+      <p class="c-error-message">{{ $message }}</p>
+    @enderror
     {{--
     未完成
 
@@ -47,12 +51,13 @@
           画像を選択する
         </label>
         <input class="img-upload-input" id="img-input" type="file" name="image" accept="image/*" style="display: none"/>
+        <input id="is-changed" type="hidden" name="is_changed" value="false"/>
         <button class="img-upload-reset c-btn-img-reset c-btn-img-reset--profile" id="reset-btn" type="button">画像を削除</button>
       </div>
       {{-- ここまで c-default影響範囲外 --}}
-      <span class="img-upload-file-name" id="file-name"></span>
+      <p class="img-upload-file-name" id="file-name"></p>
       @error('image')
-        <p class="c-error-message">{{ $message }}</p>
+        <p id="img-error" class="c-error-message">{{ $message }}</p>
       @enderror
       <h2 class="form-title form-title-name">ユーザー名</h2>
       <input class="form-input" type="text" name="name" value="{{ old('name', $user->name) }}">
@@ -84,6 +89,7 @@
     const background = document.getElementById('background');
     const resetBtn = document.getElementById('reset-btn');
     const fileName = document.getElementById('file-name');
+    const isChanged = document.getElementById('is-changed');
 
     function showPreview() {
       const file = event.target.files[0];
@@ -94,6 +100,10 @@
         reader.onload = function(e) {
           let preview = document.getElementById('preview');
           const noImage = document.getElementById('no-image');
+          const imgError = document.getElementById('img-error');
+
+          // 画像が変更されたことを示すフラグを立てる
+          isChanged.value = 'true';
 
           if (!preview) {
             // 画像を表示するためのimg要素を生成
@@ -112,6 +122,10 @@
           if (noImage) {
             noImage.style.display = 'none';
           }
+
+          if (imgError !== null && imgError !== undefined) {
+              imgError.style.display = 'none';
+          }
         }
 
         reader.readAsDataURL(file);
@@ -128,6 +142,9 @@
     function resetPreview() {
       let preview = document.getElementById('preview');
       let noImage = document.getElementById('no-image');
+
+      // 画像が変更されたことを示すフラグを立てる
+      isChanged.value = 'true';
 
       if (preview) {
         preview.src = '';

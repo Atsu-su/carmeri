@@ -1,8 +1,9 @@
 <div id="header">
   <img class="logo" src="{{ asset('img/logo.svg') }}" alt="carmeriのロゴ">
   @if (request()->headerType == 'logOut' || request()->headerType == 'logIn')
-    <form class="search" action="">
-      <input class="search-input" type="text" placeholder="なにをお探しですか？">
+    <form class="search" action="{{ route('index.search') }}" method="post">
+      @csrf
+      <input class="search-input" type="text" name="keyword" value="{{ $keyword ?? '' }}" placeholder="なにをお探しですか？">
     </form>
     <nav class="nav">
       @if (request()->headerType == 'logOut')
@@ -13,8 +14,8 @@
       @else
         <a class="nav-link" href="{{ route('login') }}">ログイン</a>
       @endif
-      <a class="nav-link" href="">マイページ</a>
-      <a class="nav-btn c-btn c-btn--header" href="">出品</a>
+      <a class="nav-link" href="{{ route('mypage') }}">マイページ</a>
+      <a class="nav-btn c-btn c-btn--header" href="{{ route('sell.create') }}">出品</a>
     </nav>
     <nav class="nav-small">
       <div id="svg" class="nav-small-svg"></div>
@@ -27,12 +28,14 @@
         @else
           <a class="nav-link" href="{{ route('login') }}">ログイン</a>
         @endif
-        <a class="nav-small-menu-link" href="">マイページ</a>
-        <a class="nav-small-menu-btn c-btn c-btn--header-small" href="">出品</a>
+        <a class="nav-small-menu-link" href="{{ route('mypage') }}">マイページ</a>
+        <a class="nav-small-menu-btn c-btn c-btn--header-small" href="{{ route('sell.create')}}">出品</a>
       </div>
     </nav>
   @endif
 </div>
+
+{{-- ハンバーガーメニュー --}}
 <script>
   const svg = document.getElementById('svg');
   const menu = document.getElementById('menu');
@@ -47,6 +50,8 @@
     });
   }
 </script>
+
+{{-- エンターキーで検索開始 --}}
 <script>
   // エンターを押すとsubmitされる機能を実装
 </script>

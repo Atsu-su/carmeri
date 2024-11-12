@@ -11,21 +11,26 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // ログインしているユーザが出品した商品は非表示
-        // SQL: WHERE status != 'active'
-        // User::where('status', '!=', 'active')->get();
-        $items = Item::orderBy('id', 'desc')->get();
-
         if (auth()->check()) {
             $user = auth()->user();
+
+            $items = Item::query()
+                ->where('seller_id', '!=', $user->id)
+                ->orderBy('id', 'desc')
+                ->get();
+
             $likedItems = Like::query()
                 ->with('item')
                 ->where('user_id', $user->id)
+                ->whereHas('item', function ($query) use ($user) {
+                    $query->where('seller_id', '!=', $user->id);
+                })
+                ->orderBy('item_id', 'desc')
                 ->get();
 
             return view('index', compact('items', 'likedItems'));
-
         } else {
+            $items = Item::orderBy('id', 'desc')->get();
             return view('index', compact('items'));
         }
     }
@@ -41,7 +46,40 @@ class HomeController extends Controller
             ->where('buyer_id', $user->id)
             ->get();
 
-
         return view('mypage', compact('user', 'listedItems', 'purchasedItems'));
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->input('keyword');
+
+        if (auth()->check()) {
+            $user = auth()->user();
+
+            $items = Item::query()
+                ->where('name', 'like', "%$keyword%")
+                ->where('seller_id', '!=', $user->id)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            $likedItems = Like::query()
+                ->with('item')
+                ->where('user_id', $user->id)
+                ->whereHas('item', function ($query) use ($keyword, $user) {
+                    $query->where('name', 'like', "%$keyword%")
+                          ->where('seller_id', '!=', $user->id);
+                })
+                ->orderBy('item_id', 'desc')
+                ->get();
+
+            return view('index', compact('items', 'likedItems', 'keyword'));
+        } else {
+            $items = Item::query()
+            ->where('name', 'like', "%$keyword%")
+            ->orderBy('id', 'desc')
+            ->get();
+
+            return view('index', compact('items', 'keyword'));
+        }
     }
 }

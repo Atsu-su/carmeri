@@ -16,6 +16,12 @@ class ProfileRequest extends FormRequest
         return true;
     }
 
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'is_changed' => $this->boolean('is_changed'),]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,6 +30,7 @@ class ProfileRequest extends FormRequest
     public function rules()
     {
         return [
+            'is_changed' => 'boolean',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'name' => 'required|string|max:30',
             'postal_code' => 'required|regex:/^\d{3}-\d{4}$/',

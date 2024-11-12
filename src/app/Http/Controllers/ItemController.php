@@ -55,7 +55,14 @@ class ItemController extends Controller
             'seller_id' => $user->id,
             'image' => $fileName,
         ]);
-        Item::create($itemData);
+        $item = Item::create($itemData);
+
+        foreach($itemData['category_id'] as $category_id) {
+            CategoryItem::create([
+                'item_id' => $item->id,
+                'category_id' => $category_id,
+            ]);
+        }
 
         return redirect()->route('index');
     }

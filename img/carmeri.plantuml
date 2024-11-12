@@ -29,14 +29,6 @@ entity "categories" as categories {
   updated_at
 }
 
-entity "conditions" as conditions {
-  id
-  --
-  condition
-  created_at
-  updated_at
-}
-
 entity "category_item" as category_item {
   id
   --
@@ -46,18 +38,25 @@ entity "category_item" as category_item {
   updated_at
 }
 
+entity "conditions" as conditions {
+  id
+  --
+  condition
+  created_at
+  updated_at
+}
+
 entity "items" as items {
   id
   --
   seller_id<<FK>>
-  category_id<<FK>>
+  on_sale
   name
   price
-  is_sold
-  image
   brand
-  condition
+  condition_id<<FK>>
   description
+  image
   created_at
   updated_at
 }
@@ -75,6 +74,7 @@ entity "purchases" as purchases {
   --
   buyer_id<<FK>>
   item_id<<FK>>
+  payment_method_id<<FK>>
   created_at
   updated_at
 }
@@ -82,8 +82,8 @@ entity "purchases" as purchases {
 entity "likes" as likes {
   id
   --
-  user_id<<FK>>
   item_id<<FK>>
+  user_id<<FK>>
   created_at
   updated_at
 }
@@ -91,23 +91,23 @@ entity "likes" as likes {
 entity "comments" as comments {
   id
   --
-  user_id<<FK>>
   item_id<<FK>>
+  user_id<<FK>>
   comment
   created_at
   updated_at
 }
 
-categories ||--{ category_item
+categories ||--o{ category_item
 conditions ||--o{ items
-items ||--{ category_item
+items ||--|{ category_item
 items ||--o{ likes
-items ||--|| purchases
+items ||--o| purchases
 items ||--o{ comments
 items }o--|| users
-users ||--o{ purchases
+purchases }o--|| users
 users ||--o{ likes
 users ||--o{ comments
-purchases }--|| payment_methods
+purchases }o--|| payment_methods
 
 @enduml

@@ -20,8 +20,9 @@ class CreatePurchasesTable extends Migration
             $table->unsignedBigInteger('payment_method_id');
             $table->timestamps();
 
-            $table->foreign('buyer_id')->references('id')->on('users');
             $table->foreign('item_id')->references('id')->on('items');
+            $table->foreign('buyer_id')->references('id')->on('users');
+            $table->foreign('payment_method_id')->reference('id')->on('payment_methods');
         });
     }
 

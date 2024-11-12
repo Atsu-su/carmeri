@@ -28,16 +28,21 @@ class ProfileController extends Controller
         $currentImage = $user->image;
         $validated = $request->validated();
 
-        if ($request->file('image')) {
-            // 新しく画像が登録される場合
-            $extension = $request->file('image')->extension();
-            $fileName = 'profile_image_'. time() . '.' . $extension;
-            $request->file('image')->storeAs('public/profile_images', $fileName);
+        if ($validated['is_changed']) {
+            if ($request->file('image')) {
+                // 新しく画像が登録される場合
+                $extension = $request->file('image')->extension();
+                $fileName = 'profile_image_'. time() . '.' . $extension;
+                $request->file('image')->storeAs('public/profile_images', $fileName);
 
-            $validated['image'] = $fileName;
+                $validated['image'] = $fileName;
+            } else {
+                // 画像が登録されない場合
+                $validated['image'] = null;
+            }
         } else {
-            // 画像が登録されない場合
-            $validated['image'] = null;
+            // 画像が変更されない場合、imageの項目を除去
+            unset($validated['image']);
         }
 
         $user->update($validated);
