@@ -54,6 +54,10 @@ class FortifyServiceProvider extends ServiceProvider
             return view('auth.login');
         });
 
+        Fortify::verifyEmailView(function () {
+            return view('auth.verify-email');
+        });
+
         app()->bind(FortifyLoginRequest::class, LoginRequest::class);
 
         RateLimiter::for('login', function ($request) {

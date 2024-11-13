@@ -25,7 +25,7 @@ Route::middleware('header')->group(function () {
     Route::post('/', [HomeController::class, 'search'])->name('index.search');
     Route::get('/item/{item_id}', [ItemController::class, 'show'])->name('item.show');
 
-    Route::middleware('auth')->group(function () {
+    Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/mypage', [HomeController::class, 'myPageIndex'])->name('mypage');
         Route::get('/mypage/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::post('/mypage/profile', [ProfileController::class, 'update'])->name('profile.update');
