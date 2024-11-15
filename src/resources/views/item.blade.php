@@ -29,7 +29,7 @@
         </div>
       </div>
       @if ($item->isOnSale())
-        <a class="item-detail-btn c-btn c-btn--red c-btn--item" href="{{ route('purchase', $item->id) }}">購入手続きへ</a>
+        <a class="item-detail-btn c-btn c-btn--item" href="{{ route('purchase', $item->id) }}">購入手続きへ</a>
       @endif
       <h2 class="item-detail-title-about">商品説明</h2>
       <pre class="c-pre item-detail-about">{{ $item->description }}</pre>
@@ -77,7 +77,7 @@
             @error('comment')
               <p class="c-error-message">{{ $message }}</p>
             @enderror
-            <button class="item-detail-comment-form-btn c-btn c-btn--item c-btn--red" type="submit">コメントを送信する</button>
+            <button class="item-detail-comment-form-btn c-btn c-btn--item" type="submit">コメントを送信する</button>
           </form>
         </div>
         @else

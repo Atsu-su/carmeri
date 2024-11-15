@@ -20,9 +20,9 @@
             <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
           @endif
           @if ($item->on_sale)
-            <p>{{ $item->id }} {{ $item->name }}</p>
+            <p>{{ $item->name }}</p>
           @else
-            <p class="sold">{{ $item->id }} {{ $item->name }}</p>
+            <p class="sold">{{ $item->name }}</p>
           @endif
         </a>
       @endforeach
