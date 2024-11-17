@@ -59,22 +59,22 @@
       @error('image')
         <p id="img-error" class="c-error-message">{{ $message }}</p>
       @enderror
-      <h2 class="form-title form-title-name">ユーザー名</h2>
+      <label class="form-title form-title-name">ユーザー名</label>
       <input class="form-input" type="text" name="name" value="{{ old('name', $user->name) }}">
       @error('name')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <h2 class="form-title">郵便番号</h2>
+      <label class="form-title">郵便番号</label>
       <input class="form-input" type="text" name="postal_code" value="{{ old('postal_code', $user->postal_code) }}">
       @error('postal_code')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <h2 class="form-title">住所</h2>
+      <label class="form-title">住所</label>
       <input class="form-input" type="text" name="address" value="{{ old('address', $user->address) }}">
       @error('address')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <h2 class="form-title">建物名</h2>
+      <label class="form-title">建物名</label>
       <input class="form-input" type="text" name="building_name" value="{{ old('building_name', $user->building_name) }}">
       @error('building_name')
         <p class="c-error-message">{{ $message }}</p>

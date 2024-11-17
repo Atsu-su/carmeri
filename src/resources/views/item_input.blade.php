@@ -26,7 +26,7 @@
         <button class="img-upload-reset c-btn-img-reset c-btn-img-reset--profile" id="reset-btn" type="button">画像を削除</button>
       </div>
       <h2 class="form-title">商品の詳細</h2>
-      <h3 class="form-name form-name-category">カテゴリ</h3>
+      <label class="form-name form-name-category">カテゴリ</label>
       <div class="form-category">
         @foreach ($categories as $category)
           <input type="checkbox" id="{{ $loop->iteration }}" value="{{ $category->id }}" name="category_id[]" {{in_array($category->id, old('category_id', [])) ? 'checked' : '' }}>
@@ -36,7 +36,7 @@
       @error('category_id')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <h3 class="form-name form-name-condition">商品の状態</h3>
+      <label class="form-name form-name-condition">商品の状態</label>
       <div class="form-condition-wrapper">
         <select class="form-condition" name="condition_id">
           <option value="">選択してください</option>
@@ -49,22 +49,22 @@
         @enderror
       </div>
       <h2 class="form-title form-title-detail">商品名と説明</h2>
-      <h3 class="form-name">商品名</h3>
+      <label class="form-name">商品名</label>
       <input class="form-input" type="text" name="name" value="{{ old('name') }}">
       @error('name')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <h3 class="form-name form-name-brand">ブランド</h3>
+      <label class="form-name form-name-brand">ブランド</label>
       <input class="form-input" type="text" name="brand" value="{{ old('brand') }}">
       @error('brand')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <h3 class="form-name form-name-description">商品の説明</h3>
+      <label class="form-name form-name-description">商品の説明</label>
       <textarea class="form-textarea" name="description"> {{ old('description') }}</textarea>
       @error('description')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <h3 class="form-name form-name-price">販売価格</h3>
+      <label class="form-name form-name-price">販売価格</label>
       <div class="form-price-wrapper">
         <input class="form-input form-input-price" type="text" name="price" value="{{ old('price') }}">
       </div>
