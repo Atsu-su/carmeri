@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/card', function () {
-    return view('stripe');
+    return view('card');
 });
 
 Route::prefix('payment')->name('payment.')->group(function () {

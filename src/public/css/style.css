@@ -206,7 +206,6 @@ iframe {
 /* font */
 :root {
   --font-family-jp: "Noto Sans JP", sans-serif;
-  /* --font-family-en: "Montserrat", sans-serif; */
 }
 
 /* rem */
@@ -231,16 +230,6 @@ html {
   clip: rect(0 0 0 0) !important;
   clip-path: inset(50%) !important;
   margin: -1px !important;
-}
-
-/* 削除 */
-.u-opacity-05:hover {
-  opacity: 0.5;
-}
-
-/* 削除 */
-.u-opacity-08:hover {
-  opacity: 0.8;
 }
 
 /* =========================== */
@@ -310,7 +299,6 @@ html {
   background-color: var(--color-bg-btn-white);
 }
 
-/* .c-btn--redの内容を上書きするために記載 */
 .c-btn--item {
   width: 100%;
   height: 56px;
@@ -452,10 +440,6 @@ html {
   background-color: var(--color-bg-category-gray)
 }
 
-/* あとで作成予定 */
-.c-label-category--red {
-}
-
 /* ---------------------- */
 /* デフォルトのフォーム
 /* ---------------------- */
@@ -474,6 +458,7 @@ html {
 
 .c-default-form .form-title {
   margin-bottom: 8px;
+  display: block;
   font-weight: 700;
 }
 
@@ -494,7 +479,6 @@ html {
   margin-bottom: 35px;
 }
 
-/* c-link */
 .c-default-form .login-link {
   display: block;
   color: var(--color-font-blue);
@@ -643,19 +627,6 @@ html {
   white-space: pre-wrap;  /* 改行を保持しつつ折り返し */
   word-wrap: break-word;    /* 長い単語も折り返し */
 }
-
-/* ---------------------- */
-/* リンク
-/* ---------------------- */
-
-/* 作成予定 */
-
-/* .c-link {
-  display: block;
-  color: var(--color-font-blue);
-  text-align: center;
-} */
-
 
 /* =========================== */
 /*
@@ -852,19 +823,6 @@ body {
     padding: 0;
     width: 100%;
   }
-}
-
-/* imgタグを有効にしたのち有効 */
-/* #item .item-img img {
-  padding: 36px 45px 0;
-  width: 100%;
-} */
-
-/* imgタグを有効にしたのち削除 */
-#item .item-img .img {
-  padding-top: 100%;
-  width: 100%;
-  background-color: var(--color-bg-img);
 }
 
 #item .item-detail {
@@ -1298,6 +1256,7 @@ body {
 
 #item-input .form-name {
   margin-bottom: 8px;
+  display: block;
   font-weight: 700;
 }
 
@@ -1309,16 +1268,11 @@ body {
   border: 1px solid var(--color-border-gray)
 }
 
-/* #item-input .form-input:not(:last-of-type) {
-  margin-bottom: 38px;
-} */
-
 #item-input .form-btn {
   margin-top: 118px;
   margin-bottom: 35px;
 }
 
-/* c-link */
 #item-input .login-link {
   display: block;
   color: var(--color-font-blue);
@@ -1571,10 +1525,22 @@ body {
   font-size: 20px;
 }
 
-/* c-link */
 #purchase .summary-link {
   margin-top: 40px;
   display: block;
   color: var(--color-font-blue);
   text-align: center;
+}
+
+/* ----------------------- */
+/* card.blade.php
+/* 商品購入画面（#card）
+/* ----------------------- */
+#card .form-input {
+  padding-top: 3px;
+}
+
+#card .error-message {
+  margin-top: 20px;
+  color: var(--color-font-red);
 }
