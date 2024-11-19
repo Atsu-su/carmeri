@@ -18,11 +18,12 @@ class CreatePurchasesTable extends Migration
             $table->unsignedBigInteger('item_id')->unique();
             $table->unsignedBigInteger('buyer_id');
             $table->unsignedBigInteger('payment_method_id');
+            $table->string('status')->nullable();
             $table->timestamps();
 
             $table->foreign('item_id')->references('id')->on('items');
             $table->foreign('buyer_id')->references('id')->on('users');
-            $table->foreign('payment_method_id')->reference('id')->on('payment_methods');
+            $table->foreign('payment_method_id')->references('id')->on('payment_methods');
         });
     }
 

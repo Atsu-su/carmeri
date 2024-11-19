@@ -23,9 +23,19 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/card', function () {
-    return view('card');
+
+Route::get('/modal', function () {
+    return view('components.modal');
 });
+
+Route::get('/sucess', function () {
+    return '<h1>success</h1>';
+})->name('payment.success');
+
+Route::get('/cancel', function () {
+    return '<h1>cancel</h1>';
+})->name('payment.cancel');
+
 
 Route::prefix('payment')->name('payment.')->group(function () {
     Route::get('/create', [PaymentController::class, 'create'])->name('create');
@@ -49,5 +59,9 @@ Route::middleware('header')->group(function () {
         Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('purchase.store');
         Route::get('/sell', [ItemController::class, 'create'])->name('sell.create');
         Route::post('/sell', [ItemController::class, 'store'])->name('sell.store');
+
+        // stripeの成功・キャンセル用ルーティング
+        Route::get('/payment/success/{purchase_id}', [PurchaseController::class, 'success'])->name('payment.success');
+        Route::get('/payment/cancel/{purchase_id}', [PurchaseController::class, 'cancel'])->name('payment.cancel');
     });
 });

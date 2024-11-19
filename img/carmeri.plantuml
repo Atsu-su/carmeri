@@ -75,6 +75,7 @@ entity "purchases" as purchases {
   buyer_id<<FK>>
   item_id<<FK>>
   payment_method_id<<FK>>
+  status
   created_at
   updated_at
 }

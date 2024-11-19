@@ -19,7 +19,7 @@
           @else
             <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
           @endif
-          @if ($item->on_sale)
+          @if ($item->isOnSale())
             <p>{{ $item->name }}</p>
           @else
             <p class="sold">{{ $item->name }}</p>
@@ -38,7 +38,11 @@
             @else
               <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
             @endif
-            <p>{{$like->item_id}}  {{ $like->item->name }}</p>
+            @if ($item->isOnSale())
+              <p>{{ $like->item->name }}</p>
+            @else
+              <p class="sold">{{ $like->item->name }}</p>
+            @endif
           </a>
         @endforeach
       @else

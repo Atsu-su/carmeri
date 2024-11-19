@@ -65,12 +65,15 @@
           <td id="payment-type">未選択</td>
         </tr>
       </table>
+
+      {{-- 修正予定（$item->isOnSale()を使わない） --}}
       @if ($item->isOnSale())
         <button class="c-btn c-btn--red" type="submit">購入する</button>
       @else
         <p class="c-btn c-btn--disabled">売り切れ</p>
         <a class="summary-link" href="{{ route('index') }}">商品一覧に戻る</a>
       @endif
+
     </div>
   </form>
 </div>

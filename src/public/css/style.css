@@ -193,6 +193,7 @@ iframe {
   --color-bg-img: #D9D9D9;
   --color-bg-input: #fff;
   --color-bg-select: #B1B1B1;
+  --color-bg-modal: rgba(217, 217, 217, 0.3);
   --color-font-base: #000;
   --color-font-blue: #0073CC;
   --color-font-gray: #5F5F5F;
@@ -329,6 +330,14 @@ html {
   height: 60px;
   color: var(--color-font-base);
   border: 1px solid var(--color-border-black);
+}
+
+.c-btn--modal-close {
+  width: 100px;
+  height: 50px;
+  color: var(--color-font-base);
+  background-color: var(--color-bg-btn-white);
+  border: 1px solid var(--color-border-gray);
 }
 
 .c-btn a:hover {
@@ -626,6 +635,53 @@ html {
   font-family: inherit;  /* 等幅フォントを解除 */
   white-space: pre-wrap;  /* 改行を保持しつつ折り返し */
   word-wrap: break-word;    /* 長い単語も折り返し */
+}
+
+/* ---------------------- */
+/* モーダル
+/* ---------------------- */
+.c-modal {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: 100;
+  background-color: var(--color-bg-modal);
+}
+
+.c-modal .message {
+  width: 800px;
+  height: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background-color: var(--color-bg-btn-white);
+}
+
+.c-modal .message-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.c-modal .title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.c-modal .content {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.c-modal .btn {
+  margin-top: 20px;
 }
 
 /* =========================== */

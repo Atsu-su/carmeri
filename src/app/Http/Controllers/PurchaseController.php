@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Purchase;
+use App\Models\User;
 use App\Http\Requests\PurchaseRequest;
+use Illuminate\Database\QueryException;
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -22,29 +26,20 @@ class PurchaseController extends Controller
     {
         $user = auth()->user();
 
-        Log::info('storeメソッドスタート');
+        Log::info('storeメソッドスタート: user_id: '. $user->id);
 
         try {
             DB::beginTransaction();
-            Log::info('transactionスタート');
+            Log::info('transactionスタート: user_id: '. $user->id);
 
             // nameのみしか必要ないはず
             $item = Item::query()
                 ->where('id', $item_id)
                 ->where('on_sale', true)
-                ->sharedLock()
+                ->lockForUpdate()
                 ->first();
 
-            /*
-            *  一旦on_saleの値のみで判定するが、本来は
-            *  1) on_saleの値（購入処理開始）
-            *  2）purchaseテーブルに決済番号が存在するか（購入処理完了）
-            *  で判定する
-            */
-             // $itemのon_saleがfalseかどうか確認する
-            // if (!$item) {
             if (!$item) {
-                Log::info('item_id: ' . $item_id . ' is not on sale');
                 return back()->with('error_message', [
                     'title' => '購入処理を完了することができませんでした',
                     'content' => '直前に他のお客様にて購入手続きが完了しました',
@@ -53,24 +48,20 @@ class PurchaseController extends Controller
 
             $item->update(['on_sale' => false]);
 
-            Purchase::create([
-                'item_id' => $item_id,
+            $purchase = Purchase::create([
+                'item_id' => $item->id,
                 'buyer_id' => $user->id,
                 'payment_method_id' => $request->input('payment_method_id'),
+                'status' => 'processing',
             ]);
 
             DB::commit();
 
-            return redirect()
-                ->route('index')
-                ->with([
-                    'message', '購入処理が完了しました',
-                    'item', $item->toArray()
-                ]);
+            return $this->stripe($item, $user, $purchase);
 
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            Log::info('transactionロールバック');
+            Log::info('transactionロールバック: user_id: '. $user->id);
             DB::rollBack();
             return back()->with('error_message', [
                 'title' => '購入処理が失敗しました',
@@ -79,57 +70,56 @@ class PurchaseController extends Controller
         }
     }
 
-    // public function store(Request $request, $item_id)
-    // {
-    //     $user = auth()->user();
+    public function stripe(Item $item, User $user, Purchase $purchase)
+    {
+        Stripe::setApiKey(config('stripe.stripe_secret_key'));
+        $session = Session::create([
+            'metadata' => [
+                'user_id' => $user->id,
+                'order_id' => $purchase->id
+            ],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'jpy',
+                    'product_data' => [
+                        'name' => $item->name
+                    ],
+                    'unit_amount' => $item->price
+                ],
+                'quantity' => 1
+            ]],
+            'mode' => 'payment',
+            'success_url' => route('payment.success', ['purchase_id' => $purchase->id]),
+            'cancel_url' => route('payment.cancel', ['purchase_id' => $purchase->id]),
+        ]);
 
-    //     Log::info('storeメソッドスタート');
+        return redirect($session->url);
+    }
 
-    //     try {
-    //         $response = DB::transaction(function() use ($request, $item_id, $user) {
-    //             Log::info('transactionスタート');
+    public function success($purchase_id)
+    {
+        $item = Purchase::query()
+            ->where('id', $purchase_id)
+            ->first();
 
-    //             // nameのみしか必要ないはず
-    //             $item = Item::query()
-    //                 ->where('id', $item_id)
-    //                 ->where('on_sale', true)
-    //                 ->sharedLock()
-    //                 ->first();
+        $successMsg = [
+            'title' => '購入処理が完了しました',
+            'content' => '購入処理が完了しました。購入履歴から詳細をご確認ください',
+        ];
 
-    //             // $itemのon_saleがfalseかどうか確認する
-    //             if (!$item) {
-    //                 Log::info('item_id: ' . $item_id . ' is not on sale');
-    //                 return back()->with('error_message', [
-    //                     'title' => '購入処理が失敗しました',
-    //                     'content' => '直前に他のお客様にて購入手続きが完了しました',
-    //                 ]);
-    //             }
+        return redirect()
+            ->route('item.show', $item->item_id)
+            ->with('successMsg', $successMsg);
+    }
 
-    //             $item->update(['on_sale' => false]);
+    public function cancel()
+    {
+        $errorMsg = [
+            'title' => '購入処理をキャンセルしました',
+            'content' => '引き続き、お買い物をお楽しみください',
+        ];
 
-    //             Purchase::create([
-    //                 'item_id' => $item_id,
-    //                 'buyer_id' => $user->id,
-    //                 'payment_method_id' => $request->input('payment'),
-    //             ]);
+        return view('cancel');
+    }
 
-    //             return redirect()
-    //                 ->route('home')
-    //                 ->with('message', '購入処理が完了しました')
-    //                 ->with('item', $item->toArray());
-
-    //         }, self::LOCK_TIMEOUT);
-
-    //         return $response;
-
-    //     } catch (\Exception $e) {
-    //         Log::error($e->getMessage());
-    //         Log::info('transactionロールバック');
-    //         DB::rollBack();
-    //         return back()->with('error_message', [
-    //             'title' => '購入処理が失敗しました',
-    //             'content' => 'お手数ですが、しばらく時間をおいて再度お試しください',
-    //         ]);
-    //     }
-    // }
 }

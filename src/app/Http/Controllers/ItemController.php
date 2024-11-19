@@ -32,6 +32,12 @@ class ItemController extends Controller
             $like = false;
         }
 
+        $successMsg = session('successMsg');
+
+        if ($successMsg) {
+            return view('item', compact('item', 'like', 'successMsg'));
+        }
+
         return view('item', compact('item', 'like'));
     }
 
