@@ -1,9 +1,18 @@
-@if (isset($successMsg) || isset($errorMsg))
+@if (isset($message))
 <div id="modal" class="c-modal">
   <div class="message">
     <div class="message-wrapper">
-      <h1 class="title">{{ $successMsg['title'] }}</h1>
-      <p class="content">{{ $successMsg['content'] }}</p>
+      @if ($message['status'] == 'success' || $message['status'] == 'info')
+        <h1 class="title">{{ $message['title'] }}</h1>
+        @foreach ($message['contents'] as $content)
+          <p class="content">{{ $content }}</p>
+        @endforeach
+      @elseif ($message['status'] == 'error')
+        <h1 class="title error">{{ $message['title'] }}</h1>
+        @foreach ($message['contents'] as $content)
+          <p class="content error">{{ $content }}</p>
+        @endforeach
+      @endif
       <a id="modal-btn" class="btn c-btn c-btn--modal-close">閉じる</a>
     </div>
   </div>

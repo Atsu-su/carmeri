@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\Like;
 use App\Models\Comment;
 use App\Models\Condition;
+use App\Messages\Session as MessageSession;
 use Illuminate\Http\Request;
 
 class ItemController extends Controller
@@ -32,13 +33,10 @@ class ItemController extends Controller
             $like = false;
         }
 
-        $successMsg = session('successMsg');
+        // リダイレクトされた場合に存在する可能性のあるメッセージを処理
+        $message = MessageSession::exists('message');
 
-        if ($successMsg) {
-            return view('item', compact('item', 'like', 'successMsg'));
-        }
-
-        return view('item', compact('item', 'like'));
+        return view('item', compact('item', 'like', 'message'));
     }
 
     public function create()

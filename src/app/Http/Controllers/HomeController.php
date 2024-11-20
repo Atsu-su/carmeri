@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Like;
 use App\Models\Purchase;
+use App\Messages\Session as MessageSession;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -45,8 +46,9 @@ class HomeController extends Controller
             ->with('item:id,name,image')
             ->where('buyer_id', $user->id)
             ->get();
+        $message = MessageSession::exists('message');
 
-        return view('mypage', compact('user', 'listedItems', 'purchasedItems'));
+        return view('mypage', compact('user', 'listedItems', 'purchasedItems', 'message'));
     }
 
     public function search(Request $request)

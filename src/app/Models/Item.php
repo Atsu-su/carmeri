@@ -43,6 +43,6 @@ class Item extends Model
 
     public function purchase()
     {
-        return $this->hasOne(Purchase::class, 'buyer_id');
+        return $this->hasOne(Purchase::class);
     }
 }

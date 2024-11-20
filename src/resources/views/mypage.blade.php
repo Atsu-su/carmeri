@@ -1,5 +1,8 @@
 @extends('layouts.base')
 @section('title', 'プロフィール')
+@section('modal')
+  @include('components.modal')
+@endsection
 @section('header')
   @include('components.header')
 @endsection

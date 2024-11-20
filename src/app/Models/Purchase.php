@@ -11,6 +11,11 @@ class Purchase extends Model
 
     protected $guarded = ['id'];
 
+    public function isPurchased()
+    {
+        return $this->status === 'purchased';
+    }
+
     public function item()
     {
         return $this->belongsTo(Item::class);

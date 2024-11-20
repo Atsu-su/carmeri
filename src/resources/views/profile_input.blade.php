@@ -1,21 +1,16 @@
 @extends('layouts.base')
 @section('title', 'プロフィール入力')
+@section('modal')
+  @include('components.modal')
+@endsection
 @section('header')
   @include('components.header')
 @endsection
 @section('content')
   <div id="profile" class="c-default-form">
-
     @error('is_changed')
       <p class="c-error-message">{{ $message }}</p>
     @enderror
-    {{--
-    未完成
-
-    @ifで分岐する（初回と編集）
-    $referer =  $request->headers->get('referer');で取得して、
-    遷移元のページによって分岐させる
-    --}}
     @if (!request()->headers->get('referer') === route('profile.edit'))
       <h1 class="title">プロフィール設定</h1>
     @else

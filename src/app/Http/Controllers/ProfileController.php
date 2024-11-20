@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileRequest;
+use App\Messages\Message;
+use App\Messages\Session as MessageSession;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
@@ -12,7 +16,8 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = auth()->user();
-        return view('profile_input', compact('user'));
+        $message = MessageSession::exists('message');
+        return view('profile_input', compact('user', 'message'));
     }
 
     public function update(ProfileRequest $request){
@@ -45,13 +50,23 @@ class ProfileController extends Controller
             unset($validated['image']);
         }
 
-        $user->update($validated);
+        try {
+            $user->update($validated);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()
+                ->route('mypage')
+                ->withInput()
+                ->with('message', Message::get('profile.failed'));
+        }
 
         if ($user->wasChanged('image') && $currentImage) {
             // 画像が変更された場合、古い画像を削除
             Storage::delete('public/profile_images/' . $currentImage);
         }
 
-        return redirect()->route('mypage');
+        return redirect()
+            ->route('mypage')
+            ->with('message', Message::get('profile.success'));
     }
 }

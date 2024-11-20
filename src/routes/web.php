@@ -7,9 +7,6 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
-
-use App\Http\Controllers\PaymentController;
-
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,24 +20,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/modal', function () {
-    return view('components.modal');
-});
-
-Route::get('/sucess', function () {
-    return '<h1>success</h1>';
-})->name('payment.success');
-
-Route::get('/cancel', function () {
-    return '<h1>cancel</h1>';
-})->name('payment.cancel');
-
-
-Route::prefix('payment')->name('payment.')->group(function () {
-    Route::get('/create', [PaymentController::class, 'create'])->name('create');
-    Route::post('/store', [PaymentController::class, 'store'])->name('store');
-});
 
 Route::middleware('header')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('index');

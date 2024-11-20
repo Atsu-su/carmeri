@@ -1,20 +1,13 @@
 @extends('layouts.base')
 @section('title', '商品購入')
+@section('modal')
+  @include('components.modal')
+@endsection
 @section('header')
   @include('components.header')
 @endsection
 @section('content')
 <div id="purchase">
-
-  {{-- 一旦コメントアウト（最終的にはモーダルにすると思われる）
-  @if (session('error_message'))
-  <div style= "border: 1px solid black; padding: 30px; margin-top: 30px">
-    <p>{{ session('error_message.title') }}</p>
-    <p>{{ session('error_message.content') }}</p>
-  </div>
-  @endif
-   --}}
-
   <form action="{{ route('purchase.store', $item->id) }}" method="post">
     @csrf
     <div class="info">
@@ -65,15 +58,14 @@
           <td id="payment-type">未選択</td>
         </tr>
       </table>
-
-      {{-- 修正予定（$item->isOnSale()を使わない） --}}
-      @if ($item->isOnSale())
+      @if (is_null($item->purchase))
         <button class="c-btn c-btn--red" type="submit">購入する</button>
       @else
-        <p class="c-btn c-btn--disabled">売り切れ</p>
+        <p class="c-btn c-btn--disabled">
+          {{ $item->purchase->isPurchased() ? '購入済み' : '購入手続き中' }}
+        </p>
         <a class="summary-link" href="{{ route('index') }}">商品一覧に戻る</a>
       @endif
-
     </div>
   </form>
 </div>
