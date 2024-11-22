@@ -17,10 +17,14 @@ class LogoutTest extends TestCase
      */
     public function test_ログアウト成功()
     {
+        // Arrange
         $this->login();
+
+        // Act
         $response = $this->from('/')
             ->post('/logout');
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/');
     }

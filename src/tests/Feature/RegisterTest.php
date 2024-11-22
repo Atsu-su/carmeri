@@ -16,11 +16,13 @@ class RegisterTest extends TestCase
      */
     public function test_名前未入力()
     {
+        // Act
         $response = $this->from('/register')
             ->post('/register', [
                     'name' => '',
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/register');
 
@@ -30,11 +32,13 @@ class RegisterTest extends TestCase
 
     public function test_メールアドレス未入力()
     {
+        // Act
         $response = $this->from('/register')
             ->post('/register', [
                     'email' => '',
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/register');
 
@@ -44,11 +48,13 @@ class RegisterTest extends TestCase
 
     public function test_パスワード未入力()
     {
+        // Act
         $response = $this->from('/register')
             ->post('/register', [
                     'password' => '',
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/register');
 
@@ -58,22 +64,26 @@ class RegisterTest extends TestCase
 
     public function test_パスワード7文字()
     {
+        // Act
         $response = $this->from('/register')
             ->post('/register', [
                     'password' => Str::random(7),
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/register');
 
         $this->followRedirects($response)
             ->assertSee('パスワードは8文字以上で入力してください');
 
+        // Act
         $response = $this->from('/register')
         ->post('/register', [
                 'password' => Str::random(8),
         ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/register');
 
@@ -83,12 +93,14 @@ class RegisterTest extends TestCase
 
     public function test_パスワード不一致()
     {
+        // Act
         $response = $this->from('/register')
             ->post('/register', [
                     'password' => 'abcdefghij',
                     'confirm_password' => 'ABCDEFGHIJ',
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/register');
 
@@ -98,6 +110,7 @@ class RegisterTest extends TestCase
 
     public function test_登録成功()
     {
+        // Act
         $response = $this->from('/register')
             ->post('/register', [
                     'name' => 'test',
@@ -106,6 +119,7 @@ class RegisterTest extends TestCase
                     'confirm_password' => 'abcdefghij',
             ]);
 
+        // Assert
         $response->assertStatus(302);
     }
 }

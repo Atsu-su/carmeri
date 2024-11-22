@@ -2,9 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Models\Condition;
 use App\Models\Item;
+use App\Models\Like;
 use App\Models\User;
+use Database\Seeders\CategoryItemSeeder;
+use Database\Seeders\CategorySeeder;
+use Database\Seeders\ConditionSeeder;
+use Database\Seeders\ItemSeeder;
+use Database\Seeders\UserSeeder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Stringable;
 use Tests\TestCase;
@@ -16,89 +25,73 @@ class SearchTest extends TestCase
      *
      * @return void
      */
+
     public function test_検索された商品が表示()
     {
-        $item = Item::factory()->create([
-            'seller_id' => 1,
-            'on_sale' => true,
-            'name' => 'abcdefg',
-            'price' => 1000,
-            'brand' => 'snail',
-            'condition_id' => '1',
-            'description' => 'this is not fake.',
-            'image' => 'image.jpg',
-        ]);
+        // Arrange
+        $user = User::factory()->create();
+        $condition = Condition::create(['condition' => '新品、未使用']);
 
-        $response = $this->from('/')
-            ->post('/', [
-                'keyword' => 'cd',
-            ]);
+        Item::factory()->create(
+            [
+                'seller_id' => $user->id,
+                'on_sale' => true,
+                'name' => 'abcdefg',
+                'price' => 1000,
+                'brand' => 'brand',
+                'condition_id' => $condition->id,
+                'description' => 'description',
+                'image' => 'image.jpg',
+            ]
+        );
 
-        $response->assertStatus(302)
-            ->assertRedirect('/');
+        // Act
+        $response = $this->post('/', ['keyword' => 'cd']);
 
-        $this->followRedirects($response)
-            ->assertSee('abcdefg');
+        // Assert
+        $response->assertStatus(200)
+            ->assertSeeInOrder([
+                '<div class="tab first-tab">',
+                'abcdefg',
+                '<div class="tab second-tab js-hidden">',
+            ], false);
     }
 
-    // public function test_パスワード未入力()
-    // {
-    //     $response = $this->from('/login')
-    //         ->post('/login', [
-    //                 'password' => '',
-    //         ]);
+    public function test_検索された商品がマイリストにも表示()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $condition = Condition::create(['condition' => '新品、未使用']);
+        $login = $this->login();
 
-    //     $response->assertStatus(302)
-    //         ->assertRedirect('/login');
+        $item = Item::factory()->create(
+            [
+                'seller_id' => $user->id,
+                'on_sale' => true,
+                'name' => 'abcdefg',
+                'price' => 1000,
+                'brand' => 'brand',
+                'condition_id' => $condition->id,
+                'description' => 'description',
+                'image' => 'image.jpg',
+            ]
+        );
 
-    //     $this->followRedirects($response)
-    //         ->assertSee('パスワードを入力してください');
-    // }
+        Like::factory()->create(
+            [
+                'user_id' => $login->id,
+                'item_id' => $item->id,
+            ]
+        );
 
-    // public function test_認証失敗()
-    // {
-    //     $user = User::factory()->create();
+        // Act
+        $response = $this->post('/', ['keyword' => 'cd']);
 
-    //     // パスワードが間違っている
-    //     $response = $this->from('/login')
-    //         ->post('/login', [
-    //                 'email' => $user->email,
-    //                 'password' => 'aaaaaaaa',
-    //         ]);
-
-    //     $response->assertStatus(302)
-    //         ->assertRedirect('/login');
-
-    //     $this->followRedirects($response)
-    //         ->assertSee('ログイン情報が登録されていません');
-
-    //     // メールアドレスが間違っている
-    //     $response = $this->from('/login')
-    //     ->post('/login', [
-    //             'email' => 'aaaa@aaaa.com',
-    //             'password' => 'password',
-    //     ]);
-
-    //     $response->assertStatus(302)
-    //         ->assertRedirect('/login');
-
-    //     $this->followRedirects($response)
-    //         ->assertSee('ログイン情報が登録されていません');
-    // }
-
-    // public function test_認証成功()
-    // {
-    //     $user = User::factory()->create();
-
-    //     $response = $this->from('/login')
-    //         ->post('/login', [
-    //                 'email' => $user->email,
-    //                 'password' => 'password',
-    //         ]);
-
-    //     $response->assertStatus(302)
-    //         ->assertRedirect('/');
-
-    //     $this->assertAuthenticated();
-    // }
+        // Assert
+        $response->assertStatus(200)
+            ->assertSeeInOrder([
+                '<div class="tab second-tab js-hidden">',
+                'abcdefg',
+            ], false);
+    }
 }
