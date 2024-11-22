@@ -17,11 +17,13 @@ class LoginTest extends TestCase
      */
     public function test_メールアドレス未入力()
     {
+        // Act
         $response = $this->from('/login')
             ->post('/login', [
                     'email' => '',
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/login');
 
@@ -31,11 +33,13 @@ class LoginTest extends TestCase
 
     public function test_パスワード未入力()
     {
+        // Act
         $response = $this->from('/login')
             ->post('/login', [
                     'password' => '',
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/login');
 
@@ -45,8 +49,10 @@ class LoginTest extends TestCase
 
     public function test_認証失敗()
     {
+        // Arrange
         $user = User::factory()->create();
 
+        // Act
         // パスワードが間違っている
         $response = $this->from('/login')
             ->post('/login', [
@@ -54,12 +60,14 @@ class LoginTest extends TestCase
                     'password' => 'aaaaaaaa',
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/login');
 
         $this->followRedirects($response)
             ->assertSee('ログイン情報が登録されていません');
 
+        // Act
         // メールアドレスが間違っている
         $response = $this->from('/login')
         ->post('/login', [
@@ -67,6 +75,7 @@ class LoginTest extends TestCase
                 'password' => 'password',
         ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/login');
 
@@ -76,14 +85,17 @@ class LoginTest extends TestCase
 
     public function test_認証成功()
     {
+        // Arrange
         $user = User::factory()->create();
 
+        // Act
         $response = $this->from('/login')
             ->post('/login', [
                     'email' => $user->email,
                     'password' => 'password',
             ]);
 
+        // Assert
         $response->assertStatus(302)
             ->assertRedirect('/');
 
