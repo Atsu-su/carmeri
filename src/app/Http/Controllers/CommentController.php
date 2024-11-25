@@ -17,7 +17,7 @@ class CommentController extends Controller
         $validated = $request->validated();
         $validated['item_id'] = $item_id;
         $validated['user_id'] = $user->id;
-        
+
         try {
             Comment::create($validated);
         } catch (Exception $e) {
