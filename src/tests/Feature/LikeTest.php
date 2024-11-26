@@ -6,11 +6,6 @@ use App\Models\Condition;
 use App\Models\Item;
 use App\Models\Like;
 use App\Models\User;
-use Database\Seeders\CategoryItemSeeder;
-use Database\Seeders\CategorySeeder;
-use Database\Seeders\ConditionSeeder;
-use Database\Seeders\ItemSeeder;
-use Database\Seeders\UserSeeder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -19,14 +14,14 @@ use Stringable;
 use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
 
-class CommentTest extends TestCase
+class LikeTest extends TestCase
 {
     /**
      * A basic test example.
      *
      * @return void
      */
-    public function test_ログイン時コメント投稿可能()
+    public function test_いいね登録可能()
     {
         // Arrange
         $user = $this->login();
@@ -46,32 +41,32 @@ class CommentTest extends TestCase
 
         $response = $this->get('/item/'.$item->id);
         $beforeCrawler = new Crawler($response->content());
-        $beforeComment = $beforeCrawler->filter('.item-detail-icons-comment span')
+        $beforeComment = $beforeCrawler->filter('.item-detail-icons-like span')
             ->text();
 
         // Act
-        $response = $this->from('/item/'.$item->id)
-            ->post('/item/'.$item->id.'/comment',
-                ['comment' => 'This is a comment.']
-            );
+        $response = $this->post('/item/'.$item->id.'/like');
 
         // Assert
-        $response->assertStatus(302)
-                ->assertRedirect('/item/'.$item->id);
+        $response->assertStatus(200)
+                ->assertJson(['likeIt' => true]);
 
         $result = $this->get('/item/'.$item->id);
         $afterCrawler = new Crawler($result->content());
-        $afterComment = $afterCrawler->filter('.item-detail-icons-comment span')
+        $afterComment = $afterCrawler->filter('.item-detail-icons-like span')
             ->text();
 
-        $result->assertSee('This is a comment.');
         $this->assertEquals($beforeComment + 1, $afterComment);
+        $this->assertDatabaseHas('likes', [
+            'user_id' => $user->id,
+            'item_id' => $item->id,
+        ]);
     }
 
-    public function test_未ログイン時コメント投稿不可()
+    public function test_いいねアイコンの色変化()
     {
         // Arrange
-        $user = User::factory()->create();
+        $user = $this->login();
         $condition = Condition::create(['condition' => '新品、未使用']);
         $item = Item::factory()->create(
             [
@@ -86,74 +81,70 @@ class CommentTest extends TestCase
             ]
         );
 
+        // 黄色に変化する
         // Act
+        $response = $this->post('/item/'.$item->id.'/like');
+
+        // Assert
+        $response->assertStatus(200)
+                ->assertJson(['likeIt' => true]);
+
+        $this->get('/item/'.$item->id)
+            ->assertSee('item-detail-icons-like filled');
+
+        // 無色に変化する
+        // Act
+        $response = $this->post('/item/'.$item->id.'/like');
+
+        // Assert
+        $response->assertStatus(200)
+                ->assertJson(['likeIt' => false]);
+
+        $this->get('/item/'.$item->id)
+            ->assertSee('item-detail-icons-like');
+    }
+
+    public function test_いいね解除可能()
+    {
+        // Arrange
+        $user = $this->login();
+        $condition = Condition::create(['condition' => '新品、未使用']);
+        $item = Item::factory()->create(
+            [
+                'seller_id' => $user->id,
+                'on_sale' => true,
+                'name' => 'abcdefg',
+                'price' => 1000,
+                'brand' => 'brand',
+                'condition_id' => $condition->id,
+                'description' => 'this is a pen',
+                'image' => 'Armani+Mens+Clock.jpg',
+            ]
+        );
+
+        // いいね登録
+        $this->post('/item/'.$item->id.'/like');
         $response = $this->get('/item/'.$item->id);
-
-        // Assert
-        $response->assertSee('<p class="item-detail-comment-login">コメントをするには<a href="http://localhost/login">ログイン</a>が必要です。</p>', false);
-    }
-
-    public function test_コメント未入力()
-    {
-        // Arrange
-        $user = $this->login();
-        $condition = Condition::create(['condition' => '新品、未使用']);
-        $item = Item::factory()->create(
-            [
-                'seller_id' => $user->id,
-                'on_sale' => true,
-                'name' => 'abcdefg',
-                'price' => 1000,
-                'brand' => 'brand',
-                'condition_id' => $condition->id,
-                'description' => 'this is a pen',
-                'image' => 'Armani+Mens+Clock.jpg',
-            ]
-        );
+        $beforeCrawler = new Crawler($response->content());
+        $beforeComment = $beforeCrawler->filter('.item-detail-icons-like span')
+            ->text();
 
         // Act
-        $response = $this->from('/item/'.$item->id)
-            ->post('/item/'.$item->id.'/comment',
-                ['comment' => '']
-            );
+        $response = $this->post('/item/'.$item->id.'/like');
 
         // Assert
-        $response->assertStatus(302)
-                ->assertRedirect('/item/'.$item->id);
+        $response->assertStatus(200)
+                ->assertJson(['likeIt' => false]);
 
-        $this->followRedirects($response)
-            ->assertSee('コメントを入力してください');
-    }
+        $result = $this->get('/item/'.$item->id);
+        $afterCrawler = new Crawler($result->content());
+        $afterComment = $afterCrawler->filter('.item-detail-icons-like span')
+            ->text();
 
-    public function test_コメント文字数超過()
-    {
-        // Arrange
-        $user = $this->login();
-        $condition = Condition::create(['condition' => '新品、未使用']);
-        $item = Item::factory()->create(
-            [
-                'seller_id' => $user->id,
-                'on_sale' => true,
-                'name' => 'abcdefg',
-                'price' => 1000,
-                'brand' => 'brand',
-                'condition_id' => $condition->id,
-                'description' => 'this is a pen',
-                'image' => 'Armani+Mens+Clock.jpg',
-            ]
-        );
-
-        // Act
-        $response = $this->from('/item/'.$item->id)
-            ->post('/item/'.$item->id.'/comment',
-                ['comment' => Str::random(256)]
-            );
-
-        // Assert
-        $response->assertStatus(302)
-                ->assertRedirect('/item/'.$item->id);
-
-        $this->followRedirects($response)
-            ->assertSee('コメントは255文字以内で入力してください');
+        $this->assertEquals($beforeComment - 1, $afterComment);
+        $this->assertDatabaseMissing('likes', [
+            'user_id' => $user->id,
+            'item_id' => $item->id,
+        ]);
     }
 }

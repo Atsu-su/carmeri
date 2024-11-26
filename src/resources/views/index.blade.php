@@ -38,7 +38,7 @@
             @else
               <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
             @endif
-            @if ($item->isOnSale())
+            @if ($like->item->isOnSale())
               <p>{{ $like->item->name }}</p>
             @else
               <p class="sold">{{ $like->item->name }}</p>
