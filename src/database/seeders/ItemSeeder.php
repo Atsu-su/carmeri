@@ -15,7 +15,7 @@ class ItemSeeder extends Seeder
     public function run()
     {
         if (! Item::exists()) {
-            Item::factory(10)->notOnSale()->create();
+            // Item::factory(10)->notOnSale()->create();
             Item::insert([
                 [
                     'name' => '腕時計',

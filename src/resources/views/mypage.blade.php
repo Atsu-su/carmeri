@@ -60,7 +60,7 @@
               @else
                 <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
               @endif
-              <p>{{ $item->item->name }}</p>
+              <p class="sold">{{ $item->item->name }}</p>
             </a>
           @endforeach
         @endif

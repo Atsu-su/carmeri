@@ -18,7 +18,7 @@ class CategoryItemSeeder extends Seeder
         if (! CategoryItem::exists()) {
             $max = Category::count();
             $cnt = 1;
-            for ($i = 0; $i < 20; ++$i) {
+            for ($i = 0; $i < 10; ++$i) {
                 for ($j = 0; $j < 3; ++$j) {
                     CategoryItem::create([
                         'item_id' => $i + 1,

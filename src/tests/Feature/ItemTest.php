@@ -10,7 +10,6 @@ use App\Models\Item;
 use App\Models\Like;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Stringable;
 use Tests\TestCase;
@@ -25,8 +24,6 @@ class ItemTest extends TestCase
     public function test_詳細情報表示()
     {
         // Arrange
-        Schema::disableForeignKeyConstraints();
-
         $user = User::factory()->create();
         $condition = Condition::create(['condition' => '新品、未使用']);
 
@@ -42,7 +39,6 @@ class ItemTest extends TestCase
                 'image' => 'Armani+Mens+Clock.jpg',
             ]
         );
-
 
         Like::factory()->create(
             [
@@ -61,7 +57,7 @@ class ItemTest extends TestCase
         $comment = Comment::with('user')->first();
 
         // Act
-        $response = $this->get('/item/' . $selectedItem->id);
+        $response = $this->get('/item/'.$selectedItem->id);
 
         // Assert
         $response->assertStatus(200)
@@ -76,16 +72,12 @@ class ItemTest extends TestCase
             ->assertSee($selectedItem->condition->condition)
             ->assertSee($comment->user->name)
             ->assertSee($comment->comment)
-            ->assertSee('<img src="'. asset('storage/item_images/' . $selectedItem->image) . '" width="600" height="600"', false);
-
-        Schema::enableForeignKeyConstraints();
+            ->assertSee('<img src="'. asset('storage/item_images/'.$selectedItem->image).'" width="600" height="600"', false);
     }
 
     public function test_複数カテゴリ表示()
     {
         // Arrange
-        Schema::disableForeignKeyConstraints();
-
         $user = User::factory()->create();
         $condition = Condition::create(['condition' => '新品、未使用']);
 
@@ -117,14 +109,12 @@ class ItemTest extends TestCase
         $selectedItem = Item::with('categoryItems.category')->first();
 
         // Act
-        $response = $this->get('/item/' . $selectedItem->id);
+        $response = $this->get('/item/'.$selectedItem->id);
 
         // Assert
         $response->assertStatus(200);
         foreach($selectedItem->categoryItems as $categoryItem) {
             $response->assertSee($categoryItem->category->category);
         }
-
-        Schema::enableForeignKeyConstraints();
     }
 }
