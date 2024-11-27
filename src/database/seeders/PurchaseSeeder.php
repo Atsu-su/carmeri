@@ -18,11 +18,11 @@ class PurchaseSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // for ($i = 1; $i <= 10; ++$i) {
-        //     Purchase::create([
-        //         'item_id' => $i,
-        //         'buyer_id' => $faker->numberBetween(1, 10),
-        //         'payment_method_id' => $faker->numberBetween(1, 2),
-        // ]);}
+        for ($i = 1; $i <= 3; ++$i) {
+            Purchase::create([
+                'item_id' => $i,
+                'buyer_id' => $faker->numberBetween(1, 10),
+                'payment_method_id' => $faker->numberBetween(1, 2),
+        ]);}
     }
 }

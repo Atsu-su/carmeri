@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ExhibitionRequest;
+use App\Messages\Message;
 use App\Models\Category;
 use App\Models\CategoryItem;
 use App\Models\Item;
@@ -10,7 +11,10 @@ use App\Models\Like;
 use App\Models\Comment;
 use App\Models\Condition;
 use App\Messages\Session as MessageSession;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
@@ -52,22 +56,42 @@ class ItemController extends Controller
 
         $extension = $request->file('image')->extension();
         $fileName = 'item_image_'. time() . '.' . $extension;
-        $request->file('image')->storeAs('public/item_images', $fileName);
+
+        Storage::disk('public')->putFileAs(
+            'item_images',
+            $request->file('image'),
+            $fileName
+        );
 
         $validated = $request->validated();
         $itemData = array_merge($validated, [
             'seller_id' => $user->id,
             'image' => $fileName,
         ]);
-        $item = Item::create($itemData);
 
-        foreach($itemData['category_id'] as $category_id) {
-            CategoryItem::create([
-                'item_id' => $item->id,
-                'category_id' => $category_id,
-            ]);
+        try {
+            DB::beginTransaction();
+
+            $item = Item::create($itemData);
+
+            foreach($itemData['category_id'] as $category_id) {
+                CategoryItem::create([
+                    'item_id' => $item->id,
+                    'category_id' => $category_id,
+                ]);
+            }
+
+            throw new Exception('エラーが発生しました');
+
+            DB::commit();
+        } catch (Exception $e) {
+            Storage::disk('public')->delete('item_images/' . $fileName);
+            DB::rollBack();
+            return redirect()->route('mypage')
+                ->with('message', Message::get('list.failed'));
         }
 
-        return redirect()->route('index');
+        return redirect()->route('mypage')
+            ->with('message', Message::get('list.success'));
     }
 }

@@ -12,7 +12,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Stringable;
-use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
 
 class AddressTest extends TestCase
@@ -54,7 +53,7 @@ class AddressTest extends TestCase
     {
         // Arrange
         $seller = User::factory()->create();
-        $buyer = $this->login();
+        $this->login();
         $condition = Condition::create(['condition' => '新品、未使用']);
         $payment = PaymentMethod::create(['payment_method' => 'クレジットカード']);
         $item = Item::factory()->create([
@@ -88,6 +87,5 @@ class AddressTest extends TestCase
         $this->assertSame($newAddress->postal_code, $updatedBuyer->postal_code);
         $this->assertSame($newAddress->address, $updatedBuyer->address);
         $this->assertSame($newAddress->building_name, $updatedBuyer->building_name);
-
     }
 }
