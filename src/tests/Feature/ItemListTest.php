@@ -11,12 +11,21 @@ use Database\Seeders\ConditionSeeder;
 use Database\Seeders\ItemSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Stringable;
 use Tests\TestCase;
 
 class ItemListTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->artisan('migrate:fresh');  // 各テスト開始時にDBをリフレッシュ
+    }
+
     /**
      * A basic test example.
      *
@@ -24,7 +33,7 @@ class ItemListTest extends TestCase
      */
      public function test_商品一覧に全商品表示()
      {
-         // Arrange
+        // Arrange
         $this->seed([
             UserSeeder::class,
             ConditionSeeder::class,

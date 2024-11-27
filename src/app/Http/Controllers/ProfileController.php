@@ -38,7 +38,13 @@ class ProfileController extends Controller
                 // 新しく画像が登録される場合
                 $extension = $request->file('image')->extension();
                 $fileName = 'profile_image_'. time() . '.' . $extension;
-                $request->file('image')->storeAs('public/profile_images', $fileName);
+
+                // 画像を保存（storeAsはテスト時に保存先を変更できないため使用しない）
+                Storage::disk('public')->putFileAs(
+                    'profile_images',
+                    $request->file('image'),
+                    $fileName
+                );
 
                 $validated['image'] = $fileName;
             } else {

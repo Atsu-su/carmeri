@@ -10,9 +10,10 @@ class UserFactory extends Factory
     protected $images = [
         'hatsune.jpeg',
         'list-pochacco.png',
-        'mario.webp',
+        'mario.jpg',
         'test.jpg',
-        'test2.jpg',
+        // ProfileEditTestで変更後の画像として使用のためコメントアウト
+        // 'test2.jpg',
     ];
 
     /**
