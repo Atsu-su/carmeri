@@ -61,20 +61,56 @@ coachtech フリマアプリ （carmeri）
 
 （注意点）
 - MYSQLのタイムゾーン設定はデフォルトである。（Asia/Tokyoではない）
-- 項番4でMySQLの権限エラーが出力した場合は以下の手順を実行すること。
+- 項番4のmigrate時にMySQLの権限エラーが出力した場合は以下の手順を実行すること。
 
     ```
     $ docker-compose exec mysql bash
     # mysql -u root
-    mysql> set password for root@localhost = '（任意のパスワード）'
+    mysql> set password for 'root'@'localhost' = '（任意のパスワード）'
     mysql> select user, host from mysql.user;
-    
+
     ＜laravel_userが存在することを確認する＞
 
     ＜存在しない場合、以下のコマンドにてユーザを作成し、権限を付与する＞
-    
-    mysql> CREATE USER 'laravel_user'@'%' IDENTIFIED BY 'laravel_pass';
-    mysql> GRANT ALL PRIVILEGES ON laravel_db . * TO 'laravel_user'@'%';
+
+    ※存在しない場合
+    mysql> select user, host from mysql.user;
+    +------------------+-----------+
+    | user             | host      |
+    +------------------+-----------+
+    | mysql.infoschema | localhost |
+    | mysql.session    | localhost |
+    | mysql.sys        | localhost |
+    | root             | localhost |
+    +------------------+-----------+
+
+    mysql> create user 'laravel_user'@'%' identified by 'laravel_pass';
+    mysql> grant all privileges on laravel_db.* to 'laravel_user'@'%';
+    mysql> flush privileges;
+    mysql> select user, host from mysql.user;
+    +------------------+-----------+
+    | user             | host      |
+    +------------------+-----------+
+    | laravel_user     | %         |
+    | mysql.infoschema | localhost |
+    | mysql.session    | localhost |
+    | mysql.sys        | localhost |
+    | root             | localhost |
+    +------------------+-----------+
+
+    ＜laravel_dbがあることを確認する＞
+    mysql> show databases;
+
+    ＜存在しない場合、以下の手順で作成する＞
+    mysql> create database laravel_db;
+    mysql> grant all privileges on laravel_db . * to 'laravel_user'@'%';
+    mysql> flush privileges;
+    ```
+    再度migrationから実行する。  
+
+    またはcarmeri/docker/mysql/dataを削除し再度以下のコマンドを実行すると正常になることもある。  
+    ```
+    $ docker-compose up -d  
     ```
 
 ## 使用技術(実行環境)
