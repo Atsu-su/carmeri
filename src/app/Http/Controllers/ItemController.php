@@ -81,17 +81,14 @@ class ItemController extends Controller
                 ]);
             }
 
-            throw new Exception('エラーが発生しました');
-
             DB::commit();
+            return redirect()->route('mypage')
+                ->with('message', Message::get('list.success'));
         } catch (Exception $e) {
             Storage::disk('public')->delete('item_images/' . $fileName);
             DB::rollBack();
             return redirect()->route('mypage')
                 ->with('message', Message::get('list.failed'));
         }
-
-        return redirect()->route('mypage')
-            ->with('message', Message::get('list.success'));
     }
 }
