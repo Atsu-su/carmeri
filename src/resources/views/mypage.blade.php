@@ -20,7 +20,16 @@
             </div>
           @endif
         </div>
-        <p class="user-info-name">{{ $user->name }}</p>
+        <div>
+          <p class="user-info-name">{{ $user->name }}</p>
+          <div class="user-info-stars">
+            <span class="user-info-stars-star1 filled"></span>
+            <span class="user-info-stars-star2"></span>
+            <span class="user-info-stars-star3"></span>
+            <span class="user-info-stars-star4"></span>
+            <span class="user-info-stars-star5"></span>
+          </div>
+        </div>
       </div>
       <a class="c-btn c-btn--profile-edit" href="{{ route('profile.edit')}}">プロフィールを編集</a>
     </div>
@@ -28,8 +37,9 @@
       <div class="titles">
         <h2 class="title title-recommend js-active-title" data-tab="first-tab">出品した商品</h2>
         <h2 class="title title-mylist" data-tab="second-tab">購入した商品</h2>
+        <h2 class="title title-processing" data-tab="third-tab">取引中の商品<span class="new-message-icon">3</span></h2>
       </div>
-      <div class="tab first-tab">
+      <div class="tab first-tab js-hidden">
         @if ($listedItems->isEmpty())
           <p class="no-listed-item">出品された商品はありません</p>
         @else
@@ -61,6 +71,26 @@
                 <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
               @endif
               <p class="sold">{{ $item->item->name }}</p>
+            </a>
+          @endforeach
+        @endif
+      </div>
+      <div class="tab third-tab">
+        {{-- 修正予定 --}}
+        @if (false)
+          <p class="no-purchased-item">取引中の商品はありません</p>
+        @else
+          @foreach ($purchasedItems as $item)
+            <a class="c-item" href="{{ route('item.show', $item->item->id) }}">
+              <div class="image-container">
+                @if ($item->item->image && Storage::disk('public')->exists('item_images/'.$item->item->image))
+                  <img src="{{ asset('storage/item_images/'.$item->item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
+                @else
+                  <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+                @endif
+                <span class="new-message-icon2">4</span>
+              </div>
+              <p class="sold">item-name</p>
             </a>
           @endforeach
         @endif

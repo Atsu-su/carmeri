@@ -194,6 +194,9 @@ iframe {
   --color-bg-input: #fff;
   --color-bg-select: #B1B1B1;
   --color-bg-modal: rgba(217, 217, 217, 0.6);
+  --color-bg-icon: #FF0000;
+  --color-bg-sidebar: #868686;
+  --color-bg-btn-gray: #EEEFEB;
   --color-font-base: #000;
   --color-font-blue: #0073CC;
   --color-font-gray: #5F5F5F;
@@ -315,6 +318,12 @@ html {
   border-radius: 10px;
 }
 
+@media screen and (max-width: 870px) {
+  .c-btn--profile-edit {
+    width: 280px;
+  }
+}
+
 .c-btn--verify-resend {
   margin: 0 auto;
   width: 300px;
@@ -393,16 +402,37 @@ html {
 .c-item {
   width: 290px;
   display: block;
+  position: relative;
 }
 
 .c-item:hover {
   opacity: 0.8;
 }
 
+.c-item .image-container {
+  position: relative;
+}
+
 .c-item img {
   width: 100%;
   height: 281px;
   object-fit: cover;
+}
+
+.c-item .new-message-icon2 {
+  padding-left: 8px;
+  padding-top: 5px;
+  width: 27px;
+  height: 27px;
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  color: var(--color-font-white);
+  font-size: 16px;
+  line-height: 1;
+  background-color: var(--color-bg-icon);
+  border-radius: 50%;
 }
 
 .c-item p {
@@ -537,13 +567,40 @@ html {
   }
 }
 
-.c-items .second-tab {
-  display: none;
+.c-items .title-processing {
+  margin-left: 75px;
+}
+
+@media screen and (max-width: 900px) {
+  .c-items .title-processing {
+    margin-left: 0;
+  }
+}
+
+.c-items .new-message-icon {
+  margin-left: 8px;
+  padding-left: 8px;
+  padding-top: 3px;
+  width: 27px;
+  height: 27px;
+  display: inline-block;
+  position: relative;
+  top: -2px;
+  color: var(--color-font-white);
+  font-size: 18px;
+  line-height: 1;
+  background-color: var(--color-bg-icon);
+  border-radius: 10px;
+}
+
+@media screen and (max-width: 900px) {
+  .c-items .new-message-icon {
+
+  }
 }
 
 /* 1行に5商品表示する場合は明示的にcolumn-gapを変更すること */
-.c-items .first-tab,
-.c-items .second-tab {
+.c-items .tab {
   margin: 0 auto 50px;
   width: calc(100% - 70px);
   display: flex;
@@ -552,23 +609,20 @@ html {
 }
 
 @media screen and (max-width: 1280px) {
-  .c-items .first-tab,
-  .c-items .second-tab {
+  .c-items .tab {
     column-gap: calc((100% - 290px * 3) / 2)
   }
 }
 
 @media screen and (max-width: 1000px) {
-  .c-items .first-tab,
-  .c-items .second-tab {
+  .c-items .tab {
     width: calc(100% - 250px);
     column-gap: calc((100% - 290px * 2))
   }
 }
 
 @media screen and (max-width: 900px) {
-  .c-items .first-tab,
-  .c-items .second-tab {
+  .c-items .tab {
     justify-content: center;
   }
 }
@@ -1243,7 +1297,7 @@ body {
 
 @media screen and (max-width: 870px) {
   #mypage .user {
-    width: 90%;
+    width: 95%;
   }
 }
 
@@ -1269,6 +1323,30 @@ body {
   font-size: 36px;
   font-weight: 700;
   line-height: 1;
+}
+
+#mypage .user-info-stars {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+#mypage .user-info-stars-star1,
+#mypage .user-info-stars-star2,
+#mypage .user-info-stars-star3,
+#mypage .user-info-stars-star4,
+#mypage .user-info-stars-star5 {
+  width: 40px;
+  height: 40px;
+  background-image: url(../img/icon_star.svg);
+}
+
+#mypage .user-info-stars-star1.filled,
+#mypage .user-info-stars-star2.filled,
+#mypage .user-info-stars-star3.filled,
+#mypage .user-info-stars-star4.filled,
+#mypage .user-info-stars-star5.filled {
+  background-image: url(../img/icon_star_filled.svg);
 }
 
 /* ----------------------- */
@@ -1631,4 +1709,111 @@ body {
 #card .error-message {
   margin-top: 20px;
   color: var(--color-font-red);
+}
+
+/* ----------------------- */
+/* chat.blade.php
+/* チャット画面（#chat）
+/* ----------------------- */
+#chat {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  display: flex;
+}
+#chat .sidebar {
+  width: 260px;
+  min-height: calc(100vh - 80px);
+  background-color: var(--color-bg-sidebar);
+}
+
+#chat .sidebar-title {
+  color: var(--color-font-white);
+  font-size: 30px;
+  font-weight: 700;
+  text-align: center;
+}
+
+#chat .sidebar-title-listed,
+#chat .sidebar-title-processing {
+  color: var(--color-font-white);
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+}
+
+#chat .sidebar-title-listed {
+  margin-top: 30px;
+}
+
+#chat .sidebar-title-processing {
+  margin-top: 20px;
+}
+
+#chat .sidebar-items-name {
+  margin: 0 auto;
+  width: 200px;
+  text-align: center;
+  background-color: var(--color-bg-btn-gray);
+}
+
+#chat .sidebar-items-name:not(:last-child) {
+  margin-bottom: 43px;
+}
+
+#chat .chat {
+  width: calc(100% - 260px);
+}
+
+#chat .chat-title {
+  padding: 13px 0 13px 37px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 2px solid var(--color-border-gray);
+}
+
+/* 外側 */
+#chat .chat-title-profile-outer-frame {
+  width: 79px;
+  height: 79px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-border-gray);
+  border-radius: 50%;
+}
+
+/* 内側 */
+#chat .chat-title-profile-inner-frame {
+  width: 52px;   /* 半径75pxの円に接する正方形（少し小さめ） */
+  height: 52px;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+#chat .chat-title-profile-no-image {
+  font-size: 14px;
+  text-align: center;
+}
+
+#chat .chat-item {
+  padding: 12px 0 12px 40px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  border-bottom: 2px solid var(--color-border-gray);
+}
+
+#chat .chat-item img {
+  width: 200px;
+  height: 200px;
+}
+
+#chat .chat-item-info-name {
+  font-size: 48px;
+  font-weight: 700px;
+}
+
+#chat .chat-item-info-price {
+  font-size: 36px;
 }

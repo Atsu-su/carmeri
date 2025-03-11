@@ -39,6 +39,25 @@ Route::middleware('header')->group(function () {
         Route::get('/sell', [ItemController::class, 'create'])->name('sell.create');
         Route::post('/sell', [ItemController::class, 'store'])->name('sell.store');
 
+
+        // ---------------------------------------------------
+        Route::get('chat', function () {
+            $user = auth()->user();
+            $listedItems = \App\Models\Item::query()
+            ->where('seller_id', $user->id)
+            ->get();
+            $purchasedItems = \App\Models\Purchase::query()
+            ->with('item:id,name,image')
+            ->where('buyer_id', $user->id)
+            ->first();
+            $message = \App\Messages\Session::exists('message');
+
+
+            return view('chat', compact('user', 'listedItems', 'purchasedItems', 'message'));
+        });
+        // ---------------------------------------------------
+
+
         // stripeの成功・キャンセル用ルーティング
         Route::get('/payment/success/{purchase_id}', [PurchaseController::class, 'success'])->name('payment.success');
         Route::get('/payment/cancel/{purchase_id}', [PurchaseController::class, 'cancel'])->name('payment.cancel');
