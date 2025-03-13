@@ -32,6 +32,15 @@ https://readouble.com/laravel/10.x/ja/broadcasting.html
 まずはこの通り実装して修正する
 https://www.hiramine.com/programming/chat_laravel_pusher_private/index.html
 
+===============================================
+### Pusher info. ###
+===============================================
+app_id = "1957048"
+key = "bbd412eda0ca21a3a4a8"
+secret = "3e68bb633e157190df1a"
+cluster = "ap3"
+===============================================
+
 WebSocketで特定の人物とだけメッセージをやり取りする場合、チャネル番号（または部屋ID）を固定するだけでは不十分です。より安全で効果的な方法を説明します。
 
 推奨されるアプローチ

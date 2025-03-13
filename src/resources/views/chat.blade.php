@@ -73,7 +73,7 @@
           <a class="c-btn c-btn--chat-complete-transaction" href="">取引完了</a>
         </div>
         <div class="chat-item">
-          <img src="{{ Storage::disk('public')->url('item_images/'.$purchasedItems->item->image) }}" width="200" height="200" alt="">
+          <img src="{{ Storage::disk('public')->url('item_images/'.'Armani+Mens+Clock.jpg') }}" width="200" height="200" alt="">
           <div class="chat-item-info">
             <h2 class="chat-item-info-name">商品名</h2>
             <p class="chat-item-info-price">¥6,000</p>
@@ -132,8 +132,8 @@
             <li class="chat-content-list right">
               <div class="chat-content-list-profile">
                 <div class="chat-content-list-profile-outer-frame">
-                  @if (!$user->image && Storage::disk('public')->exists('profile_images/'.$user->image))
-                    <img class="chat-content-list-profile-inner-frame" src="{{ asset('storage/profile_images/'.$user->image) }}" alt="プロフィールの画像">
+                  @if (!$user->image && Storage::disk('public')->exists('profile_images/'.'hatsune.jpeg'))
+                    <img class="chat-content-list-profile-inner-frame" src="{{ asset('storage/profile_images/'.'hatsune.jpeg') }}" alt="プロフィールの画像">
                   @else
                     <div class="chat-content-list-profile-no-image">
                       <p>NO</p>
@@ -154,8 +154,9 @@
             </li>
           </ul>
           <div class="chat-content-send">
-            <form action="" method="">
-              <input class="chat-content-send-input" type="text" placeholder="取引メッセージを入力してください">
+            <form id="form" action="{{ route('chat.send') }}" method="POST" onsubmit="return sendMessage()">
+              @csrf
+              <input id="input" class="chat-content-send-input" type="text" name="message" value="" placeholder="取引メッセージを入力してください">
               <button class="chat-content-send-add-image c-btn c-btn--chat-add-image">画像を追加</button>
               <button class="chat-content-send-submit" type="submit"></button>
             </form>
@@ -164,36 +165,105 @@
       </div>
     </div>
   </div>
+  {{-- コメント送付用 --}}
+  <script src="{{ mix('js/app.js') }}"></script>
   <script>
-    const stars = document.querySelectorAll('.modal-content-stars-star');
-    stars.forEach(star => {
-      star.addEventListener('mouseover', (e) => {
-        const number = parseInt(star.dataset.number);
-        for (let i = 0; i < number; i++) {
-          stars[i].classList.add('filled');
+    function sendMessage() {
+      const form = document.getElementById('form');
+      const input = document.getElementById('input');
+      const data = new FormData(form);
+
+      // フォームの内容を送信する処理
+      if (!input.value) return false;
+
+      fetch('{{ route("chat.send") }}', {
+        method: 'POST',
+        body: data,
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
         }
-      });
-
-      star.addEventListener('click', (e) => {
-        const number = parseInt(star.dataset.number);
-
-        // クエリパラメータにnumberの値をいれる
-        // ?number=numberとする
-
-        stars.forEach(star => {
-          star.classList.remove('clicked');
-        });
-
-        for (let i = 0; i < number; i++) {
-          stars[i].classList.add('clicked');
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+        // ここでチャットの表示を更新する処理
+        input.value = ''; // 入力フィールドをクリア
+      })
+      .catch(error => {
+        console.log('Error:', error);
       });
 
-      star.addEventListener('mouseout', (e) => {
-        stars.forEach(star => {
-          star.classList.remove('filled');
-        });
+      return false;
+    }
+  </script>
+  <script>
+    window.addEventListener("DOMContentLoaded", () =>
+    {
+      window.Echo.channel('testchat').listen('MessageSent', (e) => {
+        console.log(e.message);
+	      // メッセージをレンダリング
       });
+
+        // const elementListMessage = document.getElementById( "list_message" );
+
+        // window.Echo.private('chat').listen( 'MessageSent', (e) =>
+        // {
+        //     console.log('message received');
+        //     console.log(e);
+            // let strUsername = e.message.username;
+            // let strMessage = e.message.body;
+
+            // let elementLi = document.createElement( "li" );
+            // let elementUsername = document.createElement( "strong" );
+            // let elementMessage = document.createElement( "div" );
+            // elementUsername.textContent = strUsername;
+            // elementMessage.textContent = strMessage;
+            // elementLi.append( elementUsername );
+            // elementLi.append( elementMessage );
+            // elementListMessage.prepend( elementLi );  // リストの一番上に追加
+            //elementListMessage.append( elementLi ); // リストの一番下に追加
+        // });
     });
   </script>
+
+  {{-- 評価用 --}}
+  @if (false)
+    <script>
+      const stars = document.querySelectorAll('.modal-content-stars-star');
+      stars.forEach(star => {
+        star.addEventListener('mouseover', (e) => {
+          const number = parseInt(star.dataset.number);
+          for (let i = 0; i < number; i++) {
+            stars[i].classList.add('filled');
+          }
+        });
+
+        star.addEventListener('click', (e) => {
+          const number = parseInt(star.dataset.number);
+
+          // クエリパラメータにnumberの値をいれる
+          // ?number=numberとする
+
+          stars.forEach(star => {
+            star.classList.remove('clicked');
+          });
+
+          for (let i = 0; i < number; i++) {
+            stars[i].classList.add('clicked');
+          }
+        });
+
+        star.addEventListener('mouseout', (e) => {
+          stars.forEach(star => {
+            star.classList.remove('filled');
+          });
+        });
+      });
+    </script>
+  @endif
 @endsection

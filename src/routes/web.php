@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ItemController;
@@ -22,8 +23,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('header')->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('index');
-    Route::post('/', [HomeController::class, 'search'])->name('index.search');
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::post('/', [HomeController::class, 'search'])->name('home.search');
     Route::get('/item/{item_id}', [ItemController::class, 'show'])->name('item.show');
 
     Route::middleware(['auth', 'verified'])->group(function () {
@@ -41,20 +42,8 @@ Route::middleware('header')->group(function () {
 
 
         // ---------------------------------------------------
-        Route::get('chat', function () {
-            $user = auth()->user();
-            $listedItems = \App\Models\Item::query()
-            ->where('seller_id', $user->id)
-            ->get();
-            $purchasedItems = \App\Models\Purchase::query()
-            ->with('item:id,name,image')
-            ->where('buyer_id', $user->id)
-            ->first();
-            $message = \App\Messages\Session::exists('message');
-
-
-            return view('chat', compact('user', 'listedItems', 'purchasedItems', 'message'));
-        });
+        Route::get('chat', [ChatController::class, 'index'])->name('chat');
+        Route::post('chat', [ChatController::class, 'sendMessage'])->name('chat.send');
         // ---------------------------------------------------
 
 

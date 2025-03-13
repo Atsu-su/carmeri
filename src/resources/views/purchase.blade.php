@@ -64,7 +64,7 @@
         <p class="c-btn c-btn--disabled">
           {{ $item->purchase->isPurchased() ? '購入済み' : '購入手続き中' }}
         </p>
-        <a class="summary-link" href="{{ route('index') }}">商品一覧に戻る</a>
+        <a class="summary-link" href="{{ route('home') }}">商品一覧に戻る</a>
       @endif
     </div>
   </form>
