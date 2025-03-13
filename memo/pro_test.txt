@@ -1,9 +1,9 @@
-・商品詳細画面から「取引開始」ボタンを押すと取引が開始され、他のユーザは
+・[done] 商品詳細画面から「取引開始」ボタンを押すと取引が開始され、他のユーザは
   ボタンを見ることができなくなる（同時に開始された場合は片方はエラーメッセージ）
 
-・マイページに取引中の商品の画面を追加
-・マイページに評価を表す星を追加
-・チャット画面を追加
+・[done] マイページに取引中の商品の画面を追加
+・[done] マイページに評価を表す星を追加
+・[done] チャット画面を追加
 
 ・取引中の商品の並びは最新メッセージ到着順に左から並べる
 ・チャットの内容を記録するテーブルを追加
@@ -24,6 +24,11 @@
 ・取引が完了すると出品者宛にメールが送信される
 
 ＜websocket＞
+https://qiita.com/SI_Monxy/items/99114edfa56cf78e3feb
+https://note.com/plusjam/n/n8579e39380e2
+https://www.hiramine.com/programming/chat_laravel_pusher_private/06_send_chat_message.html
+https://readouble.com/laravel/10.x/ja/broadcasting.html
+
 まずはこの通り実装して修正する
 https://www.hiramine.com/programming/chat_laravel_pusher_private/index.html
 
