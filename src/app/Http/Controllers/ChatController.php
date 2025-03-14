@@ -13,7 +13,7 @@ class ChatController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index($purchase_id)
     {
         $user = auth()->user();
         $listedItems = \App\Models\Item::query()

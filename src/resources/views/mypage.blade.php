@@ -37,9 +37,10 @@
       <div class="titles">
         <h2 class="title title-recommend js-active-title" data-tab="first-tab">出品した商品</h2>
         <h2 class="title title-mylist" data-tab="second-tab">購入した商品</h2>
-        <h2 class="title title-processing" data-tab="third-tab">取引中の商品<span class="new-message-icon">3</span></h2>
+        <h2 class="title title-processing" data-tab="third-tab">取引中の出品商品<span class="new-message-icon"><span>{{ $sellingItemsMessagesCount->sum() }}</span></span></h2>
+        <h2 class="title title-processing" data-tab="fourth-tab">取引中の購入商品<span class="new-message-icon"><span>{{$purchasingItemsMessagesCount->sum() }}</span></span></h2>
       </div>
-      <div class="tab first-tab js-hidden">
+      <div class="tab first-tab">
         @if ($listedItems->isEmpty())
           <p class="no-listed-item">出品された商品はありません</p>
         @else
@@ -63,34 +64,52 @@
         @if ($purchasedItems->isEmpty())
           <p class="no-purchased-item">購入された商品はありません</p>
         @else
-          @foreach ($purchasedItems as $item)
-            <a class="c-item" href="{{ route('item.show', $item->item->id) }}">
-              @if ($item->item->image && Storage::disk('public')->exists('item_images/'.$item->item->image))
-                <img src="{{ asset('storage/item_images/'.$item->item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
+          @foreach ($purchasedItems as $purchase)
+            <a class="c-item" href="{{ route('item.show', $purchase->item->id) }}">
+              @if ($purchase->item->image && Storage::disk('public')->exists('item_images/'.$purchase->item->image))
+                <img src="{{ asset('storage/item_images/'.$purchase->item->image) }}" width="290" height="281" alt="{{ $purchase->name }}の画像">
               @else
                 <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
               @endif
-              <p class="sold">{{ $item->item->name }}</p>
+              <p class="sold">{{ $purchase->item->name }}</p>
             </a>
           @endforeach
         @endif
       </div>
-      <div class="tab third-tab">
-        {{-- 修正予定 --}}
-        @if (false)
-          <p class="no-purchased-item">取引中の商品はありません</p>
+      <div class="tab third-tab js-hidden">
+        @if ($sellingItems->isEmpty())
+          <p class="no-purchased-item">出品している商品のうち、取引中の商品はありません</p>
         @else
-          @foreach ($purchasedItems as $item)
-            <a class="c-item" href="{{ route('item.show', $item->item->id) }}">
+          @foreach ($sellingItems as $index => $purchase)
+            <a class="c-item" href="{{ route('chat', $purchase->id) }}">
               <div class="image-container">
-                @if ($item->item->image && Storage::disk('public')->exists('item_images/'.$item->item->image))
-                  <img src="{{ asset('storage/item_images/'.$item->item->image) }}" width="290" height="281" alt="{{ $item->name }}の画像">
+                @if ($purchase->item->image && Storage::disk('public')->exists('item_images/'.$purchase->item->image))
+                  <img src="{{ asset('storage/item_images/'.$purchase->item->image) }}" width="290" height="281" alt="{{ $purchase->name }}の画像">
                 @else
                   <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
                 @endif
-                <span class="new-message-icon2">4</span>
+                <span class="new-message-icon2">{{ $sellingItemsMessagesCount[$index] }}</span>
               </div>
-              <p class="sold">item-name</p>
+              <p>{{ $purchase->item->name }}</p>
+            </a>
+          @endforeach
+        @endif
+      </div>
+      <div class="tab fourth-tab js-hidden">
+        @if ($purchasedItems->isEmpty())
+          <p class="no-purchased-item">購入した商品のうち、取引中の商品はありません</p>
+        @else
+          @foreach ($purchasingItems as $index => $purchase)
+            <a class="c-item" href="{{ route('chat', $purchase->id) }}">
+              <div class="image-container">
+                @if ($purchase->item->image && Storage::disk('public')->exists('item_images/'.$purchase->item->image))
+                  <img src="{{ asset('storage/item_images/'.$purchase->item->image) }}" width="290" height="281" alt="{{ $purchase->name }}の画像">
+                @else
+                  <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+                @endif
+                <span class="new-message-icon2">{{ $purchasingItemsMessagesCount[$index] }}</span>
+              </div>
+              <p>{{ $purchase->item->name }}</p>
             </a>
           @endforeach
         @endif

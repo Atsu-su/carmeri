@@ -42,7 +42,7 @@ Route::middleware('header')->group(function () {
 
 
         // ---------------------------------------------------
-        Route::get('chat', [ChatController::class, 'index'])->name('chat');
+        Route::get('chat/{purchase_id}', [ChatController::class, 'index'])->name('chat');
         Route::post('chat', [ChatController::class, 'sendMessage'])->name('chat.send');
         // ---------------------------------------------------
 

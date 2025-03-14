@@ -165,10 +165,10 @@
       </div>
     </div>
   </div>
-  {{-- コメント送付用 --}}
   <script src="{{ mix('js/app.js') }}"></script>
+  {{-- コメント送付用 --}}
   <script>
-    function sendMessage() {
+    async function sendMessage() {
       const form = document.getElementById('form');
       const input = document.getElementById('input');
       const data = new FormData(form);
@@ -176,27 +176,25 @@
       // フォームの内容を送信する処理
       if (!input.value) return false;
 
-      fetch('{{ route("chat.send") }}', {
-        method: 'POST',
-        body: data,
-        headers: {
-          'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+      try {
+
+        const response = await fetch('{{ route("chat.send") }}', {
+          method: 'POST',
+          body: data,
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+          }
+        })
+
+        if(!response.ok) {
+            throw new Error('Network response was not ok');
         }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log(data);
-        // ここでチャットの表示を更新する処理
+
+        const data = await response.json();
         input.value = ''; // 入力フィールドをクリア
-      })
-      .catch(error => {
+      } catch {
         console.log('Error:', error);
-      });
+      }
 
       return false;
     }

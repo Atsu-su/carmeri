@@ -10,4 +10,9 @@ class Chat extends Model
     use HasFactory;
 
     protected $guareded = [];
+
+    public function purchase()
+    {
+        return $this->belongsTo(Purchase::class);
+    }
 }

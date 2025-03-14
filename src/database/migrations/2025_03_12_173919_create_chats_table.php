@@ -15,16 +15,14 @@ class CreateChatsTable extends Migration
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('item_id');
+            $table->unsignedBigInteger('purchase_id');
             $table->unsignedBigInteger('sender_id');
-            $table->unsignedBigInteger('buyer_id');
-            $table->text('message');
             $table->boolean('is_read')->default(false);
+            $table->text('message');
             $table->timestamps();
 
-            $table->foreign('item_id')->references('id')->on('items');
+            $table->foreign('purchase_id')->references('id')->on('purchases');
             $table->foreign('sender_id')->references('id')->on('users');
-            $table->foreign('buyer_id')->references('id')->on('users');
         });
     }
 

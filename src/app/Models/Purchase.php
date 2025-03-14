@@ -30,4 +30,9 @@ class Purchase extends Model
     {
         return $this->belongsTo(PaymentMethod::class);
     }
+
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
+    }
 }
