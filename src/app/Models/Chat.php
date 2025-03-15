@@ -9,10 +9,15 @@ class Chat extends Model
 {
     use HasFactory;
 
-    protected $guareded = [];
+    protected $guarded = [];
 
     public function purchase()
     {
         return $this->belongsTo(Purchase::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'sender_id');
     }
 }

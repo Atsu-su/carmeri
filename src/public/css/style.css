@@ -452,16 +452,19 @@ html {
 }
 
 .c-item .new-message-icon2 {
-  padding-left: 8px;
-  padding-top: 5px;
+  padding-bottom: 3px;
+  padding-left: 2px;
   width: 27px;
   height: 27px;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
   top: 5px;
   left: 5px;
   color: var(--color-font-white);
-  font-size: 16px;
+  font-size: 12px;
+  font-weight: 700;
   line-height: 1;
   background-color: var(--color-bg-icon);
   border-radius: 50%;
@@ -628,19 +631,19 @@ html {
   position: relative;
   top: 8px;
   color: var(--color-font-white);
-  font-size: 18px;
   line-height: 1;
   background-color: var(--color-bg-icon);
   border-radius: 50%;
 }
 
 .c-items .new-message-icon span {
-  padding-bottom: 3px;
   padding-left: 1px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 /* 1行に5商品表示する場合は明示的にcolumn-gapを変更すること */
@@ -1844,6 +1847,7 @@ body {
 }
 
 #chat .sidebar-title {
+  margin-top: 30px;
   color: var(--color-font-white);
   font-size: 30px;
   font-weight: 700;
@@ -1859,7 +1863,7 @@ body {
 }
 
 #chat .sidebar-title-listed {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 #chat .sidebar-title-processing {
@@ -1884,8 +1888,22 @@ body {
 #chat .sidebar-items-name {
   margin: 0 auto;
   width: 200px;
+  font-size: 20px;
   text-align: center;
   background-color: var(--color-bg-btn-gray);
+}
+
+#chat .sidebar-items-name a {
+  display: block;
+}
+
+
+#chat .sidebar-items-name:hover {
+  opacity: 0.6;
+}
+
+#chat .sidebar-items-name:first-child {
+  margin-top: 15px;
 }
 
 #chat .sidebar-items-name:not(:last-child) {
@@ -1894,6 +1912,8 @@ body {
 
 #chat .chat {
   width: calc(100% - 260px);
+  display: flex;
+  flex-direction: column;
 }
 
 @media screen and (max-width: 1030px) {
@@ -1940,6 +1960,10 @@ body {
   font-weight: 700;
 }
 
+#chat .chat-title-content span {
+  display: block;
+}
+
 #chat .chat-item {
   padding: 12px 0 12px 40px;
   display: flex;
@@ -1971,6 +1995,9 @@ body {
 
 #chat .chat-content {
   padding: 26px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 #chat .chat-content-list:not(:first-child) {
@@ -2037,15 +2064,20 @@ body {
   }
 }
 
+/* margin-left: auto, margin-right: autoで文字数に応じた長さになる */
 #chat .chat-content-list.right .chat-content-list-message {
   margin-left: auto;
 }
 
+#chat .chat-content-list.left .chat-content-list-message {
+  margin-right: auto;
+}
+
 /* ----------------------------- */
 /* 削除すること */
-#chat .chat-content-list .chat-content-list-message-container {
+/* #chat .chat-content-list .chat-content-list-message-container {
   display: none;
-}
+} */
 /* ----------------------------- */
 
 #chat .chat-content-list.right .chat-content-list-message-container {
@@ -2055,8 +2087,15 @@ body {
   font-size: 15px
 }
 
+/* #chat .chat-content-list.right .chat-content-list-message-container p {
+  margin-right: auto;
+} */
+
+
 #chat .chat-content-send {
-  margin-top: 30px;
+  margin-top: auto;
+  padding-top: 30px;
+  width: 100%;
 }
 
 #chat .chat-content-send form {

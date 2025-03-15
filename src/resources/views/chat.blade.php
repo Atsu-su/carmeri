@@ -37,22 +37,22 @@
     @endif
     <div class="container">
       <aside class="sidebar">
-        <h3 class="sidebar-title">その他の取引</h3>
+        <h3 class="sidebar-title">取引チャット</h3>
         <div class="sidebar-container">
           <div class="sidebar-listed-container">
             <h4 class="sidebar-title-listed">出品</h4>
             <ul class="sidebar-items">
-              <li class="sidebar-items-name"><a href="">商品名１</a></li>
-              <li class="sidebar-items-name"><a href="">商品名２</a></li>
-              <li class="sidebar-items-name"><a href="">商品名３</a></li>
+              @foreach ($sellingItems as $item)
+                <li class="sidebar-items-name"><a href="{{ route('chat', $item->id)}}">{{ $item->item->name }}</a></li>
+              @endforeach
             </ul>
           </div>
           <div class="sidebar-title-processing-container">
             <h4 class="sidebar-title-processing">購入</h4>
             <ul class="sidebar-items">
-              <li class="sidebar-items-name"><a href="">商品名A</a></li>
-              <li class="sidebar-items-name"><a href="">商品名B</a></li>
-              <li class="sidebar-items-name"><a href="">商品名C</a></li>
+              @foreach ($purchasingItems as $item)
+                <li class="sidebar-items-name"><a href="{{ route('chat', $item->id)}}">{{ $item->item->name }}</a></li>
+              @endforeach
             </ul>
           </div>
         </div>
@@ -60,8 +60,12 @@
       <div class="chat">
         <div class="chat-title">
           <div class="chat-title-profile-outer-frame">
-            @if ($user->image && Storage::disk('public')->exists('profile_images/'.$user->image))
-              <img class="chat-title-profile-inner-frame" src="{{ asset('storage/profile_images/'.$user->image) }}" alt="プロフィールの画像">
+            @php
+              $profileImage = $notBuyer ? $purchase->user->image : $purchase->item->user->image;
+            @endphp
+            @if ($profileImage && Storage::exists('profile_images/'.$profileImage))
+              <img class="chat-title-profile-inner-frame" 
+                src="{{ Storage::url('profile_images/').$profileImage }}" alt="プロフィールの画像">
             @else
               <div class="chat-title-profile-no-image">
                 <p>NO</p>
@@ -69,89 +73,48 @@
               </div>
             @endif
           </div>
-          <h1 class="chat-title-content">「購入者 or 出品者」さんとの取引画面</h1>
+          <h1 class="chat-title-content"><span>{{ $notBuyer ? $purchase->user->name : $purchase->item->user->name }}さんとの</span>取引画面</h1>
           <a class="c-btn c-btn--chat-complete-transaction" href="">取引完了</a>
         </div>
         <div class="chat-item">
-          <img src="{{ Storage::disk('public')->url('item_images/'.'Armani+Mens+Clock.jpg') }}" width="200" height="200" alt="">
+          <img src="{{ Storage::url('item_images/'.'Armani+Mens+Clock.jpg') }}" width="200" height="200" alt="">
           <div class="chat-item-info">
-            <h2 class="chat-item-info-name">商品名</h2>
-            <p class="chat-item-info-price">¥6,000</p>
+            <h2 class="chat-item-info-name">{{ $purchase->item->name}}</h2>
+            <p class="chat-item-info-price">¥{{ number_format($purchase->item->price) }}</p>
           </div>
         </div>
         <div class="chat-content">
           <ul>
             {{-- class="chat-content-list right"にすると右に寄る --}}
-            <li class="chat-content-list">
-              <div class="chat-content-list-profile">
-                <div class="chat-content-list-profile-outer-frame">
-                  @if ($user->image && Storage::disk('public')->exists('profile_images/'.$user->image))
-                    <img class="chat-content-list-profile-inner-frame" src="{{ asset('storage/profile_images/'.$user->image) }}" alt="プロフィールの画像">
-                  @else
-                    <div class="chat-content-list-profile-no-image">
-                      <p>NO</p>
-                      <p>IMAGE</p>
+            @foreach ($chats as $chat)
+              <li class="chat-content-list {{ $chat->sender_id != auth()->id() ? 'left' : 'right'}}">
+                <div class="chat-content-list-profile">
+                  <div class="chat-content-list-profile-outer-frame">
+                    @if ($chat->user->image && Storage::exists('profile_images/'.$chat->user->image))
+                      <img class="chat-content-list-profile-inner-frame" src="{{ Storage::url('profile_images/').$chat->user->image }}" alt="プロフィールの画像">
+                    @else
+                      <div class="chat-content-list-profile-no-image">
+                        <p>NO</p>
+                        <p>IMAGE</p>
+                      </div>
+                    @endif
+                  </div>
+
+                  <p class="chat-content-list-profile-name">{{ $chat->user->name }}</p>
+                </div>
+                <div class="chat-content-list-container">
+                  <p class="chat-content-list-message">{{ $chat->message }}</p>
+                  {{-- この部分はsenderだけに表示されるように変更する --}}
+                  @if ($chat->sender_id == auth()->id())
+                    <div class="chat-content-list-message-container">
+                      <p>{{ $chat->created_at }}</p>
+                      <a>編集</a>
+                      <a>削除</a>
                     </div>
                   @endif
                 </div>
-                <p class="chat-content-list-profile-name">{{ $user->name }}</p>
-              </div>
-              <div class="chat-content-list-container">
-                <p class="chat-content-list-message">ここにメッセージがはいる</p>
-
-                {{-- この部分はsenderだけに表示されるように変更する --}}
-                <div class="chat-content-list-message-container">
-                  <a>編集</a>
-                  <a>削除</a>
-                </div>
-
-              </div>
-            </li>
-            <li class="chat-content-list">
-              <div class="chat-content-list-profile">
-                <div class="chat-content-list-profile-outer-frame">
-                  @if (!$user->image && Storage::disk('public')->exists('profile_images/'.$user->image))
-                    <img class="chat-content-list-profile-inner-frame" src="{{ asset('storage/profile_images/'.$user->image) }}" alt="プロフィールの画像">
-                  @else
-                    <div class="chat-content-list-profile-no-image">
-                      <p>NO</p>
-                      <p>IMAGE</p>
-                    </div>
-                  @endif
-                </div>
-                <p class="chat-content-list-profile-name">{{ $user->name }}</p>
-              </div>
-              <div class="chat-content-list-container">
-                <p class="chat-content-list-message">ここにメッセージがはいるああああああああああああああああ</p>
-                <div class="chat-content-list-message-container">
-                  <a>編集</a>
-                  <a>削除</a>
-                </div>
-              </div>
-            </li>
-            <li class="chat-content-list right">
-              <div class="chat-content-list-profile">
-                <div class="chat-content-list-profile-outer-frame">
-                  @if (!$user->image && Storage::disk('public')->exists('profile_images/'.'hatsune.jpeg'))
-                    <img class="chat-content-list-profile-inner-frame" src="{{ asset('storage/profile_images/'.'hatsune.jpeg') }}" alt="プロフィールの画像">
-                  @else
-                    <div class="chat-content-list-profile-no-image">
-                      <p>NO</p>
-                      <p>IMAGE</p>
-                    </div>
-                  @endif
-                </div>
-                <p class="chat-content-list-profile-name">{{ $user->name }}</p>
-              </div>
-              <div class="chat-content-list-container">
-                <p class="chat-content-list-message">http://aaa.com/abccccccccc/ccc/c/c/c/cccccccccccccccccc</p>
-                <div class="chat-content-list-message-container">
-                  <a>編集</a>
-                  <a>削除</a>
-                </div>
-              </div>
-
-            </li>
+              </li>
+            @endforeach
           </ul>
           <div class="chat-content-send">
             <form id="form" action="{{ route('chat.send') }}" method="POST" onsubmit="return sendMessage()">
@@ -168,7 +131,7 @@
   <script src="{{ mix('js/app.js') }}"></script>
   {{-- コメント送付用 --}}
   <script>
-    async function sendMessage() {
+    function sendMessage() {
       const form = document.getElementById('form');
       const input = document.getElementById('input');
       const data = new FormData(form);
@@ -176,25 +139,27 @@
       // フォームの内容を送信する処理
       if (!input.value) return false;
 
-      try {
-
-        const response = await fetch('{{ route("chat.send") }}', {
-          method: 'POST',
-          body: data,
-          headers: {
-            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-          }
-        })
-
-        if(!response.ok) {
-            throw new Error('Network response was not ok');
+      fetch('{{ route("chat.send") }}', {
+        method: 'POST',
+        body: data,
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
         }
-
-        const data = await response.json();
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+        // ここでチャットの表示を更新する処理
         input.value = ''; // 入力フィールドをクリア
-      } catch {
+      })
+      .catch(error => {
         console.log('Error:', error);
-      }
+      });
 
       return false;
     }
@@ -203,6 +168,7 @@
     window.addEventListener("DOMContentLoaded", () =>
     {
       window.Echo.channel('testchat').listen('MessageSent', (e) => {
+        console.log('message received');
         console.log(e.message);
 	      // メッセージをレンダリング
       });

@@ -11,6 +11,8 @@ class Purchase extends Model
 
     protected $guarded = ['id'];
 
+    const PROCESSING = 'processing';
+
     public function isPurchased()
     {
         return $this->status === 'purchased';

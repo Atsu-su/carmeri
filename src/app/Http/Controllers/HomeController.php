@@ -54,9 +54,8 @@ class HomeController extends Controller
         // ・purchasesテーブルにあるレコードのうち、自分が出品した商品の情報と
         //   purchase_idを取得する
 
-        // purchase_id/チャットの内容も全て取れた。しかも最新のチャット順に並んでいる
         $sellingItems = Purchase::query()
-            ->with(['item:id,name,price,image', 'chats' => function($query) use ($user) {
+            ->with(['item:id,name,price,image', 'chats' => function ($query) use ($user) {
                 $query->where('sender_id', '!=', $user->id)
                     ->where('is_read', false);
             }])
@@ -65,41 +64,37 @@ class HomeController extends Controller
             })
             ->whereHas('chats')
             ->select('purchases.id', 'purchases.item_id')
-            ->join(DB::raw('(SELECT purchase_id, MAX(created_at) as latest_chat FROM chats GROUP BY purchase_id) as latest_chats'), 
-                   'purchases.id', '=', 'latest_chats.purchase_id')
-            ->orderBy('latest_chats.latest_chat', 'desc')
+            ->leftJoinSub(function ($query) use ($user) {
+                $query->from('chats')
+                    ->select('purchase_id', DB::raw('MAX(created_at) as latest_chat'))
+                    ->where('is_read', false)
+                    ->where('sender_id', '!=', $user->id)
+                    ->groupBy('purchase_id');
+            }, 'latest_chats', 'purchases.id', '=', 'latest_chats.purchase_id')
+            ->orderByRaw("COALESCE(latest_chats.latest_chat, '1900-01-01') DESC")
             ->get();
-
-        // これがいらない
-        $sellingItemsMessagesCount = $sellingItems->map(function ($item) use ($user) {
-            // $item->idはpurchase_id
-            // 購入者のメッセージ数（未読）を取得する
-            return Chat::query()
-                ->where('purchase_id', $item->id)
-                ->where('sender_id', '!=', $user->id)
-                ->where('is_read', false)
-                ->count();
-        });
 
         // 2. 購入者の場合
         // ・purchasesテーブルのレコードのうち、自分が購入した商品の情報と
         //   purchase_idを取得する
 
         $purchasingItems = Purchase::query()
-            ->with('item:id,name,price,image')
+            ->with(['item:id,name,price,image', 'chats' => function ($query) use ($user) {
+                $query->where('sender_id', '!=', $user->id)
+                    ->where('is_read', false);
+            }])
             ->where('buyer_id', $user->id)
-            ->select('id','item_id')
+            ->whereHas('chats')
+            ->select('purchases.id', 'purchases.item_id')
+            ->leftJoinSub(function ($query) use ($user) {
+                $query->from('chats')
+                    ->select('purchase_id', DB::raw('MAX(created_at) as latest_chat'))
+                    ->where('is_read', false)
+                    ->where('sender_id', '!=', $user->id)
+                    ->groupBy('purchase_id');
+            }, 'latest_chats', 'purchases.id', '=', 'latest_chats.purchase_id')
+            ->orderByRAW("COALESCE(latest_chats.latest_chat, '1900-01-01') DESC")
             ->get();
-
-        $purchasingItemsMessagesCount = $purchasedItems->map(function ($item) use ($user) {
-            // $item->idはpurchase_id
-            // 出品者のメッセージ数を取得する
-            return Chat::query()
-                ->where('purchase_id', $item->id)
-                ->where('sender_id', '!=', $user->id)
-                ->where('is_read', false)
-                ->count();
-        });
 
         return view('mypage',
             compact(
@@ -107,9 +102,7 @@ class HomeController extends Controller
                 'listedItems',
                 'purchasedItems',
                 'sellingItems',
-                'sellingItemsMessagesCount',
                 'purchasingItems',
-                'purchasingItemsMessagesCount',
                 'message'
             )
         );

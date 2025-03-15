@@ -40,12 +40,10 @@ Route::middleware('header')->group(function () {
         Route::get('/sell', [ItemController::class, 'create'])->name('sell.create');
         Route::post('/sell', [ItemController::class, 'store'])->name('sell.store');
 
-
         // ---------------------------------------------------
         Route::get('chat/{purchase_id}', [ChatController::class, 'index'])->name('chat');
         Route::post('chat', [ChatController::class, 'sendMessage'])->name('chat.send');
         // ---------------------------------------------------
-
 
         // stripeの成功・キャンセル用ルーティング
         Route::get('/payment/success/{purchase_id}', [PurchaseController::class, 'success'])->name('payment.success');

@@ -37,8 +37,18 @@
       <div class="titles">
         <h2 class="title title-recommend js-active-title" data-tab="first-tab">出品した商品</h2>
         <h2 class="title title-mylist" data-tab="second-tab">購入した商品</h2>
-        <h2 class="title title-processing" data-tab="third-tab">取引中の出品商品<span class="new-message-icon"><span>{{ $sellingItemsMessagesCount->sum() }}</span></span></h2>
-        <h2 class="title title-processing" data-tab="fourth-tab">取引中の購入商品<span class="new-message-icon"><span>{{$purchasingItemsMessagesCount->sum() }}</span></span></h2>
+        @php $result = $sellingItems->sum(function ($item) {return $item->chats->count();}) @endphp
+        <h2 class="title title-processing" data-tab="third-tab">取引中の出品商品
+          @if ($result > 0)
+            <span class="new-message-icon"><span>{{ $result < 100 ? $result : '99+' }}</span></span>
+          @endif
+        </h2>
+        @php $result = $purchasingItems->sum(function ($item) {return $item->chats->count();}) @endphp
+        <h2 class="title title-processing" data-tab="fourth-tab">取引中の購入商品
+          @if ($result > 0)
+            <span class="new-message-icon"><span>{{ $result < 100 ? $result : '99+' }}</span></span>
+          @endif
+        </h2>
       </div>
       <div class="tab first-tab">
         @if ($listedItems->isEmpty())
@@ -88,9 +98,12 @@
                 @else
                   <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
                 @endif
-                <span class="new-message-icon2">{{ $sellingItemsMessagesCount[$index] }}</span>
+                @php $result = $purchase->chats->count() @endphp
+                @if ($result > 0)
+                  <span class="new-message-icon2">{{ $result < 100 ? $result : '99+' }}</span>
+                @endif
               </div>
-              <p>{{ $purchase->item->name }}</p>
+              <p>{{$purchase->item->id}}{{ $purchase->item->name }}</p>
             </a>
           @endforeach
         @endif
@@ -107,7 +120,10 @@
                 @else
                   <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
                 @endif
-                <span class="new-message-icon2">{{ $purchasingItemsMessagesCount[$index] }}</span>
+                @php $result = $purchase->chats->count() @endphp
+                @if ($result > 0)
+                  <span class="new-message-icon2">{{ $result < 100 ? $result : '99+' }}</span>
+                @endif
               </div>
               <p>{{ $purchase->item->name }}</p>
             </a>
