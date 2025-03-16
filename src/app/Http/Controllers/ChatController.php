@@ -6,21 +6,22 @@ use App\Events\MessageSent;
 use App\Library\Message;
 use App\Models\Chat;
 use App\Models\Purchase;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
 {
     public function index($purchase_id)
     {
-        // 出品者目線（購入者の情報が表示される）
         $user = auth()->user();
-
-        // このユーザが出品者かどうかを判定
         $notSeller = false;
         $notBuyer = false;
+
+        // このユーザが出品者かどうかを判定
         try {
             Purchase::query()
                 ->whereHas('item', function ($query) use ($user) {
@@ -29,8 +30,6 @@ class ChatController extends Controller
                 ->where('id', $purchase_id)
                 ->firstOrFail();
         } catch (Exception $e) {
-            Log::info('この人は出品者ではない');
-            Log::error($e->getMessage());
             $notSeller = true;
         }
 
@@ -41,8 +40,6 @@ class ChatController extends Controller
                 ->where('id', $purchase_id)
                 ->firstOrFail();
         } catch (Exception $e) {
-            Log::info('この人は購入者ではない');
-            Log::error($e->getMessage());
             $notBuyer = true;
         }
 
@@ -56,9 +53,16 @@ class ChatController extends Controller
             ->with('user:id,name,image')
             ->where('purchase_id', $purchase_id)
             ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         // チャットを既読に変更する
+        $chats->map(function ($chat) use ($user) {
+            // 送信者のチャットかつ未読の場合は既読に変更
+            if ($chat->sender_id != $user->id && !$chat->is_read) {
+                $chat->update(['is_read' => true]);
+            }
+        });
 
         // 取引相手の情報を取得
         $purchase = null;
@@ -118,30 +122,110 @@ class ChatController extends Controller
         return view('chat',compact('chats', 'purchase', 'notBuyer', 'sellingItems', 'purchasingItems'));
     }
 
-    public function sendMessage(Request $request)
+    public function sendMessage(Request $request, $purchase_id)
     {
         // auth()->user() : 現在認証しているユーザーを取得
         $user = auth()->user();
-        $strUsername = $user->name;
+        $now = Carbon::now();
+        $validator = Validator::make(
+            $request->all(),
+            ['message' => 'required|string|max:400'],
+            ['message.required' => 'メッセージを入力してください',
+                'message.string' => 'メッセージの形式が不正です',
+                'message.max' => 'メッセージは400文字以内で入力してください']
+        );
 
-        // リクエストからデータの取り出し
-        $strMessage = $request->input('message');
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation Error.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-        // メッセージオブジェクトの作成と公開メンバー設定
+        // メッセージをテーブルに保存
+        try {
+            Chat::create([
+                'purchase_id' => $purchase_id,
+                'sender_id' => $user->id,
+                'is_read' => false,
+                'message' => $request->input('message'),
+            ]);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['message' => 'メッセージの保存に失敗'], 500);
+        }
+
+        // メッセージオブジェクトの作成
         $message = new Message;
-        $message->username = $strUsername;
-        $message->body = $strMessage;
+        $message->username = $user->name;
+        $message->message = $request->input('message');
+        $message->datetime = $now->format('Y/m/d H:i');
+        $message->image = $user->image;
 
-        // 送信者を含めてメッセージを送信
-        //event( new MessageSent( $message ) ); // Laravel V7までの書き方
-        MessageSent::dispatch($message);    // Laravel V8以降の書き方
+        // メッセージ送信イベントを送信
+        broadcast(new MessageSent($message))->toOthers();
 
-        // 送信者を除いて他者にメッセージを送信
-        // Note : toOthersメソッドを呼び出すには、
-        //        イベントでIlluminate\Broadcasting\InteractsWithSocketsトレイトをuseする必要がある。
-        // broadcast( new MessageSent($message))->toOthers();
+        return response()->json($message);
+    }
 
-        // return ['message' => $strMessage];
-        return $request;
+    public function read($purchase_id)
+    {
+        // リアルタイムで受信した場合に実行されるAPI
+        // jsから呼び出される
+        $user = auth()->user();
+
+        try {
+        Chat::query()
+            ->where('purchase_id', $purchase_id)
+            ->where('sender_id', '!=', $user->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['message' => '既読フラグの変更に失敗'], 500);        
+        }
+        return response()->json(['success' => true]);
+    }
+
+    public function update(Request $request, $chat_id)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            ['modified-message' => 'required|string|max:400'],
+            [
+                'modified-message.required' => 'メッセージを入力してください',
+                'modified-message.string' => 'メッセージの形式が不正です',
+                'modified-message.max' => 'メッセージは400文字以内で入力してください'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation Error.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $chat = Chat::find($chat_id);
+            $chat->message = $request->input('modified-message');
+            $chat->save();
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['message' => 'メッセージの更新に失敗'], 500);
+        }
+
+        return response()->json([
+            'success' => true,
+            'chatId' => $chat_id,
+            'modifiedMessage' =>  $request->input('modified-message')
+        ]);
+    }
+
+    public function delete()
+    {
+        //
     }
 }

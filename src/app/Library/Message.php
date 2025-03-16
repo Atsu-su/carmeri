@@ -5,5 +5,7 @@ namespace App\Library;
 class Message
 {
     public $username;
-    public $body;
+    public $message;
+    public $datetime;
+    public $image;
 }

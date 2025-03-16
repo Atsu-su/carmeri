@@ -13,14 +13,14 @@
 
 ・評価機能の追加
 
-・チャネルをプライベートにする
-・enter連打の抑止
-・テキストをチャットで送信できる
+・[ongoing] チャネルをプライベートにする
+・[done] enter連打の抑止
+・[done] テキストをチャットで送信できる
 ・画像をチャットで送信できる
-・入力内容の保持（クッキーを使う）
-・バリデーション（1文字以上400文字以内）
-・投稿済みのメッセージを修正できる
-・投稿済みのメッセージを削除できる
+・[ongoing] 入力内容の保持（クッキーを使う）
+・[done] バリデーション（1文字以上400文字以内）
+・[done] 投稿済みのメッセージを修正できる
+・[ongoing]投稿済みのメッセージを削除できる
 ・（購入者）取引完了後、出品者の評価ができる
 ・（出品者）取引完了後、チャット画面にて購入者の評価ができる
   ⇒ チャットへの遷移元の画面は残る
@@ -35,11 +35,19 @@ https://readouble.com/laravel/10.x/ja/broadcasting.html
 まずはこの通り実装して修正する
 https://www.hiramine.com/programming/chat_laravel_pusher_private/index.html
 
-===============================================
-### Pusher info. ###
-===============================================
-BROADCAST_DRIVER=pusher
+チャネルプライベート化
+https://www.messiahworks.com/archives/19071
+https://qiita.com/kensukeX/items/d43cb6a8529aec89a1bb
 
+===============================================
+.env修正内容
+===============================================
+
+BROADCAST_DRIVER=pusher
+FILESYSTEM_DRIVER=public
+MAIL_FROM_ADDRESS=info@carmeri.com
+
+### Pusher info. ###
 app_id = "1957048"
 key = "bbd412eda0ca21a3a4a8"
 secret = "3e68bb633e157190df1a"

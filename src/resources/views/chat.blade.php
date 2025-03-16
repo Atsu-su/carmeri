@@ -64,7 +64,7 @@
               $profileImage = $notBuyer ? $purchase->user->image : $purchase->item->user->image;
             @endphp
             @if ($profileImage && Storage::exists('profile_images/'.$profileImage))
-              <img class="chat-title-profile-inner-frame" 
+              <img class="chat-title-profile-inner-frame"
                 src="{{ Storage::url('profile_images/').$profileImage }}" alt="プロフィールの画像">
             @else
               <div class="chat-title-profile-no-image">
@@ -77,7 +77,11 @@
           <a class="c-btn c-btn--chat-complete-transaction" href="">取引完了</a>
         </div>
         <div class="chat-item">
-          <img src="{{ Storage::url('item_images/'.'Armani+Mens+Clock.jpg') }}" width="200" height="200" alt="">
+          @if ($purchase->item->image && Storage::exists('item_images/'.$purchase->item->image))
+            <img src="{{ Storage::url('item_images/'.$purchase->item->image) }}" width="200" height="200" alt="">
+          @else
+            <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="200" height="200" alt="">
+          @endif
           <div class="chat-item-info">
             <h2 class="chat-item-info-name">{{ $purchase->item->name}}</h2>
             <p class="chat-item-info-price">¥{{ number_format($purchase->item->price) }}</p>
@@ -99,15 +103,13 @@
                       </div>
                     @endif
                   </div>
-
                   <p class="chat-content-list-profile-name">{{ $chat->user->name }}</p>
                 </div>
                 <div class="chat-content-list-container">
-                  <p class="chat-content-list-message">{{ $chat->message }}</p>
-                  {{-- この部分はsenderだけに表示されるように変更する --}}
+                  <p class="chat-content-list-message" data-chatid="{{ $chat->id }}">{{ $chat->message }}</p>
+                  <p class="chat-content-list-datetime">{{ $chat->created_at->format('Y/m/d H:i') }}</p>
                   @if ($chat->sender_id == auth()->id())
                     <div class="chat-content-list-message-container">
-                      <p>{{ $chat->created_at }}</p>
                       <a>編集</a>
                       <a>削除</a>
                     </div>
@@ -116,10 +118,22 @@
               </li>
             @endforeach
           </ul>
-          <div class="chat-content-send">
-            <form id="form" action="{{ route('chat.send') }}" method="POST" onsubmit="return sendMessage()">
+          <dialog id="modify" class="chat-content-modal-modify">
+            <form id="modify-form">
               @csrf
-              <input id="input" class="chat-content-send-input" type="text" name="message" value="" placeholder="取引メッセージを入力してください">
+              <textarea id="modify-textarea" name="modified-message" placeholder="メッセージを入力してください"></textarea>
+              <div class="chat-content-modal-modify-buttons">
+                <button id="modify-submit" class="c-btn c-btn--modal-edit" type="button">編集</button>
+                <a id="modify-cancel" class="c-btn c-btn--modal-edit-cancel">キャンセル</a>
+              </div>
+            </form>
+          </dialog>
+          <dialog id="delete">
+          </dialog>
+          <div class="chat-content-send">
+            <form id="form" onsubmit="return sendMessageWrapper()">
+              @csrf
+              <textarea id="input" class="chat-content-send-input" type="text" name="message" value="" placeholder="取引メッセージを入力してください"></textarea>
               <button class="chat-content-send-add-image c-btn c-btn--chat-add-image">画像を追加</button>
               <button class="chat-content-send-submit" type="submit"></button>
             </form>
@@ -129,21 +143,101 @@
     </div>
   </div>
   <script src="{{ mix('js/app.js') }}"></script>
-  {{-- コメント送付用 --}}
+  {{-- ================================================ --}}
+  {{-- メッセージ送信用 --}}
+  {{-- ================================================ --}}
   <script>
+    // -----------------------
+    // 変数定義
+    // -----------------------
+    let isSending = false;
+
+    // -----------------------
+    // 関数定義
+    // -----------------------
+    function renderChat(isLeft, data) {
+      const ul = document.querySelector('.chat-content ul');
+
+      const li = document.createElement('li');
+      li.className = `chat-content-list ${isLeft ? 'left' : 'right'}`;
+
+      // プロフィール部分を作成
+      const profileDiv = document.createElement('div');
+      profileDiv.className = 'chat-content-list-profile';
+
+      const profileFrameOuter = document.createElement('div');
+      profileFrameOuter.className = 'chat-content-list-profile-outer-frame';
+
+      const profileImg = document.createElement('img');
+      profileImg.className = 'chat-content-list-profile-inner-frame';
+      profileImg.src = '{{ Storage::url('profile_images/') }}' + data.image;
+      profileImg.alt = 'プロフィールの画像';
+
+      const profileName = document.createElement('p');
+      profileName.className = 'chat-content-list-profile-name';
+      profileName.textContent = data.username;
+
+      // コンテンツ部分を作成
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'chat-content-list-container';
+
+      const messageP = document.createElement('p');
+      messageP.className = 'chat-content-list-message';
+      messageP.textContent = data.message;
+
+      const datetimeP = document.createElement('p');
+      datetimeP.className = 'chat-content-list-datetime';
+      datetimeP.textContent = data.datetime;
+
+      // if文に入れるとeditDivは外では使えない
+      const editDiv =document.createElement('div');
+      editDiv.className = 'chat-content-list-message-container';
+      if (!isLeft) {
+        const editA1 = document.createElement('a');
+        editA1.textContent = '編集';
+        const editA2 = document.createElement('a');
+        editA2.textContent = '削除';
+        editDiv.appendChild(editA1);
+        editDiv.appendChild(editA2);
+      }
+
+      // 要素を組み立てる
+      profileFrameOuter.appendChild(profileImg);
+      profileDiv.appendChild(profileFrameOuter);
+      profileDiv.appendChild(profileName);
+
+      contentDiv.appendChild(messageP);
+      contentDiv.appendChild(datetimeP);
+      if (!isLeft) {
+        contentDiv.appendChild(editDiv);
+      }
+
+      li.appendChild(profileDiv);
+      li.appendChild(contentDiv);
+
+      ul.appendChild(li);
+    }
+
     function sendMessage() {
+      isSending = true;
+
+      const socket_id = Echo.socketId();
       const form = document.getElementById('form');
       const input = document.getElementById('input');
       const data = new FormData(form);
 
       // フォームの内容を送信する処理
-      if (!input.value) return false;
+      if (!input.value) {
+        isSending = false;
+        return false;
+      }
 
-      fetch('{{ route("chat.send") }}', {
+      fetch('{{ route("chat.send", $purchase->id) }}', {
         method: 'POST',
         body: data,
         headers: {
-          'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+          'X-Socket-ID': socket_id
         }
       })
       .then(response => {
@@ -153,49 +247,232 @@
         return response.json();
       })
       .then(data => {
-        console.log(data);
-        // ここでチャットの表示を更新する処理
-        input.value = ''; // 入力フィールドをクリア
+        // 送信したチャットの表示
+        renderChat(false, data);
+        // 入力フィールドをクリア
+        input.value = '';
+        // 送信中フラグを下げる
+        isSending = false;
+        adjustHeight();
       })
       .catch(error => {
+        isSending = false;
         console.log('Error:', error);
       });
 
       return false;
     }
-  </script>
-  <script>
+
+    function sendMessageWrapper() {
+      if (!isSending) {
+        sendMessage();
+      }
+      return false;
+    }
+
+    function read() {
+      fetch('{{ route("chat.read", $purchase->id) }}', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+      })
+      .catch(error => {
+        console.log('Error:', error);
+      });
+    }
+
+    // 改行された場合に高さを調節するように修正する
+    const textarea = document.querySelector('.chat-content-send-input');
+    function adjustHeight() {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    // -----------------------
+    // イベント定義
+    // -----------------------
+    // チャットの受信処理
     window.addEventListener("DOMContentLoaded", () =>
     {
       window.Echo.channel('testchat').listen('MessageSent', (e) => {
-        console.log('message received');
-        console.log(e.message);
 	      // メッセージをレンダリング
+        renderChat(true, e.message);
+        // チャットの既読処理
+        read();
+      });
+    });
+
+    // 入力時に高さ調整
+    textarea.addEventListener('input', adjustHeight);
+    // 初期化
+    adjustHeight();
+  </script>
+
+  {{-- ================================================ --}}
+  {{-- メッセージ修正用 --}}
+  {{-- ================================================ --}}
+  <script>
+    let isModifySending = false;
+
+    // -----------------------
+    // 関数定義
+    // -----------------------
+    function modifyMessage(chatId) {
+      isModifySending = true;
+      // 文字列は参照ではない
+      let baseUrl = '{{ route("chat.update", ":chatid") }}';
+      let url = baseUrl.replace(':chatid', chatId);
+      const form = document.getElementById('modify-form');
+      const textarea = document.getElementById('modify-textarea');
+      const data = new FormData(form);
+
+      // フォームの内容を送信する処理
+      if (!textarea.value) {
+        isModifySending = false;
+        return false;
+      }
+
+      fetch(url, {
+        method: 'POST',
+        body: data,
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // 修正したチャットの表示
+        modifyChatContent(data.chatId, data.modifiedMessage);
+        // 送信中フラグを下げる
+        isModifySending = false;
+      })
+      .catch(error => {
+        isModifySending = false;
+        console.log('Error:', error);
       });
 
-        // const elementListMessage = document.getElementById( "list_message" );
+      return false;
+    }
 
-        // window.Echo.private('chat').listen( 'MessageSent', (e) =>
-        // {
-        //     console.log('message received');
-        //     console.log(e);
-            // let strUsername = e.message.username;
-            // let strMessage = e.message.body;
+    function modifyMessageWrapper(chatid) {
+      if (!isModifySending) {
+        modifyMessage(chatid);
+      }
+      return false;
+    }
 
-            // let elementLi = document.createElement( "li" );
-            // let elementUsername = document.createElement( "strong" );
-            // let elementMessage = document.createElement( "div" );
-            // elementUsername.textContent = strUsername;
-            // elementMessage.textContent = strMessage;
-            // elementLi.append( elementUsername );
-            // elementLi.append( elementMessage );
-            // elementListMessage.prepend( elementLi );  // リストの一番上に追加
-            //elementListMessage.append( elementLi ); // リストの一番下に追加
-        // });
+    function modifyChatContent(chatId, modifiedMessage) {
+      const messageElement = document.querySelector(`.chat-content-list-message[data-chatid="${chatId}"]`);
+      messageElement.textContent = modifiedMessage;
+    }
+
+    // -----------------------
+    // 編集前の準備
+    // -----------------------
+    document.addEventListener('DOMContentLoaded', function() {
+      const modifyDialog = document.getElementById('modify');
+      const modifyForm = document.getElementById('modify-form');
+
+      // dialog内の編集ボタンのイベント
+      const update = document.getElementById('modify-submit');
+      update.addEventListener('click', function() {
+        const chatId = modifyForm.dataset.chatId;
+        modifyMessageWrapper(chatId);
+        modifyDialog.close();
+      });
+
+      // dialog内のキャンセルボタンのイベント
+      const cancel = document.getElementById('modify-cancel');
+      cancel.addEventListener('click', function() {
+        modifyDialog.close();
+      });
+
+      // すべての編集リンクを取得
+      const editLinks = document.querySelectorAll('.chat-content-list-message-container a:first-child');
+      editLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault(); // リンクのデフォルト動作を防止
+
+          // クリックされた編集リンクの親要素（chat-content-list-message-container）を取得
+          const messageContainer = this.parentElement;
+          // 親のchat-content-list-containerを取得
+          const contentContainer = messageContainer.parentElement;
+          // その中のメッセージ要素を取得
+          const messageElement = contentContainer.querySelector('.chat-content-list-message');
+          // メッセージのテキストを取得
+          const messageText = messageElement.textContent;
+
+          // dialogのformにdata-chatidをセット
+          const chatId = messageElement.dataset.chatid;
+          modifyForm.dataset.chatId = chatId;
+
+          // 編集エリアにメッセージを表示
+          const textarea = document.getElementById('modify-textarea');
+          textarea.value = messageText;
+
+          // ダイアログを表示
+          modifyDialog.showModal();
+        });
+      });
     });
   </script>
 
+  {{-- ================================================ --}}
+  {{-- メッセージ削除用 --}}
+  {{-- ================================================ --}}
+  <script>
+    let isDeleteSending = false;
+
+    function deleteMessage() {
+      //
+    }
+
+    function deleteMessageWrapper() {
+      //
+    }
+
+    function deleteChatContent() {
+      //
+    }
+
+    // // DELETEとして処理してほしいPOSTリクエストを送信
+    // fetch('/your-endpoint', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'X-HTTP-Method-Override': 'DELETE'  // これはオプション
+    //   },
+    //   body: JSON.stringify({
+    //     _method: 'DELETE',  // Laravelがこれを認識します
+    //     // 他のデータ
+    //   })
+    // })
+    // .then(response => response.json())
+    // .then(data => console.log(data))
+    // .catch(error => console.error('Error:', error));
+
+    // （残作業）
+    // 削除しますかのダイアログ
+    // 「はい」でdeleteMessageWrapperを呼び出す
+    // deleteメソッドを実行
+    // メッセージを論理削除
+    // 画面の表示を変更する
+  </script>
+
+  {{-- ================================================ --}}
   {{-- 評価用 --}}
+  {{-- ================================================ --}}
   @if (false)
     <script>
       const stars = document.querySelectorAll('.modal-content-stars-star');

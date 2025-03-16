@@ -42,7 +42,9 @@ Route::middleware('header')->group(function () {
 
         // ---------------------------------------------------
         Route::get('chat/{purchase_id}', [ChatController::class, 'index'])->name('chat');
-        Route::post('chat', [ChatController::class, 'sendMessage'])->name('chat.send');
+        Route::post('chat/{purchase_id}', [ChatController::class, 'sendMessage'])->name('chat.send');
+        Route::post('chat/{purchase_id}/read', [ChatController::class, 'read'])->name('chat.read');
+        Route::post('chat/{chat_id}/update', [ChatController::class, 'update'])->name('chat.update');
         // ---------------------------------------------------
 
         // stripeの成功・キャンセル用ルーティング
