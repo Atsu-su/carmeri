@@ -224,8 +224,19 @@ class ChatController extends Controller
         ]);
     }
 
-    public function delete()
+    public function delete($chat_id)
     {
-        //
+        try {
+            Chat::find($chat_id)
+                ->update(['is_deleted' => true]);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['message' => 'メッセージの削除に失敗'], 500);
+        }
+
+        return response()->json([
+            'success' => true,
+            'chatId' => $chat_id,
+        ]);
     }
 }

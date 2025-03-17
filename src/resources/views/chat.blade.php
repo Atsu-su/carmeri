@@ -106,18 +106,23 @@
                   <p class="chat-content-list-profile-name">{{ $chat->user->name }}</p>
                 </div>
                 <div class="chat-content-list-container">
-                  <p class="chat-content-list-message" data-chatid="{{ $chat->id }}">{{ $chat->message }}</p>
+                  @if (!$chat->is_deleted)
+                    <p class="chat-content-list-message" data-chatid="{{ $chat->id }}">{{ $chat->message }}</p>
+                  @else
+                    <p class="chat-content-list-message deleted" data-chatid="{{ $chat->id }}">このメッセージは削除されました</p>
+                  @endif
                   <p class="chat-content-list-datetime">{{ $chat->created_at->format('Y/m/d H:i') }}</p>
-                  @if ($chat->sender_id == auth()->id())
-                    <div class="chat-content-list-message-container">
-                      <a>編集</a>
-                      <a>削除</a>
+                  @if ($chat->sender_id == auth()->id() && !$chat->is_deleted)
+                    <div class="chat-content-list-edit">
+                      <a class="chat-content-list-edit-modify">編集</a>
+                      <a class="chat-content-list-edit-delete">削除</a>
                     </div>
                   @endif
                 </div>
               </li>
             @endforeach
           </ul>
+          {{-- メッセージ編集 --}}
           <dialog id="modify" class="chat-content-modal-modify">
             <form id="modify-form">
               @csrf
@@ -128,7 +133,16 @@
               </div>
             </form>
           </dialog>
-          <dialog id="delete">
+          {{-- メッセージ削除 --}}
+          <dialog id="delete" class="chat-content-modal-delete">
+            <div id="delete-container" class="chat-content-modal-delete-container">
+              @csrf
+              <p id="delete-p"></p>
+              <div class="chat-content-modal-delete-buttons">
+                <button id="delete-submit" class="c-btn c-btn--modal-edit" type="button">削除</button>
+                <a id="delete-cancel" class="c-btn c-btn--modal-edit-cancel">キャンセル</a>
+              </div>
+            </div>
           </dialog>
           <div class="chat-content-send">
             <form id="form" onsubmit="return sendMessageWrapper()">
@@ -148,7 +162,7 @@
   {{-- ================================================ --}}
   <script>
     // -----------------------
-    // 変数定義
+    // グローバル変数定義
     // -----------------------
     let isSending = false;
 
@@ -191,7 +205,7 @@
 
       // if文に入れるとeditDivは外では使えない
       const editDiv =document.createElement('div');
-      editDiv.className = 'chat-content-list-message-container';
+      editDiv.className = 'chat-content-list-edit';
       if (!isLeft) {
         const editA1 = document.createElement('a');
         editA1.textContent = '編集';
@@ -339,11 +353,11 @@
       }
 
       fetch(url, {
-        method: 'POST',
-        body: data,
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-        }
+        },
+        method: 'POST',
+        body: data,
       })
       .then(response => {
         if (!response.ok) {
@@ -365,9 +379,9 @@
       return false;
     }
 
-    function modifyMessageWrapper(chatid) {
+    function modifyMessageWrapper(chatId) {
       if (!isModifySending) {
-        modifyMessage(chatid);
+        modifyMessage(chatId);
       }
       return false;
     }
@@ -378,7 +392,7 @@
     }
 
     // -----------------------
-    // 編集前の準備
+    // イベント定義
     // -----------------------
     document.addEventListener('DOMContentLoaded', function() {
       const modifyDialog = document.getElementById('modify');
@@ -387,7 +401,7 @@
       // dialog内の編集ボタンのイベント
       const update = document.getElementById('modify-submit');
       update.addEventListener('click', function() {
-        const chatId = modifyForm.dataset.chatId;
+        const chatId = modifyForm.dataset.chatid;
         modifyMessageWrapper(chatId);
         modifyDialog.close();
       });
@@ -399,12 +413,12 @@
       });
 
       // すべての編集リンクを取得
-      const editLinks = document.querySelectorAll('.chat-content-list-message-container a:first-child');
-      editLinks.forEach(function(link) {
+      const modifyLinks = document.querySelectorAll('.chat-content-list-edit-modify');
+      modifyLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
           e.preventDefault(); // リンクのデフォルト動作を防止
 
-          // クリックされた編集リンクの親要素（chat-content-list-message-container）を取得
+          // クリックされた編集リンクの親要素（chat-content-list-edit）を取得
           const messageContainer = this.parentElement;
           // 親のchat-content-list-containerを取得
           const contentContainer = messageContainer.parentElement;
@@ -415,7 +429,7 @@
 
           // dialogのformにdata-chatidをセット
           const chatId = messageElement.dataset.chatid;
-          modifyForm.dataset.chatId = chatId;
+          modifyForm.dataset.chatid = chatId;
 
           // 編集エリアにメッセージを表示
           const textarea = document.getElementById('modify-textarea');
@@ -432,42 +446,122 @@
   {{-- メッセージ削除用 --}}
   {{-- ================================================ --}}
   <script>
+    // -----------------------
+    // グローバル変数定義
+    // -----------------------
     let isDeleteSending = false;
 
-    function deleteMessage() {
-      //
+    // -----------------------
+    // 関数定義
+    // -----------------------
+    function deleteMessage(chatId) {
+      isDeleteSending = true;
+      let baseUrl = '{{ route("chat.delete", ":chatid") }}';
+      let url = baseUrl.replace(':chatid', chatId);
+
+      // DELETEとして処理してほしいPOSTリクエストを送信
+      fetch(url, {
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        method: 'POST',
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json()
+      })
+      .then(data => {
+        // 削除したチャットの表示を変更
+        deleteChatContent(data.chatId);
+        // 送信中フラグを下げる
+        isDeleteSending = false;
+      })
+      .catch(error => {
+          isDeleteSending = false;
+          console.error('Error:', error)
+        }
+      );
+
+      return false;
     }
 
-    function deleteMessageWrapper() {
-      //
+    function deleteMessageWrapper(chatId) {
+      if (!isDeleteSending) {
+        deleteMessage(chatId);
+      }
+      return false;
     }
 
-    function deleteChatContent() {
-      //
+    // 削除されたメッセージの表示を変更
+    function deleteChatContent(chatId) {
+      const targetMessage = document.querySelector(`.chat-content-list-message[data-chatid="${chatId}"]`);
+
+      // 対象の要素の親要素を取得
+      const parentElement = targetMessage.parentElement;
+
+      // 削除後のメッセージを作成
+      const deletedMessage = document.createElement('p');
+      deletedMessage.className = 'chat-content-list-message deleted';
+      deletedMessage.setAttribute('data-chatid', chatId);
+      deletedMessage.textContent = 'このメッセージは削除されました';
+
+      // 削除対象のメッセージを置き換える
+      parentElement.replaceChild(deletedMessage, targetMessage);
+
+      // 編集・削除ボタンを削除
+      const targetEditors = parentElement.querySelector('.chat-content-list-edit');
+      parentElement.removeChild(targetEditors);
     }
 
-    // // DELETEとして処理してほしいPOSTリクエストを送信
-    // fetch('/your-endpoint', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'X-HTTP-Method-Override': 'DELETE'  // これはオプション
-    //   },
-    //   body: JSON.stringify({
-    //     _method: 'DELETE',  // Laravelがこれを認識します
-    //     // 他のデータ
-    //   })
-    // })
-    // .then(response => response.json())
-    // .then(data => console.log(data))
-    // .catch(error => console.error('Error:', error));
+    // -----------------------
+    // イベント定義
+    // -----------------------
+    document.addEventListener('DOMContentLoaded', function() {
+      const deleteDialog = document.getElementById('delete');
+      const deleteContainer = document.getElementById('delete-container');
 
-    // （残作業）
-    // 削除しますかのダイアログ
-    // 「はい」でdeleteMessageWrapperを呼び出す
-    // deleteメソッドを実行
-    // メッセージを論理削除
-    // 画面の表示を変更する
+      // dialog内の削除ボタンのイベント
+      const update = document.getElementById('delete-submit');
+      update.addEventListener('click', function() {
+        const chatId = deleteContainer.dataset.chatid;
+        deleteMessageWrapper(chatId);
+        deleteDialog.close();
+      });
+
+      // dialog内のキャンセルボタンのイベント
+      const cancel = document.getElementById('delete-cancel');
+      cancel.addEventListener('click', function() {
+        deleteDialog.close();
+      });
+
+      const deleteLinks = document.querySelectorAll('.chat-content-list-edit-delete');
+      deleteLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault(); // リンクのデフォルト動作を防止
+
+          // クリックされた編集リンクの親要素（chat-content-list-edit）を取得
+          const messageContainer = this.parentElement;
+          // 親のchat-content-list-containerを取得
+          const contentContainer = messageContainer.parentElement;
+          // その中のメッセージ要素を取得
+          const messageElement = contentContainer.querySelector('.chat-content-list-message');
+          // メッセージのテキストを取得
+          const messageText = messageElement.textContent;
+
+          // dialogのformにdata-chatidをセット
+          const chatId = messageElement.dataset.chatid;
+          deleteContainer.dataset.chatid = chatId;
+
+          const pragraph = document.getElementById('delete-p');
+          pragraph.textContent = messageText;
+
+          // ダイアログを表示
+          deleteDialog.showModal();
+        });
+      });
+    });
   </script>
 
   {{-- ================================================ --}}
