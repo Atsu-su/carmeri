@@ -7,8 +7,16 @@
   @include('components.header')
 @endsection
 @section('content')
-
-  <div id="chat">
+  <div id=values
+    data-purchaseid="{{ $purchase->id }}" 
+    data-receiverid="{{ $notBuyer ? $purchase->user->id : $purchase->item->user->id }}"
+    data-storage="{{ Storage::url('profile_images/') }}"
+    data-chatsend="{{ route('chat.send', ['purchase_id' => $purchase->id, 'receiver_id' => $notBuyer ? $purchase->user->id : $purchase->item->user->id]) }}"
+    data-chatread="{{ route("chat.read", $purchase->id) }}"
+    data-chatupdate="{{ route("chat.update", ":chatid") }}"
+    data-chatdelete="{{ route("chat.delete", ":chatid") }}"
+    ></div>
+  <div id="chat" data-purchaseid="{{ $purchase->id }}" data-receiverid="{{ $notBuyer ? $purchase->user->id : $purchase->item->user->id }}">
     @if (false)
       <div class="modal">
         <div class="modal-content">
@@ -156,20 +164,60 @@
       </div>
     </div>
   </div>
-  <script src="{{ mix('js/app.js') }}"></script>
   {{-- ================================================ --}}
-  {{-- メッセージ送信用 --}}
+  {{-- bootstrap.jsをコンパイルしたファイル --}}
+  {{-- ================================================ --}}
+  <script src="{{ mix('js/app.js') }}"></script>
+
+  {{-- ================================================ --}}
+  {{-- メッセージ送信 --}}
   {{-- ================================================ --}}
   <script>
     // -----------------------
     // グローバル変数定義
     // -----------------------
     let isSending = false;
+    // 受信時のチャネルIDに使用する（window.Laravel.user）
+
+    window.Laravel = {!! json_encode([
+        'user' => auth()->check() ? auth()->user()->id : null,
+    ]) !!};
+
+    // -----------------------
+    // グローバル関数定義
+    // （複数の機能で使用）
+    // -----------------------
+    function createUpdateLink(event, link, modifyForm, modifyDialog) {
+      event.preventDefault(); // リンクのデフォルト動作を防止
+
+      // クリックされた編集リンクの親要素（chat-content-list-edit）を取得
+      const messageContainer = link.parentElement;
+      // 親のchat-content-list-containerを取得
+      const contentContainer = messageContainer.parentElement;
+      // その中のメッセージ要素を取得
+      const messageElement = contentContainer.querySelector('.chat-content-list-message');
+      // メッセージのテキストを取得
+      const messageText = messageElement.textContent;
+
+      // dialogのformにdata-chatidをセット
+      const chatId = messageElement.dataset.chatid;
+      modifyForm.dataset.chatid = chatId;
+
+      // 編集エリアにメッセージを表示
+      const textarea = document.getElementById('modify-textarea');
+      textarea.value = messageText;
+
+      // ダイアログを表示
+      modifyDialog.showModal();
+    }
+
 
     // -----------------------
     // 関数定義
     // -----------------------
     function renderChat(isLeft, data) {
+      console.log(data);
+
       const ul = document.querySelector('.chat-content ul');
 
       const li = document.createElement('li');
@@ -184,7 +232,15 @@
 
       const profileImg = document.createElement('img');
       profileImg.className = 'chat-content-list-profile-inner-frame';
-      profileImg.src = '{{ Storage::url('profile_images/') }}' + data.image;
+
+
+      // --------------------------------
+      // this value will be picked up
+      // --------------------------------
+      const storage = document.getElementById('values').dataset.storage;
+      profileImg.src = `${storage}${data.image}`;
+
+
       profileImg.alt = 'プロフィールの画像';
 
       const profileName = document.createElement('p');
@@ -198,6 +254,7 @@
       const messageP = document.createElement('p');
       messageP.className = 'chat-content-list-message';
       messageP.textContent = data.message;
+      messageP.dataset.chatid = data.chat_id;
 
       const datetimeP = document.createElement('p');
       datetimeP.className = 'chat-content-list-datetime';
@@ -213,6 +270,16 @@
         editA2.textContent = '削除';
         editDiv.appendChild(editA1);
         editDiv.appendChild(editA2);
+
+
+        // =============================================
+        // editA1, editA2にイベントリスナーをつける
+        // =============================================
+        const modifyForm = document.getElementById('modify-form');
+        const modifyDialog = document.getElementById('modify');
+        editA1.addEventListener('click', function(e) {
+          createUpdateLink(e, editA1, modifyForm, modifyDialog);
+        });
       }
 
       // 要素を組み立てる
@@ -246,7 +313,14 @@
         return false;
       }
 
-      fetch('{{ route("chat.send", $purchase->id) }}', {
+
+      // --------------------------------
+      // this value will be picked up
+      // --------------------------------
+      const url = document.getElementById('values').dataset.chatsend;
+
+
+      fetch(url, {
         method: 'POST',
         body: data,
         headers: {
@@ -267,7 +341,10 @@
         input.value = '';
         // 送信中フラグを下げる
         isSending = false;
+        // 入力フィールドの幅を初期化
         adjustHeight();
+        // 保存された入力値の削除
+        // deleteSavedTextCookie()
       })
       .catch(error => {
         isSending = false;
@@ -285,7 +362,15 @@
     }
 
     function read() {
-      fetch('{{ route("chat.read", $purchase->id) }}', {
+
+
+      // --------------------------------
+      // this value will be picked up
+      // --------------------------------
+      const url = document.getElementById('values').dataset.chatread;
+      fetch(url, {
+
+
         method: 'POST',
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -308,18 +393,26 @@
       textarea.style.height = textarea.scrollHeight + 'px';
     }
 
+    function deleteSavedTextCookie() {
+      // document.cookie = 'savedText=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/chat';
+      console.log('deleteSavedTextCookie 作成中')
+    }
+
     // -----------------------
     // イベント定義
     // -----------------------
     // チャットの受信処理
     window.addEventListener("DOMContentLoaded", () =>
     {
-      window.Echo.channel('testchat').listen('MessageSent', (e) => {
-	      // メッセージをレンダリング
-        renderChat(true, e.message);
-        // チャットの既読処理
-        read();
-      });
+      const purchaseId = document.getElementById('values').dataset.purchaseid;
+      window.Echo.private(`channel.${window.Laravel.user}.${purchaseId}`)
+        // .chat-nameでドットが必要
+        .listen('.carmeri-chat', (e) => {
+          // メッセージをレンダリング
+          renderChat(true, e.message);
+          // チャットの既読処理
+          read();
+        });
     });
 
     // 入力時に高さ調整
@@ -329,7 +422,7 @@
   </script>
 
   {{-- ================================================ --}}
-  {{-- メッセージ修正用 --}}
+  {{-- メッセージ修正 --}}
   {{-- ================================================ --}}
   <script>
     let isModifySending = false;
@@ -340,7 +433,13 @@
     function modifyMessage(chatId) {
       isModifySending = true;
       // 文字列は参照ではない
-      let baseUrl = '{{ route("chat.update", ":chatid") }}';
+
+      // --------------------------------
+      // this value will be picked up
+      // --------------------------------
+      let baseUrl = document.getElementById('values').dataset.chatupdate;
+
+
       let url = baseUrl.replace(':chatid', chatId);
       const form = document.getElementById('modify-form');
       const textarea = document.getElementById('modify-textarea');
@@ -395,12 +494,19 @@
     // イベント定義
     // -----------------------
     document.addEventListener('DOMContentLoaded', function() {
+
+
+      // ========================================================
+      // この二つをinputにすれば関数化は可能
       const modifyDialog = document.getElementById('modify');
       const modifyForm = document.getElementById('modify-form');
+      // ========================================================
+
 
       // dialog内の編集ボタンのイベント
       const update = document.getElementById('modify-submit');
       update.addEventListener('click', function() {
+        // id=valueには入れられない（$chats as $chat）
         const chatId = modifyForm.dataset.chatid;
         modifyMessageWrapper(chatId);
         modifyDialog.close();
@@ -416,34 +522,44 @@
       const modifyLinks = document.querySelectorAll('.chat-content-list-edit-modify');
       modifyLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
-          e.preventDefault(); // リンクのデフォルト動作を防止
-
-          // クリックされた編集リンクの親要素（chat-content-list-edit）を取得
-          const messageContainer = this.parentElement;
-          // 親のchat-content-list-containerを取得
-          const contentContainer = messageContainer.parentElement;
-          // その中のメッセージ要素を取得
-          const messageElement = contentContainer.querySelector('.chat-content-list-message');
-          // メッセージのテキストを取得
-          const messageText = messageElement.textContent;
-
-          // dialogのformにdata-chatidをセット
-          const chatId = messageElement.dataset.chatid;
-          modifyForm.dataset.chatid = chatId;
-
-          // 編集エリアにメッセージを表示
-          const textarea = document.getElementById('modify-textarea');
-          textarea.value = messageText;
-
-          // ダイアログを表示
-          modifyDialog.showModal();
+          createUpdateLink(e, link, modifyForm, modifyDialog);
         });
       });
+        // link.addEventListener('click', function(e) {
+
+
+        //   // ===========================================================
+        //   // ここが共通関数になる
+        //   // ===========================================================
+
+        //   e.preventDefault(); // リンクのデフォルト動作を防止
+
+        //   // クリックされた編集リンクの親要素（chat-content-list-edit）を取得
+        //   const messageContainer = this.parentElement;
+        //   // 親のchat-content-list-containerを取得
+        //   const contentContainer = messageContainer.parentElement;
+        //   // その中のメッセージ要素を取得
+        //   const messageElement = contentContainer.querySelector('.chat-content-list-message');
+        //   // メッセージのテキストを取得
+        //   const messageText = messageElement.textContent;
+
+        //   // dialogのformにdata-chatidをセット
+        //   const chatId = messageElement.dataset.chatid;
+        //   modifyForm.dataset.chatid = chatId;
+
+        //   // 編集エリアにメッセージを表示
+        //   const textarea = document.getElementById('modify-textarea');
+        //   textarea.value = messageText;
+
+        //   // ダイアログを表示
+        //   modifyDialog.showModal();
+
+        //   // ===========================================================
     });
   </script>
 
   {{-- ================================================ --}}
-  {{-- メッセージ削除用 --}}
+  {{-- メッセージ削除 --}}
   {{-- ================================================ --}}
   <script>
     // -----------------------
@@ -456,7 +572,14 @@
     // -----------------------
     function deleteMessage(chatId) {
       isDeleteSending = true;
-      let baseUrl = '{{ route("chat.delete", ":chatid") }}';
+
+
+      // --------------------------------
+      // this value will be picked up
+      // --------------------------------
+      let baseUrl = document.getElementById('values').dataset.chatdelete;
+
+
       let url = baseUrl.replace(':chatid', chatId);
 
       // DELETEとして処理してほしいPOSTリクエストを送信
@@ -565,7 +688,67 @@
   </script>
 
   {{-- ================================================ --}}
-  {{-- 評価用 --}}
+  {{-- 入力したメッセージのクッキーへの保存 --}}
+  {{-- ================================================ --}}
+  <script>
+    // textareaの値をCookieに保存する関数
+    function saveTextAreaToCookie(textarea, cookieName, id, expirationHours = 1) {
+        // 入力値を取得
+        const value = textarea.value;
+
+        // Cookieの有効期限を設定
+        const date = new Date();
+        date.setTime(date.getTime() + (expirationHours * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+
+        // Cookieに保存（エスケープして保存）
+        document.cookie = `${cookieName}=${encodeURIComponent(value)};${expires};path=/chat/${id}`;
+    }
+
+    // Cookieからtextareaの値を取得して設定する関数
+    function loadTextAreaFromCookie(textarea, cookieName) {
+        // Cookieから値を取得
+        const value = getCookie(cookieName);
+
+        // textareaに値をセット
+        if (value) {
+            textarea.value = decodeURIComponent(value);
+        }
+    }
+
+    // 指定したCookieの値を取得する関数
+    function getCookie(name) {
+        const cookieName = name + "=";
+        const cookies = document.cookie.split(';');
+
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.indexOf(cookieName) === 0) {
+                return cookie.substring(cookieName.length, cookie.length);
+            }
+        }
+        return "";
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const cookieName = 'savedText';
+      const textarea = document.getElementById('input');
+      const currentUrl = window.location.href;
+      const urlElements = window.location.pathname.split('/');
+      const id = urlElements[urlElements.length - 1];
+
+      // ページ読み込み時にCookieから値を復元
+      loadTextAreaFromCookie(textarea, cookieName);
+
+      // textareaの入力内容が変更されたらCookieに保存
+      textarea.addEventListener('input', function() {
+          saveTextAreaToCookie(textarea, cookieName, id);
+      });
+    });
+  </script>
+
+  {{-- ================================================ --}}
+  {{-- 評価 --}}
   {{-- ================================================ --}}
   @if (false)
     <script>

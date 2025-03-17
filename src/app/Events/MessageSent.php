@@ -15,7 +15,7 @@ class MessageSent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $message;
+    public $message;    // \App\Library\Messageクラスのインスタンス
 
     /**
      * Create a new event instance.
@@ -34,6 +34,12 @@ class MessageSent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('testchat');
+        // ここにpurchase_idをつけることで特定の商品のみチャットを受信できる
+        return new PrivateChannel('channel.'.$this->message->receiver_id.'.'.$this->message->purchase_id);
+    }
+
+    public function broadcastAs()
+    {
+        return 'carmeri-chat';
     }
 }

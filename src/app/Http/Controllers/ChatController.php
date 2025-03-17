@@ -67,7 +67,6 @@ class ChatController extends Controller
         // 取引相手の情報を取得
         $purchase = null;
         if (!$notSeller && $notBuyer) {
-            \Log::info('私は出品者です');
             // 出品者の場合は購入者の情報を取得
             $purchase = Purchase::query()
                 ->with(['item:id,name,price,image', 'user:id,name,image'])
@@ -75,7 +74,6 @@ class ChatController extends Controller
                 ->select('id', 'item_id', 'buyer_id')
                 ->first();
         } else {
-            \Log::info('私は購入者です');
             // 購入者の場合は出品者の情報を取得
             $purchase = Purchase::query()
                 ->with(['item:id,seller_id,name,price,image', 'item.user:id,name,image'])
@@ -122,7 +120,7 @@ class ChatController extends Controller
         return view('chat',compact('chats', 'purchase', 'notBuyer', 'sellingItems', 'purchasingItems'));
     }
 
-    public function sendMessage(Request $request, $purchase_id)
+    public function sendMessage(Request $request, $purchase_id, $receiver_id)
     {
         // auth()->user() : 現在認証しているユーザーを取得
         $user = auth()->user();
@@ -130,9 +128,11 @@ class ChatController extends Controller
         $validator = Validator::make(
             $request->all(),
             ['message' => 'required|string|max:400'],
-            ['message.required' => 'メッセージを入力してください',
+            [
+                'message.required' => '（おまえか！）メッセージを入力してください',
                 'message.string' => 'メッセージの形式が不正です',
-                'message.max' => 'メッセージは400文字以内で入力してください']
+                'message.max' => 'メッセージは400文字以内で入力してください'
+            ]
         );
 
         if ($validator->fails()) {
@@ -145,7 +145,7 @@ class ChatController extends Controller
 
         // メッセージをテーブルに保存
         try {
-            Chat::create([
+            $chat= Chat::create([
                 'purchase_id' => $purchase_id,
                 'sender_id' => $user->id,
                 'is_read' => false,
@@ -158,6 +158,10 @@ class ChatController extends Controller
 
         // メッセージオブジェクトの作成
         $message = new Message;
+
+        $message->chat_id = $chat->id;          // チャットID
+        $message->receiver_id = $receiver_id;   // 受信者のユーザID
+        $message->purchase_id = $purchase_id;   // 購入ID
         $message->username = $user->name;
         $message->message = $request->input('message');
         $message->datetime = $now->format('Y/m/d H:i');
@@ -176,11 +180,11 @@ class ChatController extends Controller
         $user = auth()->user();
 
         try {
-        Chat::query()
-            ->where('purchase_id', $purchase_id)
-            ->where('sender_id', '!=', $user->id)
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
+            Chat::query()
+                ->where('purchase_id', $purchase_id)
+                ->where('sender_id', '!=', $user->id)
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
             return response()->json(['message' => '既読フラグの変更に失敗'], 500);        

@@ -13,14 +13,14 @@
 
 ・[plannedtofinish] 評価機能の追加
 
-・[ongoing] チャネルをプライベートにする
+・[done] チャネルをプライベートにする
 ・[done] enter連打の抑止
 ・[done] テキストをチャットで送信できる
 ・画像をチャットで送信できる
 ・[ongoing] 入力内容の保持（クッキーを使う）
 ・[done] バリデーション（1文字以上400文字以内）
 ・[done] 投稿済みのメッセージを修正できる
-・[ongoing]投稿済みのメッセージを削除できる
+・[done] 投稿済みのメッセージを削除できる
 ・（購入者）取引完了後、出品者の評価ができる
 ・（出品者）取引完了後、チャット画面にて購入者の評価ができる
   ⇒ チャットへの遷移元の画面は残る
@@ -38,6 +38,16 @@ https://www.hiramine.com/programming/chat_laravel_pusher_private/index.html
 チャネルプライベート化
 https://www.messiahworks.com/archives/19071
 https://qiita.com/kensukeX/items/d43cb6a8529aec89a1bb
+
+$(document).ready(function() {
+    //受信するチャネル名・イベント名を指定＆処理を記述
+    //window.Echo.channel('my-channel')
+    window.Echo.private('channel')
+        // イベント名の前にドットをつけるのを忘れずに！！(app/Eventsがデフォ)
+        .listen('.my-event', (e) => {
+            console.log(e);
+        });
+});
 
 ===============================================
 .env修正内容
