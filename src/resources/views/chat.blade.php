@@ -253,11 +253,6 @@
     ]) !!};
 
     // -----------------------
-    // グローバル関数定義
-    // （複数の機能で使用）
-    // -----------------------
-
-    // -----------------------
     // 関数定義
     // -----------------------
     function renderChat(isLeft, data) {
@@ -367,11 +362,17 @@
       })
       .then(response => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          return response.json().then(errorData => {
+            const error = new Error('Network response was not ok');
+            error.data = errorData;
+            throw error;
+          });
         }
         return response.json();
       })
       .then(data => {
+        console.log('送信成功ルート')
+
         // 送信したチャットの表示
         renderChat(false, data);
         // 入力フィールドをクリア
@@ -385,10 +386,17 @@
       })
       .catch(error => {
         isSending = false;
-        console.log('Error:', error);
+
+        // エラーメッセージ
+        // console.log(error.data.errors.message[0]);
+        // displayError();
       });
 
       return false;
+    }
+
+    function displayError(message) {
+      // 
     }
 
     function sendMessageWrapper() {

@@ -132,7 +132,7 @@ class ChatController extends Controller
             $request->all(),
             ['message' => 'required|string|max:400'],
             [
-                'message.required' => '（おまえか！）メッセージを入力してください',
+                'message.required' => 'メッセージを入力してください',
                 'message.string' => 'メッセージの形式が不正です',
                 'message.max' => 'メッセージは400文字以内で入力してください'
             ]
