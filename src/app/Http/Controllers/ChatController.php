@@ -18,8 +18,8 @@ class ChatController extends Controller
     public function index($purchase_id)
     {
         $user = auth()->user();
-        $notSeller = false;
-        $notBuyer = false;
+        $notSeller = false; // true: 購入者（出品者ではない）, false: 出品者
+        $notBuyer = false;  // true: 出品者（購入者ではない）, false: 購入者
 
         // このユーザが出品者かどうかを判定
         try {
@@ -30,6 +30,7 @@ class ChatController extends Controller
                 ->where('id', $purchase_id)
                 ->firstOrFail();
         } catch (Exception $e) {
+            // 出品者ではない（購入者）
             $notSeller = true;
         }
 
@@ -40,6 +41,7 @@ class ChatController extends Controller
                 ->where('id', $purchase_id)
                 ->firstOrFail();
         } catch (Exception $e) {
+            // 購入者ではない（出品者）
             $notBuyer = true;
         }
 
@@ -66,6 +68,7 @@ class ChatController extends Controller
 
         // 取引相手の情報を取得
         $purchase = null;
+
         if (!$notSeller && $notBuyer) {
             // 出品者の場合は購入者の情報を取得
             $purchase = Purchase::query()

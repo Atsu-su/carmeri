@@ -41,6 +41,7 @@ class HomeController extends Controller
     public function myPageIndex()
     {
         $user = auth()->user();
+        $user->rating = $user->evaluations > 0 ? round($user->rating_sum / $user->evaluations) : 0;
         $listedItems = Item::query()
             ->where('seller_id', $user->id)
             ->get();

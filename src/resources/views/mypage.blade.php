@@ -23,11 +23,13 @@
         <div>
           <p class="user-info-name">{{ $user->name }}</p>
           <div class="user-info-stars">
-            <span class="user-info-stars-star1 filled"></span>
-            <span class="user-info-stars-star2"></span>
-            <span class="user-info-stars-star3"></span>
-            <span class="user-info-stars-star4"></span>
-            <span class="user-info-stars-star5"></span>
+            @if ($user->evaluations > 0)
+              @for ($i = 1; $i <= 5; $i++)
+                <span class="user-info-stars-star{{$i}}{{ $i <= $user->rating ? ' filled' : '' }}"></span>
+              @endfor
+            @else
+              <p class="user-info-stars-zero">評価はまだありません</p>
+            @endif
           </div>
         </div>
       </div>
@@ -103,7 +105,7 @@
                   <span class="new-message-icon2">{{ $result < 100 ? $result : '99+' }}</span>
                 @endif
               </div>
-              <p>{{$purchase->item->id}}{{ $purchase->item->name }}</p>
+              <p>{{ $purchase->item->name }}</p>
             </a>
           @endforeach
         @endif

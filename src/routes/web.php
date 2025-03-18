@@ -8,6 +8,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\UserController;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,9 @@ Route::middleware('header')->group(function () {
         Route::post('/item/{item_id}/comment', [CommentController::class, 'store'])->name('comment.store');
         Route::get('/purchase/address/{item_id}', [AddressController::class, 'edit'])->name('address.edit');
         Route::post('/purchase/address/{item_id}', [AddressController::class, 'update'])->name('address.update');
+
+        // チャット終了後の処理
+        Route::post('/purchase/complete/{purchase_id}', [PurchaseController::class, 'complete'])->name('purchase.complete');
         Route::get('/purchase/{item_id}', [PurchaseController::class, 'index'])->name('purchase');
         Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('purchase.store');
         Route::get('/sell', [ItemController::class, 'create'])->name('sell.create');
@@ -48,6 +52,8 @@ Route::middleware('header')->group(function () {
         Route::post('chat/{chat_id}/update', [ChatController::class, 'update'])->name('chat.update');
         Route::post('chat/{chat_id}/delete', [ChatController::class, 'delete'])->name('chat.delete');
         Route::post('chat/{purchase_id}/{receiver_id}', [ChatController::class, 'sendMessage'])->name('chat.send');
+        
+        Route::post('rating/{user_id}', [UserController::class, 'rating'])->name('user.rating');
         // ---------------------------------------------------
 
         // stripeの成功・キャンセル用ルーティング
