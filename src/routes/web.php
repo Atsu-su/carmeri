@@ -53,7 +53,7 @@ Route::middleware('header')->group(function () {
         Route::post('chat/{chat_id}/delete', [ChatController::class, 'delete'])->name('chat.delete');
         Route::post('chat/{purchase_id}/{receiver_id}', [ChatController::class, 'sendMessage'])->name('chat.send');
         
-        Route::post('rating/{user_id}', [UserController::class, 'rating'])->name('user.rating');
+        Route::post('rating/{seller_id}', [UserController::class, 'rating'])->name('user.rating');
         // ---------------------------------------------------
 
         // stripeの成功・キャンセル用ルーティング
