@@ -51,19 +51,19 @@ class HomeController extends Controller
             ->get();
         $message = MessageSession::exists('message');
 
-        // 1. 出品者の場合
-        // ・purchasesテーブルにあるレコードのうち、自分が出品した商品の情報と
-        //   purchase_idを取得する
-
-        $sellingItems = Purchase::query()
+        // チャット中の商品を取得（統合版）
+        $purchases = Purchase::query()
             ->with(['item:id,name,price,image', 'chats' => function ($query) use ($user) {
                 $query->where('sender_id', '!=', $user->id)
                     ->where('is_read', false);
             }])
-            ->whereHas('item', function ($query) use ($user) {
-                $query->where('seller_id', $user->id);
+            ->where('status', Purchase::PROCESSING)
+            ->where(function ($query) use ($user) {
+                $query->whereHas('item', function ($query) use ($user) {
+                    $query->where('seller_id', $user->id);
+                })
+                ->orWhere('buyer_id', $user->id);
             })
-            ->whereHas('chats')
             ->select('purchases.id', 'purchases.item_id')
             ->leftJoinSub(function ($query) use ($user) {
                 $query->from('chats')
@@ -75,35 +75,64 @@ class HomeController extends Controller
             ->orderByRaw("COALESCE(latest_chats.latest_chat, '1900-01-01') DESC")
             ->get();
 
+        // ======================================================================================
+        // 出品者と購入者で表示を分ける場合
+
+        // 1. 出品者の場合
+        // ・purchasesテーブルにあるレコードのうち、自分が出品した商品の情報と
+        //   purchase_idを取得する
+
+        // $sellingItems = Purchase::query()
+        //     ->with(['item:id,name,price,image', 'chats' => function ($query) use ($user) {
+        //         $query->where('sender_id', '!=', $user->id)
+        //             ->where('is_read', false);
+        //     }])
+        //     ->whereHas('item', function ($query) use ($user) {
+        //         $query->where('seller_id', $user->id);
+        //     })
+        //     ->whereHas('chats')
+        //     ->select('purchases.id', 'purchases.item_id')
+        //     ->leftJoinSub(function ($query) use ($user) {
+        //         $query->from('chats')
+        //             ->select('purchase_id', DB::raw('MAX(created_at) as latest_chat'))
+        //             ->where('is_read', false)
+        //             ->where('sender_id', '!=', $user->id)
+        //             ->groupBy('purchase_id');
+        //     }, 'latest_chats', 'purchases.id', '=', 'latest_chats.purchase_id')
+        //     ->orderByRaw("COALESCE(latest_chats.latest_chat, '1900-01-01') DESC")
+        //     ->get();
+
         // 2. 購入者の場合
         // ・purchasesテーブルのレコードのうち、自分が購入した商品の情報と
         //   purchase_idを取得する
 
-        $purchasingItems = Purchase::query()
-            ->with(['item:id,name,price,image', 'chats' => function ($query) use ($user) {
-                $query->where('sender_id', '!=', $user->id)
-                    ->where('is_read', false);
-            }])
-            ->where('buyer_id', $user->id)
-            ->whereHas('chats')
-            ->select('purchases.id', 'purchases.item_id')
-            ->leftJoinSub(function ($query) use ($user) {
-                $query->from('chats')
-                    ->select('purchase_id', DB::raw('MAX(created_at) as latest_chat'))
-                    ->where('is_read', false)
-                    ->where('sender_id', '!=', $user->id)
-                    ->groupBy('purchase_id');
-            }, 'latest_chats', 'purchases.id', '=', 'latest_chats.purchase_id')
-            ->orderByRAW("COALESCE(latest_chats.latest_chat, '1900-01-01') DESC")
-            ->get();
+        // $purchasingItems = Purchase::query()
+        //     ->with(['item:id,name,price,image', 'chats' => function ($query) use ($user) {
+        //         $query->where('sender_id', '!=', $user->id)
+        //             ->where('is_read', false);
+        //     }])
+        //     ->where('buyer_id', $user->id)
+        //     ->whereHas('chats')
+        //     ->select('purchases.id', 'purchases.item_id')
+        //     ->leftJoinSub(function ($query) use ($user) {
+        //         $query->from('chats')
+        //             ->select('purchase_id', DB::raw('MAX(created_at) as latest_chat'))
+        //             ->where('is_read', false)
+        //             ->where('sender_id', '!=', $user->id)
+        //             ->groupBy('purchase_id');
+        //     }, 'latest_chats', 'purchases.id', '=', 'latest_chats.purchase_id')
+        //     ->orderByRAW("COALESCE(latest_chats.latest_chat, '1900-01-01') DESC")
+        //     ->get();
+        // ======================================================================================
 
         return view('mypage',
             compact(
                 'user',
                 'listedItems',
                 'purchasedItems',
-                'sellingItems',
-                'purchasingItems',
+                'purchases',
+                // 'sellingItems',
+                // 'purchasingItems',
                 'message'
             )
         );

@@ -55,6 +55,18 @@
         <h3 class="sidebar-title">取引チャット</h3>
         <div class="sidebar-container">
           <div class="sidebar-listed-container">
+            <ul class="sidebar-items">
+              @foreach ($items as $item)
+                <li class="sidebar-items-name"><a href="{{ route('chat', $item->id)}}">{{ $item->item->name }}</a></li>
+              @endforeach
+            </ul>
+          </div>
+        </div>
+
+        {{-- 分離バージョン --}}
+        {{-- <h3 class="sidebar-title">取引チャット</h3>
+        <div class="sidebar-container">
+          <div class="sidebar-listed-container">
             <h4 class="sidebar-title-listed">出品</h4>
             <ul class="sidebar-items">
               @foreach ($sellingItems as $item)
@@ -70,7 +82,7 @@
               @endforeach
             </ul>
           </div>
-        </div>
+        </div> --}}
       </aside>
       <div class="chat">
         <form class="chat-title" onclick="return changeStatusWrapper()">
@@ -809,54 +821,5 @@
         });
       });
     });
-
-
-
-
-
-
-    // ================================================
-    function modifyMessage(chatId) {
-      isModifySending = true;
-      // 文字列は参照ではない
-      let baseUrl = document.getElementById('values').dataset.chatupdate;
-      let url = baseUrl.replace(':chatid', chatId);
-      const form = document.getElementById('modify-form');
-      const textarea = document.getElementById('modify-textarea');
-      const data = new FormData(form);
-
-      // フォームの内容を送信する処理
-      if (!textarea.value) {
-        isModifySending = false;
-        return false;
-      }
-
-      fetch(url, {
-        headers: {
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-        },
-        method: 'POST',
-        body: data,
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // 修正したチャットの表示
-        modifyChatContent(data.chatId, data.modifiedMessage);
-        // 送信中フラグを下げる
-        isModifySending = false;
-      })
-      .catch(error => {
-        isModifySending = false;
-        console.log('Error:', error);
-      });
-
-      return false;
-    }
-
   </script>
 @endsection

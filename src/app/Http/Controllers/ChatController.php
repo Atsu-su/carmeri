@@ -85,42 +85,76 @@ class ChatController extends Controller
                 ->first();
         }
 
-        // 現在取引中の出品商品
-        $sellingItems = Purchase::query()
+
+        $items = Purchase::query()
             ->with('item:id,name')
-            ->whereHas('item', function ($query) use ($user) {
-                $query->where('seller_id', $user->id);
+            ->where(function ($query) use($user) {
+                $query->whereHas('item', function ($query) use ($user) {
+                    $query->where('seller_id', $user->id);
+                })
+                ->orWhere('buyer_id', $user->id);
             })
             ->where('status', Purchase::PROCESSING)
             ->where('id', '!=', $purchase_id)
             ->select('id', 'item_id')
+            ->orderBy('id', 'asc')
             ->get();
 
+
         // 商品名が長い場合は省略する
-        $sellingItems->map(function ($purchase) {
+        $items->map(function ($purchase) {
             $purchase->item->name = mb_strlen($purchase->item->name) > 7
                 ? mb_substr($purchase->item->name, 0, 7) . '...'
                 : $purchase->item->name;
             return $purchase;});
 
-        // 現在取引中の購入商品
-        $purchasingItems = Purchase::query()
-            ->with('item:id,name')
-            ->where('buyer_id', $user->id)
-            ->where('status', Purchase::PROCESSING)
-            ->where('id', '!=', $purchase_id)
-            ->select('id', 'item_id')
-            ->get();
+        // ======================================================================================
+        // 出品商品と購入商品を分ける場合
 
-        // 商品名が長い場合は省略する
-        $purchasingItems->map(function ($purchase) {
-            $purchase->item->name = mb_strlen($purchase->item->name) > 7
-                ? mb_substr($purchase->item->name, 0, 7) . '...'
-                : $purchase->item->name;
-            return $purchase;
-        });
+        // 現在取引中の出品商品
+        // $sellingItems = Purchase::query()
+        //     ->with('item:id,name')
+        //     ->whereHas('item', function ($query) use ($user) {
+        //         $query->where('seller_id', $user->id);
+        //     })
+        //     ->where('status', Purchase::PROCESSING)
+        //     ->where('id', '!=', $purchase_id)
+        //     ->select('id', 'item_id')
+        //     ->get();
 
-        return view('chat',compact('chats', 'purchase', 'notBuyer', 'sellingItems', 'purchasingItems'));
+        // // 商品名が長い場合は省略する
+        // $sellingItems->map(function ($purchase) {
+        //     $purchase->item->name = mb_strlen($purchase->item->name) > 7
+        //         ? mb_substr($purchase->item->name, 0, 7) . '...'
+        //         : $purchase->item->name;
+        //     return $purchase;});
+
+        // // 現在取引中の購入商品
+        // $purchasingItems = Purchase::query()
+        //     ->with('item:id,name')
+        //     ->where('buyer_id', $user->id)
+        //     ->where('status', Purchase::PROCESSING)
+        //     ->where('id', '!=', $purchase_id)
+        //     ->select('id', 'item_id')
+        //     ->get();
+
+        // // 商品名が長い場合は省略する
+        // $purchasingItems->map(function ($purchase) {
+        //     $purchase->item->name = mb_strlen($purchase->item->name) > 7
+        //         ? mb_substr($purchase->item->name, 0, 7) . '...'
+        //         : $purchase->item->name;
+        //     return $purchase;
+        // });
+        // ======================================================================================
+
+        return view('chat',compact(
+            'chats',
+            'purchase',
+            'notBuyer',
+            'items'
+            // 'sellingItems',
+            // 'purchasingItems'
+        ));
     }
 
     public function sendMessage(Request $request, $purchase_id, $receiver_id)

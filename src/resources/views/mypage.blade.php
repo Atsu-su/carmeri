@@ -39,18 +39,23 @@
       <div class="titles">
         <h2 class="title title-recommend js-active-title" data-tab="first-tab">出品した商品</h2>
         <h2 class="title title-mylist" data-tab="second-tab">購入した商品</h2>
-        @php $result = $sellingItems->sum(function ($item) {return $item->chats->count();}) @endphp
-        <h2 class="title title-processing" data-tab="third-tab">取引中の出品商品
+        @php $result = $purchases->sum(function ($purchase) {return $purchase->chats->count();}) @endphp
+        <h2 class="title title-processing" data-tab="third-tab">取引中の商品
           @if ($result > 0)
             <span class="new-message-icon"><span>{{ $result < 100 ? $result : '99+' }}</span></span>
           @endif
         </h2>
-        @php $result = $purchasingItems->sum(function ($item) {return $item->chats->count();}) @endphp
+        {{-- <h2 class="title title-processing" data-tab="third-tab">取引中の出品商品
+          @if ($result > 0)
+            <span class="new-message-icon"><span>{{ $result < 100 ? $result : '99+' }}</span></span>
+          @endif
+        </h2> --}}
+        {{-- @php $result = $purchasingItems->sum(function ($item) {return $item->chats->count();}) @endphp
         <h2 class="title title-processing" data-tab="fourth-tab">取引中の購入商品
           @if ($result > 0)
             <span class="new-message-icon"><span>{{ $result < 100 ? $result : '99+' }}</span></span>
           @endif
-        </h2>
+        </h2> --}}
       </div>
       <div class="tab first-tab">
         @if ($listedItems->isEmpty())
@@ -89,6 +94,28 @@
         @endif
       </div>
       <div class="tab third-tab js-hidden">
+        @if ($purchases->isEmpty())
+          <p class="no-purchased-item">取引中の商品はありません</p>
+        @else
+          @foreach ($purchases as $index => $purchase)
+            <a class="c-item" href="{{ route('chat', $purchase->id) }}">
+              <div class="image-container">
+                @if ($purchase->item->image && Storage::disk('public')->exists('item_images/'.$purchase->item->image))
+                  <img src="{{ asset('storage/item_images/'.$purchase->item->image) }}" width="290" height="281" alt="{{ $purchase->item->name }}の画像">
+                @else
+                  <img class="c-no-image" src="{{ asset('img/'.'no_image.jpg') }}" width="290" height="281" alt="商品の画像がありません">
+                @endif
+                @php $result = $purchase->chats->count() @endphp
+                @if ($result > 0)
+                  <span class="new-message-icon2">{{ $result < 100 ? $result : '99+' }}</span>
+                @endif
+              </div>
+              <p>{{ $purchase->item->name }}</p>
+            </a>
+          @endforeach
+        @endif
+      </div>
+      {{-- <div class="tab third-tab js-hidden">
         @if ($sellingItems->isEmpty())
           <p class="no-purchased-item">出品している商品のうち、取引中の商品はありません</p>
         @else
@@ -131,7 +158,7 @@
             </a>
           @endforeach
         @endif
-      </div>
+      </div> --}}
     </div>
   </div>
 
