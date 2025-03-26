@@ -22,10 +22,10 @@ class UserController extends Controller
     //  (mypage view)
     // ・評価を計算する
 
-    public function rating(RatingRequest $request, $seller_id)
+    public function rating(RatingRequest $request, $user_id)
     {
         // $seller_idは出品者のID
-        $user = User::find($seller_id);
+        $user = User::find($user_id);
 
         try {
             $user->update([

@@ -22,9 +22,13 @@
     data-transactioncomplete="{{ route('purchase.complete', $purchase->id) }}?notBuyer={{ (int) $notBuyer }}&receiverId={{ $notBuyer ? $purchase->user->id : $purchase->item->user->id }}"
     ></div>
   <div id="chat" data-purchaseid="{{ $purchase->id }}" data-receiverid="{{ $notBuyer ? $purchase->user->id : $purchase->item->user->id }}">
-    @if (!$notBuyer)
+    {{-- @if (!$notBuyer) --}}
       <div id="modal" class="modal js-hidden">
-        <form class="modal-content" action="{{ route('user.rating', $purchase->item->user->id) }}" method="POST">
+        @if (!$notBuyer)
+          <form class="modal-content" action="{{ route('user.rating', $purchase->item->user->id) }}" method="POST">
+        @else
+          <form class="modal-content" action="{{ route('user.rating', $purchase->user->id) }}" method="POST">
+        @endif
           @csrf
           <h2 class="modal-content-title">取引が完了しました</h2>
           <p class="modal-content-text">今回の取引相手はいかがでしたか？</p>
@@ -49,7 +53,7 @@
           <button id="modal-button" class="modal-content-btn c-btn c-btn--modal-send" type="submit" disabled>送信する</a>
         </form>
       </div>
-    @endif
+    {{-- @endif --}}
     <div class="container">
       <aside class="sidebar">
         <h3 class="sidebar-title">取引チャット</h3>
@@ -101,9 +105,9 @@
             @endif
           </div>
           <h1 class="chat-title-content"><span>{{ $notBuyer ? $purchase->user->name : $purchase->item->user->name }}さんとの</span>取引画面</h1>
-          @if (!$notBuyer)
+          {{-- @if (!$notBuyer) --}}
             <button id="transaction-complete" class="c-btn c-btn--chat-complete-transaction">取引完了</button>
-          @endif
+          {{-- @endif --}}
         </form>
         <div class="chat-item">
           @if ($purchase->item->image && Storage::exists('item_images/'.$purchase->item->image))
@@ -176,7 +180,10 @@
           <div class="chat-content-send">
             <form id="form" onsubmit="return sendMessageWrapper()">
               @csrf
-              <textarea id="input" class="chat-content-send-input" type="text" name="message" value="" placeholder="取引メッセージを入力してください"></textarea>
+              <div class="chat-content-send-textarea">
+                <p id="validation-error" class="c-error-message-top"></p>
+                <textarea id="input" class="chat-content-send-input" type="text" name="message" value="" placeholder="取引メッセージを入力してください"></textarea>
+              </div>
               <button class="chat-content-send-add-image c-btn c-btn--chat-add-image">画像を追加</button>
               <button class="chat-content-send-submit" type="submit"></button>
             </form>
@@ -248,6 +255,33 @@
       // ダイアログを表示
       deleteDialog.showModal();
     }
+
+    function scrollToBottom() {
+      const chatContent = document.querySelector('.chat-content ul');
+      chatContent.scrollTop = chatContent.scrollHeight;
+    }
+  </script>
+
+  {{-- ================================================ --}}
+  {{-- DOM読み込み後の処理 --}}
+  {{-- ================================================ --}}
+  <script>
+    // チャットの受信処理
+    window.addEventListener("DOMContentLoaded", () =>
+    {
+      // purchaseIdは共通変数で定義
+      window.Echo.private(`channel.${window.Laravel.user}.${purchaseId}`)
+        // .chat-nameでドットが必要
+        .listen('.carmeri-chat', (e) => {
+          // メッセージをレンダリング
+          renderChat(true, e.message);
+          // チャットの既読処理
+          read();
+        });
+
+      // 最下部に移動
+      scrollToBottom();
+    });
   </script>
 
   {{-- ================================================ --}}
@@ -268,10 +302,7 @@
     // 関数定義
     // -----------------------
     function renderChat(isLeft, data) {
-      console.log(data);
-
       const ul = document.querySelector('.chat-content ul');
-
       const li = document.createElement('li');
       li.className = `chat-content-list ${isLeft ? 'left' : 'right'}`;
 
@@ -352,16 +383,16 @@
     function sendMessage() {
       isSending = true;
 
-      const socket_id = Echo.socketId();
+      const socketId = Echo.socketId();
       const form = document.getElementById('form');
       const input = document.getElementById('input');
       const data = new FormData(form);
+      const error = document.getElementById('validation-error');
 
-      // フォームの内容を送信する処理
-      if (!input.value) {
-        isSending = false;
-        return false;
-      }
+      // if (!input.value) {
+      //   isSending = false;
+      //   return false;
+      // }
 
       const url = document.getElementById('values').dataset.chatsend;
       fetch(url, {
@@ -369,13 +400,13 @@
         body: data,
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-          'X-Socket-ID': socket_id
+          'X-Socket-ID': socketId
         }
       })
       .then(response => {
         if (!response.ok) {
           return response.json().then(errorData => {
-            const error = new Error('Network response was not ok');
+            const error = new Error('Network response was not ok or validation error');
             error.data = errorData;
             throw error;
           });
@@ -383,12 +414,14 @@
         return response.json();
       })
       .then(data => {
-        console.log('送信成功ルート')
-
         // 送信したチャットの表示
         renderChat(false, data);
+        // 一番下までスクロール
+        scrollToBottom();
         // 入力フィールドをクリア
         input.value = '';
+        // バリデーションエラーメッセージをクリア
+        error.textContent = '';
         // 送信中フラグを下げる
         isSending = false;
         // 入力フィールドの幅を初期化
@@ -398,17 +431,16 @@
       })
       .catch(error => {
         isSending = false;
-
-        // エラーメッセージ
-        // console.log(error.data.errors.message[0]);
-        // displayError();
+        displayError(error.data.errors.message[0]);
+        scrollToBottom();
       });
 
       return false;
     }
 
+    // バリデーションエラーメッセージの表示
     function displayError(message) {
-      // 
+      document.getElementById('validation-error').textContent = message;
     }
 
     function sendMessageWrapper() {
@@ -453,20 +485,6 @@
     // -----------------------
     // イベント定義
     // -----------------------
-    // チャットの受信処理
-    window.addEventListener("DOMContentLoaded", () =>
-    {
-      // purchaseIdは共通変数で定義
-      window.Echo.private(`channel.${window.Laravel.user}.${purchaseId}`)
-        // .chat-nameでドットが必要
-        .listen('.carmeri-chat', (e) => {
-          // メッセージをレンダリング
-          renderChat(true, e.message);
-          // チャットの既読処理
-          read();
-        });
-    });
-
     // 入力時に高さ調整
     textarea.addEventListener('input', adjustHeight);
     // 初期化
@@ -541,13 +559,11 @@
     // -----------------------
     document.addEventListener('DOMContentLoaded', function() {
 
-
       // ========================================================
       // この二つをinputにすれば関数化は可能
       const modifyDialog = document.getElementById('modify');
       const modifyForm = document.getElementById('modify-form');
       // ========================================================
-
 
       // dialog内の編集ボタンのイベント
       const updateSubmit = document.getElementById('modify-submit');

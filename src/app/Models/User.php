@@ -45,6 +45,11 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new CustomVerifyEmail($this));
     }
 
+    public function sendEmailCompleteNotification()
+    {
+        $this->notify(new CustomCompleteEmail($this));
+    }
+
     public function items()
     {
         return $this->hasMany(Item::class, 'seller_id');

@@ -208,10 +208,22 @@ class PurchaseController extends Controller
         //     }
         // }
 
+        \Log::info('取引完了ボタンが押されました');
+
+        $notBuyer = $request->query('notBuyer');
+        $receiverId = $request->query('receiverId');
+        // 出品者メールを送る処理
+        if (!$notBuyer) {
+            // 出品者にメールを送る
+            $seller = User::find($receiverId);
+            $seller->sendEmailCompleteNotification();
+            \Log::info('出品者にメールを送信しました');
+        }
+
         try {
-            Purchase::query()
-                ->where('id', $purchase_id)
-                ->update(['status' => 'complete']);
+            // Purchase::query()
+            //     ->where('id', $purchase_id)
+            //     ->update(['status' => 'complete']);
             return response()->json(['success' => true]);
         } catch(Exception $e) {
             Log::error($e->getMessage());

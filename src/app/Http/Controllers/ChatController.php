@@ -85,7 +85,6 @@ class ChatController extends Controller
                 ->first();
         }
 
-
         $items = Purchase::query()
             ->with('item:id,name')
             ->where(function ($query) use($user) {
