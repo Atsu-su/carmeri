@@ -367,6 +367,7 @@ html {
   height: 44px;
   color: var(--color-font-red);
   font-weight: 700;
+  line-height: 1;
   border: 2px solid var(--color-border-red);
   border-radius: 5px;
 }
@@ -709,6 +710,7 @@ html {
 
 .c-error-message-top {
   margin-bottom: 8px;
+  padding-left: 18px;
   color: var(--color-font-red);
   font-size: 0.75rem;
   line-height: 1;
@@ -1942,7 +1944,7 @@ body {
 
 #chat .chat {
   width: calc(100% - 260px);
-  height: calc(100vh - 80px);
+  height: calc(100vh - 80px + 156px + 226px);
   display: flex;
   flex-direction: column;
 }
@@ -2229,6 +2231,10 @@ body {
   color: var(--color-font-light-gray);
   opacity: 0.5;
 } 
+
+#chat .chat-content-send-img-input {
+  display: none;
+}
 
 #chat .chat-content-send-submit {
   margin-left: -15px;

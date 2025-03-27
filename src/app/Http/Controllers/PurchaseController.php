@@ -208,16 +208,15 @@ class PurchaseController extends Controller
         //     }
         // }
 
-        \Log::info('取引完了ボタンが押されました');
-
         $notBuyer = $request->query('notBuyer');
         $receiverId = $request->query('receiverId');
         // 出品者メールを送る処理
         if (!$notBuyer) {
             // 出品者にメールを送る
+            $buyer = auth()->user();
             $seller = User::find($receiverId);
-            $seller->sendEmailCompleteNotification();
-            \Log::info('出品者にメールを送信しました');
+            $purchase = Purchase::with('item')->find($purchase_id);
+            $seller->sendEmailCompleteNotification($buyer, $purchase);
         }
 
         try {

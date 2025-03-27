@@ -178,15 +178,24 @@
             </div>
           </dialog>
           <div class="chat-content-send">
+            <p id="validation-error" class=""></p>
             <form id="form" onsubmit="return sendMessageWrapper()">
               @csrf
               <div class="chat-content-send-textarea">
-                <p id="validation-error" class="c-error-message-top"></p>
                 <textarea id="input" class="chat-content-send-input" type="text" name="message" value="" placeholder="取引メッセージを入力してください"></textarea>
               </div>
-              <button class="chat-content-send-add-image c-btn c-btn--chat-add-image">画像を追加</button>
+              <label id="label" class="c-btn c-btn--chat-add-image" for="img-input">画像を追加</label>
+              <input id="img-input" class="chat-content-send-img-input" type="file" name="image" accept="image/*"/>
               <button class="chat-content-send-submit" type="submit"></button>
             </form>
+            <dialog id="img-preview">
+              <form action="" method="POST">
+                <img src="">
+                <input type="hidden" name="base64" value=""/>
+                <button class="c-btn">送信</button>
+                <button class="c-btn">キャンセル</button>
+              </form>
+            </dialog>
           </div>
         </div>
       </div>
@@ -421,7 +430,7 @@
         // 入力フィールドをクリア
         input.value = '';
         // バリデーションエラーメッセージをクリア
-        error.textContent = '';
+        hideError();
         // 送信中フラグを下げる
         isSending = false;
         // 入力フィールドの幅を初期化
@@ -440,7 +449,16 @@
 
     // バリデーションエラーメッセージの表示
     function displayError(message) {
-      document.getElementById('validation-error').textContent = message;
+      const error = document.getElementById('validation-error');
+      error.classList.add('c-error-message-top');
+      error.textContent = message;
+    }
+
+    // バリデーションエラーメッセージの削除
+    function hideError(message) {
+      const error = document.getElementById('validation-error');
+      error.classList.remove('c-error-message-top');
+      error.textContent = '';
     }
 
     function sendMessageWrapper() {
@@ -453,8 +471,6 @@
     function read() {
       const url = document.getElementById('values').dataset.chatread;
       fetch(url, {
-
-
         method: 'POST',
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -837,5 +853,53 @@
         });
       });
     });
+  </script>
+
+  {{-- ================================================ --}}
+  {{-- 画像送信 --}}
+  {{-- ================================================ --}}
+  <script>
+    // 画像プレビュー
+    // DOM読み込み後に実行する
+    function previewImage(){
+      const imgInput = document.getElementById('img-input');
+      // const preview = document.getElementById('preview');
+      const background = document.querySelector('.img-upload-background');
+      const resetBtn = document.getElementById('reset-btn');
+      const fileName = document.getElementById('file-name');
+      const label = document.getElementById('label');
+      const imgError = document.getElementById('img-error');
+      const input = document.getElementById('img-input');
+      const preview = document.getElementById('img-preview');
+
+      console.log('change検証');
+      preview.showModal();
+
+      input.addEventListener('change', function(e) {
+        console.log('changeが発生')
+
+        // const file = e.target.files[0];
+
+        // if (file && file.type.startsWith('image/')) {
+        //   const reader = new FileReader();
+
+        //   // ロード後の処理
+        //   reader.onload = function(e) {
+        //     preview.src = e.target.result;
+        //     preview.style.display = 'block';
+        //     background.style.display = 'block';
+        //     resetBtn.style.display = 'block';
+        //     label.style.display = 'none';
+        //     fileName.textContent = `ファイル名：${file.name}`;
+        //     if (imgError !== null && imgError !== undefined) {
+        //         imgError.style.display = 'none';
+        //     }
+        //   }
+
+        //   reader.readAsDataURL(file);
+        // }
+      });
+    }
+    previewImage();
   </script>
 @endsection

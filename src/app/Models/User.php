@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Notifications\CustomVerifyEmail;
+use App\Notifications\CustomCompleteEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -45,9 +46,9 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new CustomVerifyEmail($this));
     }
 
-    public function sendEmailCompleteNotification()
+    public function sendEmailCompleteNotification($buyer, $purchase)
     {
-        $this->notify(new CustomCompleteEmail($this));
+        $this->notify(new CustomCompleteEmail($this, $buyer, $purchase));
     }
 
     public function items()

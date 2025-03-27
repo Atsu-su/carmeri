@@ -3,7 +3,7 @@
 @slot('header')
 @component('mail::header', ['url' => config('app.url')])
 {{-- {{ config('app.name') }} --}}
-CoachTech
+{{ config('app.name') }}
 @endcomponent
 @endslot
 
@@ -24,7 +24,7 @@ CoachTech
 @slot('footer')
 @component('mail::footer')
 {{-- © {{ date('Y') }} {{ config('app.name') }}. @lang('All rights reserved.') --}}
-© {{ date('Y') }} CoachTeck. @lang('All rights reserved.')
+© {{ date('Y') }} {{ config('app.name') }}. @lang('All rights reserved.')
 @endcomponent
 @endslot
 @endcomponent
