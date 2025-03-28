@@ -20,6 +20,7 @@
     data-chatupdate="{{ route("chat.update", ":chatid") }}"
     data-chatdelete="{{ route("chat.delete", ":chatid") }}"
     data-transactioncomplete="{{ route('purchase.complete', $purchase->id) }}?notBuyer={{ (int) $notBuyer }}&receiverId={{ $notBuyer ? $purchase->user->id : $purchase->item->user->id }}"
+    data-chatsendimage="{{ route('chat.send.image', ['purchase_id' => $purchase->id, 'receiver_id' => $notBuyer ? $purchase->user->id : $purchase->item->user->id]) }}"
     ></div>
   <div id="chat" data-purchaseid="{{ $purchase->id }}" data-receiverid="{{ $notBuyer ? $purchase->user->id : $purchase->item->user->id }}">
     {{-- @if (!$notBuyer) --}}
@@ -33,7 +34,7 @@
           <h2 class="modal-content-title">取引が完了しました</h2>
           <p class="modal-content-text">今回の取引相手はいかがでしたか？</p>
           <div id="stars" class="modal-content-stars">
-            <svg class="modal-content-stars-star" data-number="1" width="100" height="100" viewBox="0 0 40 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {{-- <svg class="modal-content-stars-star" data-number="1" width="100" height="100" viewBox="0 0 40 37" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M20 0L24.4903 13.8197H39.0211L27.2654 22.3607L31.7557 36.1803L20 27.6393L8.2443 36.1803L12.7346 22.3607L0.97887 13.8197H15.5097L20 0Z"/>
             </svg>
             <svg class="modal-content-stars-star" data-number="2" width="100" height="100" viewBox="0 0 40 37" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,7 +48,12 @@
             </svg>
             <svg class="modal-content-stars-star" data-number="5" width="100" height="100" viewBox="0 0 40 37" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M20 0L24.4903 13.8197H39.0211L27.2654 22.3607L31.7557 36.1803L20 27.6393L8.2443 36.1803L12.7346 22.3607L0.97887 13.8197H15.5097L20 0Z"/>
-            </svg>
+            </svg> --}}
+            <div class="modal-content-stars-star" data-number="1"></div>
+            <div class="modal-content-stars-star" data-number="2"></div>
+            <div class="modal-content-stars-star" data-number="3"></div>
+            <div class="modal-content-stars-star" data-number="4"></div>
+            <div class="modal-content-stars-star" data-number="5"></div>
           </div>
           <input id="modal-input" type="hidden" name="rating" value="">
           <button id="modal-button" class="modal-content-btn c-btn c-btn--modal-send" type="submit" disabled>送信する</a>
@@ -188,12 +194,14 @@
               <input id="img-input" class="chat-content-send-img-input" type="file" name="image" accept="image/*"/>
               <button class="chat-content-send-submit" type="submit"></button>
             </form>
-            <dialog id="img-preview">
-              <form action="" method="POST">
-                <img src="">
-                <input type="hidden" name="base64" value=""/>
-                <button class="c-btn">送信</button>
-                <button class="c-btn">キャンセル</button>
+            <dialog id="img-preview" class="chat-content-send-modal">
+              <form id="img-preview-form" method="POST" onclick="return sendImageWrapper()">
+                <img id="img-preview-img" src="">
+                <input id="img-preview-input" type="hidden" name="base64" value=""/>
+                <div class="chat-content-send-modal-buttons">
+                  <button class="c-btn c-btn--modal-img-preview-send" type="submit">送信</button>
+                  <a id="img-preview-cancel" class="c-btn c-btn--modal-img-preview-cancel">キャンセル</a>
+                </div>
               </form>
             </dialog>
           </div>
@@ -397,13 +405,8 @@
       const input = document.getElementById('input');
       const data = new FormData(form);
       const error = document.getElementById('validation-error');
-
-      // if (!input.value) {
-      //   isSending = false;
-      //   return false;
-      // }
-
       const url = document.getElementById('values').dataset.chatsend;
+
       fetch(url, {
         method: 'POST',
         body: data,
@@ -859,47 +862,123 @@
   {{-- 画像送信 --}}
   {{-- ================================================ --}}
   <script>
+    let isImageSending = false;
+
     // 画像プレビュー
     // DOM読み込み後に実行する
-    function previewImage(){
-      const imgInput = document.getElementById('img-input');
-      // const preview = document.getElementById('preview');
-      const background = document.querySelector('.img-upload-background');
-      const resetBtn = document.getElementById('reset-btn');
-      const fileName = document.getElementById('file-name');
-      const label = document.getElementById('label');
-      const imgError = document.getElementById('img-error');
-      const input = document.getElementById('img-input');
-      const preview = document.getElementById('img-preview');
+    function previewImage(e){
+      // const input = document.getElementById('img-input');
+      const previewDialog = document.getElementById('img-preview');
+      const imgPreview = document.getElementById('img-preview-img');
+      const imgPreviewInput = document.getElementById('img-preview-input');
 
-      console.log('change検証');
-      preview.showModal();
+      // preview.showModal();
 
-      input.addEventListener('change', function(e) {
-        console.log('changeが発生')
+      const file = e.target.files[0];
 
-        // const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
 
-        // if (file && file.type.startsWith('image/')) {
-        //   const reader = new FileReader();
-
-        //   // ロード後の処理
-        //   reader.onload = function(e) {
-        //     preview.src = e.target.result;
-        //     preview.style.display = 'block';
-        //     background.style.display = 'block';
-        //     resetBtn.style.display = 'block';
-        //     label.style.display = 'none';
-        //     fileName.textContent = `ファイル名：${file.name}`;
-        //     if (imgError !== null && imgError !== undefined) {
-        //         imgError.style.display = 'none';
-        //     }
-        //   }
-
-        //   reader.readAsDataURL(file);
-        // }
-      });
+        // ロード後の処理
+        reader.onload = function(e) {
+          imgPreview.src = e.target.result;
+          imgPreviewInput.value = e.target.result;
+          previewDialog.showModal();
+        }
+        reader.readAsDataURL(file);
+      }
     }
-    previewImage();
+
+    function closeModal() {
+      const imgPreview = document.getElementById('img-preview-img');
+      const imgPreviewInput = document.getElementById('img-preview-input');
+      const previewDialog = document.getElementById('img-preview');
+
+      // データを削除後モーダルを閉じる
+      imgPreview.src = '';
+      imgPreviewInput.value = '';
+      previewDialog.close();
+    }
+
+    function sendImage(){
+      // formからデータを作る
+      // fetchで送る
+      // return でJsonを受け取る
+
+      // 成功時／失敗時両方とも
+      // 画像データを削除
+      // ダイアログを閉じる
+      isSending = true;
+
+      const socketId = Echo.socketId();
+      const previewDialog = document.getElementById('img-preview');
+      const imgPreview = document.getElementById('img-preview-img');
+      const imgPreviewInput = document.getElementById('img-preview-input');
+      const form = document.getElementById('img-preview-form');
+      const input = document.getElementById('img-preview-input');
+      const data = new FormData(form);
+      // const error = document.getElementById('validation-error');
+      const url = document.getElementById('values').dataset.chatsendimage;
+
+      fetch(url, {
+        method: 'POST',
+        body: data,
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+          'X-Socket-ID': socketId
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(errorData => {
+            const error = new Error('Network response was not ok or validation error');
+            error.data = errorData;
+            throw error;
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('成功');
+        console.log(data);
+        imgPreview.src = '';
+        imgPreviewInput.value = '';
+        previewDialog.close();
+
+        // // 送信したチャットの表示
+        // renderChat(false, data);
+        // // 一番下までスクロール
+        // scrollToBottom();
+        // // 入力フィールドをクリア
+        // input.value = '';
+        // // バリデーションエラーメッセージをクリア
+        // hideError();
+        // // 送信中フラグを下げる
+        // isSending = false;
+        // // 入力フィールドの幅を初期化
+        // adjustHeight();
+        // // 保存された入力値の削除
+        // deleteSavedTextCookie(cookieName, purchaseId);
+      })
+      .catch(error => {
+        isSending = false;
+        displayError(error.data.errors.image[0]);
+        previewDialog.close();
+        scrollToBottom();
+      });
+
+      return false;
+    }
+
+    function sendImageWrapper(){
+      if (!isImageSending) {
+        sendImage();
+      }
+      return false;
+    }
+
+    document.getElementById('img-input').addEventListener('change', previewImage);
+    document.getElementById('img-preview-cancel').addEventListener('click', closeModal);
+
   </script>
 @endsection

@@ -9,6 +9,14 @@ use Illuminate\Database\Seeder;
 
 class ChatSeeder extends Seeder
 {
+    private $imageArray = [
+        'hatsune.jpeg',
+        'list-pochacco.png',
+        'mario.jpg',
+        'test.jpg',
+        'test2.jpg',
+    ];
+
     /**
      * Run the database seeds.
      *
@@ -30,7 +38,8 @@ class ChatSeeder extends Seeder
                             'purchase_id' => $i,
                             'sender_id' => $i + 1,
                             'is_read' => false,
-                            'message' => $faker->realText(100),
+                            'is_text' => false,
+                            'message' => $this->imageArray[array_rand($this->imageArray)],
                             'created_at' => now()->addMinutes($j),
                             'updated_at' => now()->addMinutes($j)
                         ],

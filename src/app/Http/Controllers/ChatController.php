@@ -9,12 +9,44 @@ use App\Models\Purchase;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\File\File;
 
 class ChatController extends Controller
 {
+    public function decodeBase64($base64)
+    {
+        if ($base64) {
+            // base64をデコード。プレフィックスに「data:image/jpeg;base64,」のような文字列がついている場合は除去して処理する
+            $data = explode(',', $base64);
+            if (isset($data[1])) {
+                $fileData = base64_decode($data[1]);
+            } else {
+                $fileData = base64_decode($data[0]);
+            }
+
+            // tmp領域に画像ファイルとして保存してUploadedFileとして扱う
+            $tmpFilePath = sys_get_temp_dir() . '/' . Str::uuid()->toString();
+            file_put_contents($tmpFilePath, $fileData);
+            $tmpFile = new File($tmpFilePath);
+            $filename = $tmpFile->getFilename();
+            $file = new UploadedFile(
+                $tmpFile->getPathname(),
+                $filename,
+                $tmpFile->getMimeType(),
+                0,
+                true
+            );
+        } else {
+            return null;
+        }
+        return $file;
+    }
+
     public function index($purchase_id)
     {
         $user = auth()->user();
@@ -278,5 +310,45 @@ class ChatController extends Controller
             'success' => true,
             'chatId' => $chat_id,
         ]);
+    }
+
+    public function sendImage(Request $request)
+    {
+        // base64を戻す
+        // バリデーション
+        // ファイルの保存
+        // chatsへ情報を格納
+        // レスポンスを返す
+
+        $file = $this->decodeBase64(request()->input('base64'));
+        $validator = Validator::make(
+            ['image' => $file], 
+            ['image' => 'required|image|mimes:jpeg,png,jpg|max:2048'],
+            [
+                'image.required' => '画像を選択してください',
+                'image.image' => '画像の形式が不正です',
+                'image.mimes' => '「.png」または「.jpeg」形式でアップロードしてください',
+                'image.max' => '2MB以下の画像を選択してください'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation Error.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        return response()->json([
+            'file' => $file,
+            'name' => $file->getClientOriginalName(),
+            'mime' => $file->getClientMimeType(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => '画像の送信に成功',
+        ], 200);
     }
 }

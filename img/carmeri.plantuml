@@ -107,6 +107,8 @@ entity "chats" as chats {
   purchase_id<<FK>>
   sender_id<<FK>>
   is_read
+  is_text
+  message
   is_updated
   is_deleted
   created_at

@@ -18,6 +18,7 @@ class CreateChatsTable extends Migration
             $table->unsignedBigInteger('purchase_id');
             $table->unsignedBigInteger('sender_id');
             $table->boolean('is_read')->default(false);
+            $table->boolean('is_text')->default(true);
             $table->text('message');
             $table->boolean('is_updated')->default(false);
             $table->boolean('is_deleted')->default(false);

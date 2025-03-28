@@ -46,13 +46,16 @@ Route::middleware('header')->group(function () {
 
         // ---------------------------------------------------
         Route::get('chat/{purchase_id}', [ChatController::class, 'index'])->name('chat');
-        
+
         // API用ルーティング
         Route::post('chat/{purchase_id}/read', [ChatController::class, 'read'])->name('chat.read');
         Route::post('chat/{chat_id}/update', [ChatController::class, 'update'])->name('chat.update');
         Route::post('chat/{chat_id}/delete', [ChatController::class, 'delete'])->name('chat.delete');
-        Route::post('chat/{purchase_id}/{receiver_id}', [ChatController::class, 'sendMessage'])->name('chat.send');
-        
+        Route::post('chat/{purchase_id}/{receiver_id}', [ChatController::class, 'sendMessage'])->name('chat.send')
+            ->whereNumber('purchase_id')
+            ->whereNumber('receiver_id');
+        Route::post('chat/image/{purchase_id}/{receiver_id}', [ChatController::class, 'sendImage'])->name('chat.send.image');
+
         Route::post('rating/{user_id}', [UserController::class, 'rating'])->name('user.rating');
         // ---------------------------------------------------
 
