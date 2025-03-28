@@ -145,11 +145,15 @@
                   <p class="chat-content-list-profile-name">{{ $chat->user->name }}</p>
                 </div>
                 <div class="chat-content-list-container">
-                  @if (!$chat->is_deleted)
-                    <p class="chat-content-list-message" data-chatid="{{ $chat->id }}">{{ $chat->message }}</p>
-                  @else
-                    <p class="chat-content-list-message deleted" data-chatid="{{ $chat->id }}">このメッセージは削除されました</p>
-                  @endif
+                @if ($chat->is_text && !$chat->is_deleted)
+                  <p class="chat-content-list-message" data-chatid="{{ $chat->id }}">{{ $chat->message }}</p>
+                @elseif ($chat->is_text && $chat->is_deleted)
+                  <p class="chat-content-list-message deleted" data-chatid="{{ $chat->id }}">このメッセージは削除されました</p>
+                @elseif (!$chat->is_text && !$chat->is_deleted)
+                  <img class="chat-content-list-image" src="{{ Storage::url('chat_images/').$chat->message }}" alt="チャットの画像">
+                @elseif (!$chat->is_text && $chat->is_deleted)
+                  <p class="chat-content-list-image deleted" data-chatid="{{ $chat->id }}">この画像は削除されました</p>
+                @endif
                   <p class="chat-content-list-datetime">{{ $chat->created_at->format('Y/m/d H:i') }}</p>
                   @if ($chat->sender_id == auth()->id() && !$chat->is_deleted)
                     <div class="chat-content-list-edit">
@@ -276,6 +280,99 @@
     function scrollToBottom() {
       const chatContent = document.querySelector('.chat-content ul');
       chatContent.scrollTop = chatContent.scrollHeight;
+    }
+
+    // これを使って送信されたチャットを表示する
+    // renderChat()と置き換える
+    // 変数修正（chatId, receiverId, purchaseId...）
+    // dataにisTextのbooleanがある
+    function renderChat2(isLeft, data) {
+      const ul = document.querySelector('.chat-content ul');
+      const li = document.createElement('li');
+      li.className = `chat-content-list ${isLeft ? 'left' : 'right'}`;
+
+      // プロフィール部分を作成
+      const profileDiv = document.createElement('div');
+      profileDiv.className = 'chat-content-list-profile';
+
+      const profileFrameOuter = document.createElement('div');
+      profileFrameOuter.className = 'chat-content-list-profile-outer-frame';
+
+      const profileImg = document.createElement('img');
+      profileImg.className = 'chat-content-list-profile-inner-frame';
+
+      const storage = document.getElementById('values').dataset.storage;
+      profileImg.src = `${storage}${data.image}`;
+      profileImg.alt = 'プロフィールの画像';
+
+      const profileName = document.createElement('p');
+      profileName.className = 'chat-content-list-profile-name';
+      profileName.textContent = data.username;
+
+      // コンテンツ部分を作成
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'chat-content-list-container';
+
+      // テキストか画像かで分岐
+      if (isText) {
+        // テキストの場合
+        const message = document.createElement('p');
+        message.className = 'chat-content-list-message';
+        message.textContent = data.message;
+        message.dataset.chatid = data.chat_id;
+      } else {
+        // 画像の場合
+        const message = document.createElement('img');
+        message.className = 'chat-content-list-image';
+        message.src = data.message;
+        message.dataset.chatid = data.chat_id;
+      }
+
+      const datetimeP = document.createElement('p');
+      datetimeP.className = 'chat-content-list-datetime';
+      datetimeP.textContent = data.datetime;
+
+      // if文に入れるとeditDivは外では使えない
+      const editDiv =document.createElement('div');
+      editDiv.className = 'chat-content-list-edit';
+      if (!isLeft) {
+        const editA1 = document.createElement('a');
+        editA1.textContent = '編集';
+        const editA2 = document.createElement('a');
+        editA2.textContent = '削除';
+        editDiv.appendChild(editA1);
+        editDiv.appendChild(editA2);
+
+        // 編集ボタンにイベントリスナーを付与
+        const modifyForm = document.getElementById('modify-form');
+        const modifyDialog = document.getElementById('modify');
+        editA1.addEventListener('click', function(e) {
+          createUpdateLink(e, editA1, modifyForm, modifyDialog);
+        });
+
+        // 削除ボタンにイベントリスナーを付与
+        const deleteContainer = document.getElementById('delete-container');
+        const deleteDialog = document.getElementById('delete');
+        editA2.addEventListener('click', function(e) {
+          createDeleteLink(e, editA2, deleteContainer, deleteDialog);
+        });
+      }
+
+      // 要素を組み立てる
+      profileFrameOuter.appendChild(profileImg);
+      profileDiv.appendChild(profileFrameOuter);
+      profileDiv.appendChild(profileName);
+
+      contentDiv.appendChild(message);
+      contentDiv.appendChild(datetimeP);
+      if (!isLeft) {
+        contentDiv.appendChild(editDiv);
+      }
+
+      li.appendChild(profileDiv);
+      li.appendChild(contentDiv);
+
+      ul.appendChild(li);
     }
   </script>
 
@@ -428,24 +525,24 @@
       .then(data => {
         // 送信したチャットの表示
         renderChat(false, data);
-        // 一番下までスクロール
-        scrollToBottom();
         // 入力フィールドをクリア
         input.value = '';
         // バリデーションエラーメッセージをクリア
         hideError();
-        // 送信中フラグを下げる
-        isSending = false;
         // 入力フィールドの幅を初期化
         adjustHeight();
         // 保存された入力値の削除
         deleteSavedTextCookie(cookieName, purchaseId);
       })
       .catch(error => {
-        isSending = false;
+        // バリデーションエラーメッセージを表示
         displayError(error.data.errors.message[0]);
-        scrollToBottom();
       });
+
+      // 送信中フラグを変更（送信可能）
+      isSending = false;
+      // 一番下までスクロール
+      scrollToBottom();
 
       return false;
     }
@@ -498,7 +595,6 @@
 
     function deleteSavedTextCookie(cookieName, id) {
       document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/chat/${id}`;
-      console.log('deleteSavedTextCookie 作成中')
     }
 
     // -----------------------
@@ -706,7 +802,6 @@
       const deleteLinks = document.querySelectorAll('.chat-content-list-edit-delete');
       deleteLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
-          console.log('削除にイベントを付加します')
           createDeleteLink(e, link, deleteContainer, deleteDialog);
         });
       });
@@ -765,7 +860,6 @@
 
       // textareaの入力内容が変更されたらCookieに保存
       textarea.addEventListener('input', function() {
-          console.log('inputイベントが発生しました');
           saveTextAreaToCookie(textarea, cookieName, purchaseId);
       });
     });
@@ -867,7 +961,6 @@
     // 画像プレビュー
     // DOM読み込み後に実行する
     function previewImage(e){
-      // const input = document.getElementById('img-input');
       const previewDialog = document.getElementById('img-preview');
       const imgPreview = document.getElementById('img-preview-img');
       const imgPreviewInput = document.getElementById('img-preview-input');
@@ -939,33 +1032,20 @@
         return response.json();
       })
       .then(data => {
-        console.log('成功');
-        console.log(data);
-        imgPreview.src = '';
-        imgPreviewInput.value = '';
-        previewDialog.close();
-
         // // 送信したチャットの表示
         // renderChat(false, data);
-        // // 一番下までスクロール
-        // scrollToBottom();
-        // // 入力フィールドをクリア
-        // input.value = '';
-        // // バリデーションエラーメッセージをクリア
-        // hideError();
-        // // 送信中フラグを下げる
-        // isSending = false;
-        // // 入力フィールドの幅を初期化
-        // adjustHeight();
-        // // 保存された入力値の削除
-        // deleteSavedTextCookie(cookieName, purchaseId);
+        // バリデーションエラーメッセージをクリア
+        hideError();
       })
       .catch(error => {
-        isSending = false;
         displayError(error.data.errors.image[0]);
-        previewDialog.close();
-        scrollToBottom();
       });
+
+      imgPreview.src = '';
+      imgPreviewInput.value = '';
+      previewDialog.close();
+      scrollToBottom();
+      isSending = false;
 
       return false;
     }
@@ -980,5 +1060,23 @@
     document.getElementById('img-input').addEventListener('change', previewImage);
     document.getElementById('img-preview-cancel').addEventListener('click', closeModal);
 
+  </script>
+
+  {{-- ================================================ --}}
+  {{-- 画像拡大表示 --}}
+  {{-- ================================================ --}}
+  <script>
+  document.querySelectorAll('.chat-content-list-image').forEach(image => {
+    image.addEventListener('click', function() {
+      displayImageModal(this.src);
+    });
+  });
+
+  function displayImageModal(src) {
+    // const modal = document.getElementById('image-modal');
+    // const img = document.getElementById('image-modal-img');
+    // img.src = src;
+    // modal.showModal();
+  }
   </script>
 @endsection

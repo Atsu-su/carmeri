@@ -2132,6 +2132,24 @@ body {
   text-align: center;
 }
 
+#chat .chat-content-list-image {
+  padding: 10px;
+  max-width: 45%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  display: inline-block;
+  background-color: var(--color-bg-chat);
+  border-radius: 5px;
+}
+
+#chat .chat-content-list-image.deleted {
+  width: 300px;
+  color: var(--color-font-light-gray);
+  font-size: 16px;
+  text-align: center;
+}
+
 #chat .chat-content-list-datetime {
   font-size: 12px;
   color: var(--color-font-gray);

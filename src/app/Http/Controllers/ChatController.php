@@ -227,6 +227,7 @@ class ChatController extends Controller
         // メッセージオブジェクトの作成
         $message = new Message;
 
+        // 変数修正（chatId, receiverId, purchaseId...）
         $message->chat_id = $chat->id;          // チャットID
         $message->receiver_id = $receiver_id;   // 受信者のユーザID
         $message->purchase_id = $purchase_id;   // 購入ID
@@ -322,7 +323,7 @@ class ChatController extends Controller
 
         $file = $this->decodeBase64(request()->input('base64'));
         $validator = Validator::make(
-            ['image' => $file], 
+            ['image' => $file],
             ['image' => 'required|image|mimes:jpeg,png,jpg|max:2048'],
             [
                 'image.required' => '画像を選択してください',
