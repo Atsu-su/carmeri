@@ -217,24 +217,27 @@ class ChatController extends Controller
                 'purchase_id' => $purchase_id,
                 'sender_id' => $user->id,
                 'is_read' => false,
+                'is_text' => true,
                 'message' => $request->input('message'),
             ]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return response()->json(['message' => 'メッセージの保存に失敗'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'メッセージの保存に失敗'
+            ], 500);
         }
 
         // メッセージオブジェクトの作成
         $message = new Message;
-
-        // 変数修正（chatId, receiverId, purchaseId...）
-        $message->chat_id = $chat->id;          // チャットID
-        $message->receiver_id = $receiver_id;   // 受信者のユーザID
-        $message->purchase_id = $purchase_id;   // 購入ID
+        $message->chatId = $chat->id;          // チャットID
+        $message->receiverId = $receiver_id;   // 受信者のユーザID
+        $message->purchaseId = $purchase_id;   // 購入ID
         $message->username = $user->name;
         $message->message = $request->input('message');
         $message->datetime = $now->format('Y/m/d H:i');
         $message->image = $user->image;
+        $message->isText = true;               // テキスト送信の場合はtrue
 
         // メッセージ送信イベントを送信
         broadcast(new MessageSent($message))->toOthers();
@@ -256,7 +259,10 @@ class ChatController extends Controller
                 ->update(['is_read' => true]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return response()->json(['message' => '既読フラグの変更に失敗'], 500);        
+            return response()->json([
+                'success' => false,
+                'message' => '既読フラグの変更に失敗'
+            ], 500);
         }
         return response()->json(['success' => true]);
     }
@@ -287,7 +293,10 @@ class ChatController extends Controller
             $chat->save();
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return response()->json(['message' => 'メッセージの更新に失敗'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'メッセージの更新に失敗'
+            ], 500);
         }
 
         return response()->json([
@@ -304,7 +313,10 @@ class ChatController extends Controller
                 ->update(['is_deleted' => true]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return response()->json(['message' => 'メッセージの削除に失敗'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'メッセージの削除に失敗'
+            ], 500);
         }
 
         return response()->json([
@@ -313,15 +325,17 @@ class ChatController extends Controller
         ]);
     }
 
-    public function sendImage(Request $request)
+    public function sendImage(Request $request, $purchase_id, $receiver_id)
     {
         // base64を戻す
         // バリデーション
         // ファイルの保存
         // chatsへ情報を格納
         // レスポンスを返す
-
+        $user = auth()->user();
+        $now = Carbon::now();
         $file = $this->decodeBase64(request()->input('base64'));
+
         $validator = Validator::make(
             ['image' => $file],
             ['image' => 'required|image|mimes:jpeg,png,jpg|max:2048'],
@@ -341,15 +355,46 @@ class ChatController extends Controller
             ], 422);
         }
 
-        return response()->json([
-            'file' => $file,
-            'name' => $file->getClientOriginalName(),
-            'mime' => $file->getClientMimeType(),
-        ]);
+        try {
+            // ファイルの保存
+            $extension = $file->extension();
+            $fileName = 'chat_image_'. time() . '.' . $extension;
+            Storage::disk('public')->putFileAs(
+                'chat_images',
+                $file,
+                $fileName
+            );
 
-        return response()->json([
-            'success' => true,
-            'message' => '画像の送信に成功',
-        ], 200);
+            // chatsテーブルへ情報を追加
+            $chat= Chat::create([
+                'purchase_id' => $purchase_id,
+                'sender_id' => $user->id,
+                'is_read' => false,
+                'is_text' => false,
+                'message' => $fileName,
+            ]);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => '画像の保存及び送信に失敗'
+            ], 500);
+        }
+
+        // メッセージの作成と送信
+        $message = new Message;
+        $message->chatId = $chat->id;          // チャットID
+        $message->receiverId = $receiver_id;   // 受信者のユーザID
+        $message->purchaseId = $purchase_id;   // 購入ID
+        $message->username = $user->name;
+        $message->message = Storage::disk('public')->url('chat_images/' . $fileName);
+        $message->datetime = $now->format('Y/m/d H:i');
+        $message->image = $user->image;
+        $message->isText = false;              // 画像送信の場合はfalse
+
+        // メッセージ送信イベントを送信
+        broadcast(new MessageSent($message))->toOthers();
+
+        return response()->json($message);
     }
 }

@@ -35,7 +35,7 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn()
     {
         // ここにpurchase_idをつけることで特定の商品のみチャットを受信できる
-        return new PrivateChannel('channel.'.$this->message->receiver_id.'.'.$this->message->purchase_id);
+        return new PrivateChannel('channel.'.$this->message->receiverId.'.'.$this->message->purchaseId);
     }
 
     public function broadcastAs()
