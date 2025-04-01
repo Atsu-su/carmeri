@@ -145,19 +145,21 @@
                   <p class="chat-content-list-profile-name">{{ $chat->user->name }}</p>
                 </div>
                 <div class="chat-content-list-container">
-                @if ($chat->is_text && !$chat->is_deleted)
-                  <p class="chat-content-list-message" data-chatid="{{ $chat->id }}">{{ $chat->message }}</p>
-                @elseif ($chat->is_text && $chat->is_deleted)
-                  <p class="chat-content-list-message deleted" data-chatid="{{ $chat->id }}">このメッセージは削除されました</p>
-                @elseif (!$chat->is_text && !$chat->is_deleted)
-                  <img class="chat-content-list-image" src="{{ Storage::url('chat_images/').$chat->message }}" alt="チャットの画像">
-                @elseif (!$chat->is_text && $chat->is_deleted)
-                  <p class="chat-content-list-image deleted" data-chatid="{{ $chat->id }}">この画像は削除されました</p>
-                @endif
+                  @if ($chat->is_text && !$chat->is_deleted)
+                    <p class="chat-content-list-message" data-chatid="{{ $chat->id }}">{{ $chat->message }}</p>
+                  @elseif ($chat->is_text && $chat->is_deleted)
+                    <p class="chat-content-list-message deleted" data-chatid="{{ $chat->id }}">このメッセージは削除されました</p>
+                  @elseif (!$chat->is_text && !$chat->is_deleted)
+                    <img class="chat-content-list-image" src="{{ Storage::url('chat_images/').$chat->message }}" alt="チャットの画像" data-chatid="{{ $chat->id }}">
+                  @elseif (!$chat->is_text && $chat->is_deleted)
+                    <p class="chat-content-list-image deleted" data-chatid="{{ $chat->id }}">この画像は削除されました</p>
+                  @endif
                   <p class="chat-content-list-datetime">{{ $chat->created_at->format('Y/m/d H:i') }}</p>
                   @if ($chat->sender_id == auth()->id() && !$chat->is_deleted)
-                    <div class="chat-content-list-edit">
-                      <a class="chat-content-list-edit-modify">編集</a>
+                    <div class="chat-content-list-edit" data-istext="{{ $chat->is_text }}">
+                      @if ($chat->is_text)
+                        <a class="chat-content-list-edit-modify">編集</a>
+                      @endif
                       <a class="chat-content-list-edit-delete">削除</a>
                     </div>
                   @endif
@@ -181,6 +183,17 @@
             <div id="delete-container" class="chat-content-modal-delete-container">
               @csrf
               <p id="delete-p"></p>
+              <div class="chat-content-modal-delete-buttons">
+                <button id="delete-submit" class="c-btn c-btn--modal-edit" type="button">削除</button>
+                <a id="delete-cancel" class="c-btn c-btn--modal-edit-cancel">キャンセル</a>
+              </div>
+            </div>
+          </dialog>
+          {{-- 画像削除 --}}
+          <dialog id="delete-image" class="chat-content-modal-delete-image">
+            <div id="delete-container-image" class="chat-content-modal-delete-container">
+              @csrf
+              <img id="delete-image-img" src="">
               <div class="chat-content-modal-delete-buttons">
                 <button id="delete-submit" class="c-btn c-btn--modal-edit" type="button">削除</button>
                 <a id="delete-cancel" class="c-btn c-btn--modal-edit-cancel">キャンセル</a>
@@ -254,24 +267,38 @@
       modifyDialog.showModal();
     }
 
-    function createDeleteLink(event, link, deleteContainer, deleteDialog) {
+    function createDeleteLink(event, link, deleteContainer, deleteDialog, isText = 1) {
       event.preventDefault(); // リンクのデフォルト動作を防止
 
       // クリックされた編集リンクの親要素（chat-content-list-edit）を取得
       const messageContainer = link.parentElement;
       // 親のchat-content-list-containerを取得
       const contentContainer = messageContainer.parentElement;
-      // その中のメッセージ要素を取得
-      const messageElement = contentContainer.querySelector('.chat-content-list-message');
-      // メッセージのテキストを取得
-      const messageText = messageElement.textContent;
+
+      let messageElement;
+      if (parseInt(isText)) {
+        // contentContainerのメッセージ要素を取得
+        messageElement = contentContainer.querySelector('.chat-content-list-message');
+        const messageText = messageElement.textContent;
+        const pragraph = document.getElementById('delete-p');
+        pragraph.textContent = messageText;
+      } else {
+
+        // ★ここまで終わった。。。
+        // ★次はdialogのスタイル追加
+
+        // contentContainerの画像要素を取得
+        messageElement = contentContainer.querySelector('.chat-content-list-image');
+        const messageSrc = messageElement.src;
+        const image = document.getElementById('delete-image-img');
+        image.src = messageSrc;
+      }
+
+      console.log('messageElement::' + messageElement);
 
       // dialogのformにdata-chatidをセット
       const chatId = messageElement.dataset.chatid;
       deleteContainer.dataset.chatid = chatId;
-
-      const pragraph = document.getElementById('delete-p');
-      pragraph.textContent = messageText;
 
       // ダイアログを表示
       deleteDialog.showModal();
@@ -282,10 +309,27 @@
       chatContent.scrollTop = chatContent.scrollHeight;
     }
 
-    // これを使って送信されたチャットを表示する
-    // renderChat()と置き換える
-    // 変数修正（chatId, receiverId, purchaseId...）
-    // dataにisTextのbooleanがある
+    function imageScrollToBottom(image){
+      if (image) {
+          if (image.complete) {
+            // 画像がすでに読み込まれている場合はすぐにスクロール
+            scrollToBottom();
+            isSending = false;
+          } else {
+            // 画像の読み込みを待ってからスクロール
+            image.onload = function() {
+              scrollToBottom();
+              isSending = false;
+            };
+            // 画像が読み込めなかった場合のフォールバック
+            image.onerror = function() {
+              scrollToBottom();
+              isSending = false;
+            };
+          }
+        }
+    }
+
     function renderChat(isLeft, data) {
       const isText = data.isText;
       const ul = document.querySelector('.chat-content ul');
@@ -337,7 +381,7 @@
       // if文に入れるとeditDivは外では使えない
       const editDiv =document.createElement('div');
       editDiv.className = 'chat-content-list-edit';
-      if (!isLeft) {
+      if (!isLeft && isText) {
         const editA1 = document.createElement('a');
         editA1.textContent = '編集';
         const editA2 = document.createElement('a');
@@ -357,6 +401,17 @@
         const deleteDialog = document.getElementById('delete');
         editA2.addEventListener('click', function(e) {
           createDeleteLink(e, editA2, deleteContainer, deleteDialog);
+        });
+      } else if (!isLeft && !isText) {
+        const editA2 = document.createElement('a');
+        editA2.textContent = '削除';
+        editDiv.appendChild(editA2);
+
+        // 削除ボタンにイベントリスナーを付与
+        const deleteContainer = document.getElementById('delete-container-image');
+        const deleteDialog = document.getElementById('delete-image');
+        editA2.addEventListener('click', function(e) {
+          createDeleteLink(e, editA2, deleteContainer, deleteDialog, false);
         });
       }
 
@@ -393,6 +448,10 @@
           renderChat(true, e.message);
           // チャットの既読処理
           read();
+          // 最後に追加された画像要素を取得
+          const lastImage = document.querySelector('.chat-content ul li:last-child .chat-content-list-image');
+          // 画像が読み込まれたらスクロール
+          imageScrollToBottom(lastImage);
         });
 
       // 最下部に移動
@@ -413,88 +472,6 @@
     window.Laravel = {!! json_encode([
         'user' => auth()->check() ? auth()->user()->id : null,
     ]) !!};
-
-    // -----------------------
-    // 関数定義
-    // -----------------------
-    // function renderChat(isLeft, data) {
-    //   const ul = document.querySelector('.chat-content ul');
-    //   const li = document.createElement('li');
-    //   li.className = `chat-content-list ${isLeft ? 'left' : 'right'}`;
-
-    //   // プロフィール部分を作成
-    //   const profileDiv = document.createElement('div');
-    //   profileDiv.className = 'chat-content-list-profile';
-
-    //   const profileFrameOuter = document.createElement('div');
-    //   profileFrameOuter.className = 'chat-content-list-profile-outer-frame';
-
-    //   const profileImg = document.createElement('img');
-    //   profileImg.className = 'chat-content-list-profile-inner-frame';
-
-    //   const storage = document.getElementById('values').dataset.storage;
-    //   profileImg.src = `${storage}${data.image}`;
-    //   profileImg.alt = 'プロフィールの画像';
-
-    //   const profileName = document.createElement('p');
-    //   profileName.className = 'chat-content-list-profile-name';
-    //   profileName.textContent = data.username;
-
-    //   // コンテンツ部分を作成
-    //   const contentDiv = document.createElement('div');
-    //   contentDiv.className = 'chat-content-list-container';
-
-    //   const messageP = document.createElement('p');
-    //   messageP.className = 'chat-content-list-message';
-    //   messageP.textContent = data.message;
-    //   messageP.dataset.chatid = data.chatId;
-
-    //   const datetimeP = document.createElement('p');
-    //   datetimeP.className = 'chat-content-list-datetime';
-    //   datetimeP.textContent = data.datetime;
-
-    //   // if文に入れるとeditDivは外では使えない
-    //   const editDiv =document.createElement('div');
-    //   editDiv.className = 'chat-content-list-edit';
-    //   if (!isLeft) {
-    //     const editA1 = document.createElement('a');
-    //     editA1.textContent = '編集';
-    //     const editA2 = document.createElement('a');
-    //     editA2.textContent = '削除';
-    //     editDiv.appendChild(editA1);
-    //     editDiv.appendChild(editA2);
-
-    //     // 編集ボタンにイベントリスナーを付与
-    //     const modifyForm = document.getElementById('modify-form');
-    //     const modifyDialog = document.getElementById('modify');
-    //     editA1.addEventListener('click', function(e) {
-    //       createUpdateLink(e, editA1, modifyForm, modifyDialog);
-    //     });
-
-    //     // 削除ボタンにイベントリスナーを付与
-    //     const deleteContainer = document.getElementById('delete-container');
-    //     const deleteDialog = document.getElementById('delete');
-    //     editA2.addEventListener('click', function(e) {
-    //       createDeleteLink(e, editA2, deleteContainer, deleteDialog);
-    //     });
-    //   }
-
-    //   // 要素を組み立てる
-    //   profileFrameOuter.appendChild(profileImg);
-    //   profileDiv.appendChild(profileFrameOuter);
-    //   profileDiv.appendChild(profileName);
-
-    //   contentDiv.appendChild(messageP);
-    //   contentDiv.appendChild(datetimeP);
-    //   if (!isLeft) {
-    //     contentDiv.appendChild(editDiv);
-    //   }
-
-    //   li.appendChild(profileDiv);
-    //   li.appendChild(contentDiv);
-
-    //   ul.appendChild(li);
-    // }
 
     function sendMessage() {
       isSending = true;
@@ -759,6 +736,7 @@
       return false;
     }
 
+    // ★ここも修正が必要
     // 削除されたメッセージの表示を変更
     function deleteChatContent(chatId) {
       const targetMessage = document.querySelector(`.chat-content-list-message[data-chatid="${chatId}"]`);
@@ -785,7 +763,9 @@
     // -----------------------
     document.addEventListener('DOMContentLoaded', function() {
       const deleteDialog = document.getElementById('delete');
+      const deleteImageDialog = document.getElementById('delete-image');
       const deleteContainer = document.getElementById('delete-container');
+      const deleteContainerImage = document.getElementById('delete-container-image');
 
       // dialog内の削除ボタンのイベント
       const deleteSubmit = document.getElementById('delete-submit');
@@ -804,7 +784,15 @@
       const deleteLinks = document.querySelectorAll('.chat-content-list-edit-delete');
       deleteLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
-          createDeleteLink(e, link, deleteContainer, deleteDialog);
+          linkParent = link.parentElement;
+          const isText = link.parentElement.dataset.istext;
+          if (parseInt(isText)) {
+            // テキストの場合
+            createDeleteLink(e, link, deleteContainer, deleteDialog, isText);
+          } else {
+            // 画像の場合
+            createDeleteLink(e, link, deleteContainerImage, deleteImageDialog, isText);
+          }
         });
       });
     });
@@ -1033,30 +1021,13 @@
         hideError();
         imgPreview.src = '';
         imgPreviewInput.value = '';
-        // scrollToBottom();
         previewDialog.close();
         isSending = false;
 
         // 最後に追加された画像要素を取得
         const lastImage = document.querySelector('.chat-content ul li:last-child .chat-content-list-image');
-        if (lastImage) {
-          if (lastImage.complete) {
-            // 画像がすでに読み込まれている場合はすぐにスクロール
-            scrollToBottom();
-            isSending = false;
-          } else {
-            // 画像の読み込みを待ってからスクロール
-            lastImage.onload = function() {
-              scrollToBottom();
-              isSending = false;
-            };
-            // 画像が読み込めなかった場合のフォールバック
-            lastImage.onerror = function() {
-              scrollToBottom();
-              isSending = false;
-            };
-          }
-        }
+        // 画像が読み込まれたらスクロール
+        imageScrollToBottom(lastImage);
       })
       .catch(error => {
         displayError(error.data.errors.image[0]);

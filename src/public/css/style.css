@@ -1964,7 +1964,7 @@ body {
 
 #chat .chat {
   width: calc(100% - 260px);
-  height: calc(100vh - 80px + 156px + 226px);
+  height: calc(100vh + 80px + 158px + 226px);
   display: flex;
   flex-direction: column;
 }
@@ -2134,7 +2134,7 @@ body {
 
 #chat .chat-content-list-image {
   padding: 10px;
-  max-width: 45%;
+  max-width: 30%;
   height: auto;
   max-height: 600px;
   object-fit: contain;
