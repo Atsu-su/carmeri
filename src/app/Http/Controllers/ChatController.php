@@ -309,8 +309,8 @@ class ChatController extends Controller
     public function delete($chat_id)
     {
         try {
-            Chat::find($chat_id)
-                ->update(['is_deleted' => true]);
+            $chat = Chat::find($chat_id);
+            $chat->update(['is_deleted' => true]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
             return response()->json([
@@ -322,6 +322,7 @@ class ChatController extends Controller
         return response()->json([
             'success' => true,
             'chatId' => $chat_id,
+            'isText' => $chat->is_text,
         ]);
     }
 

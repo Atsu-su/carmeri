@@ -2136,7 +2136,7 @@ body {
   padding: 10px;
   max-width: 30%;
   height: auto;
-  max-height: 600px;
+  max-height: 400px;
   object-fit: contain;
   display: inline-block;
   background-color: var(--color-bg-chat);
@@ -2195,7 +2195,8 @@ body {
 }
 
 #chat .chat-content-modal-modify,
-#chat .chat-content-modal-delete {
+#chat .chat-content-modal-delete,
+#chat .chat-content-modal-delete-image {
   padding: 20px;
   width: 45%;
   border: 1px solid var(--color-border-gray);
@@ -2204,7 +2205,8 @@ body {
 
 @media screen and (max-width: 900px) {
   #chat .chat-content-modal-modify,
-  #chat .chat-content-modal-delete {
+  #chat .chat-content-modal-delete,
+  #chat .chat-content-modal-delete-image {
     width: 60%;
   }
 }
@@ -2234,6 +2236,15 @@ body {
   margin-top: 20px;
   display: flex;
   gap: 40px;
+}
+
+#chat .chat-content-modal-delete-image img {
+  width: 100%;
+  min-width: 380px;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  display: block;
 }
 
 #chat .chat-content-send {
@@ -2300,7 +2311,6 @@ body {
   max-height: 400px;
   object-fit: contain;
   display: block;
-  /* border: 1px solid var(--color-border-gray); */
 }
 
 #chat .chat-content-send-modal-buttons {

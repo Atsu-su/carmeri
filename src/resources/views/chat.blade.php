@@ -195,8 +195,8 @@
               @csrf
               <img id="delete-image-img" src="">
               <div class="chat-content-modal-delete-buttons">
-                <button id="delete-submit" class="c-btn c-btn--modal-edit" type="button">削除</button>
-                <a id="delete-cancel" class="c-btn c-btn--modal-edit-cancel">キャンセル</a>
+                <button id="delete-submit-image" class="c-btn c-btn--modal-edit" type="button">削除</button>
+                <a id="delete-cancel-image" class="c-btn c-btn--modal-edit-cancel">キャンセル</a>
               </div>
             </div>
           </dialog>
@@ -284,9 +284,6 @@
         pragraph.textContent = messageText;
       } else {
 
-        // ★ここまで終わった。。。
-        // ★次はdialogのスタイル追加
-
         // contentContainerの画像要素を取得
         messageElement = contentContainer.querySelector('.chat-content-list-image');
         const messageSrc = messageElement.src;
@@ -309,25 +306,26 @@
       chatContent.scrollTop = chatContent.scrollHeight;
     }
 
-    function imageScrollToBottom(image){
-      if (image) {
-          if (image.complete) {
-            // 画像がすでに読み込まれている場合はすぐにスクロール
+    function scrollToBottomWrapper(isText){
+      if (isText) {
+        // テキストの場合
+        scrollToBottom();
+      } else {
+        const image = document.querySelector('.chat-content ul li:last-child .chat-content-list-image');
+        if (image.complete) {
+          // 画像がすでに読み込まれている場合はすぐにスクロール
+          scrollToBottom();
+        } else {
+          // 画像の読み込みを待ってからスクロール
+          image.onload = function() {
             scrollToBottom();
-            isSending = false;
-          } else {
-            // 画像の読み込みを待ってからスクロール
-            image.onload = function() {
-              scrollToBottom();
-              isSending = false;
-            };
-            // 画像が読み込めなかった場合のフォールバック
-            image.onerror = function() {
-              scrollToBottom();
-              isSending = false;
-            };
-          }
+          };
+          // 画像が読み込めなかった場合のフォールバック
+          image.onerror = function() {
+            scrollToBottom();
+          };
         }
+      }
     }
 
     function renderChat(isLeft, data) {
@@ -444,18 +442,14 @@
       window.Echo.private(`channel.${window.Laravel.user}.${purchaseId}`)
         // .chat-nameでドットが必要
         .listen('.carmeri-chat', (e) => {
+          console.log(e.message);
           // メッセージをレンダリング
           renderChat(true, e.message);
           // チャットの既読処理
           read();
-          // 最後に追加された画像要素を取得
-          const lastImage = document.querySelector('.chat-content ul li:last-child .chat-content-list-image');
-          // 画像が読み込まれたらスクロール
-          imageScrollToBottom(lastImage);
+          // 最下部にスクロール（テキストと画像）
+          scrollToBottomWrapper(e.message.isText);
         });
-
-      // 最下部に移動
-      scrollToBottom();
     });
   </script>
 
@@ -463,12 +457,10 @@
   {{-- メッセージ送信 --}}
   {{-- ================================================ --}}
   <script>
-    // -----------------------
-    // グローバル変数定義
-    // -----------------------
     let isSending = false;
-    // 受信時のチャネルIDに使用する（window.Laravel.user）
+    let isSendingImage = false;
 
+    // 受信時のチャネルIDに使用する（window.Laravel.user）
     window.Laravel = {!! json_encode([
         'user' => auth()->check() ? auth()->user()->id : null,
     ]) !!};
@@ -526,6 +518,59 @@
       return false;
     }
 
+    function sendImage(){
+      isSendingImage = true;
+
+      const socketId = Echo.socketId();
+      const previewDialog = document.getElementById('img-preview');
+      const imgPreview = document.getElementById('img-preview-img');
+      const imgPreviewInput = document.getElementById('img-preview-input');
+      const form = document.getElementById('img-preview-form');
+      const input = document.getElementById('img-preview-input');
+      const data = new FormData(form);
+      const url = document.getElementById('values').dataset.chatsendimage;
+
+      fetch(url, {
+        method: 'POST',
+        body: data,
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+          'X-Socket-ID': socketId
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(errorData => {
+            const error = new Error('Network response was not ok or validation error');
+            error.data = errorData;
+            throw error;
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        // 送信したチャットの表示
+        renderChat(false, data);
+        // バリデーションエラーメッセージをクリア
+        hideError();
+        imgPreview.src = '';
+        imgPreviewInput.value = '';
+        previewDialog.close();
+        isSendingImage = false;
+        // 画像が読み込まれたらスクロール
+        scrollToBottomWrapper(data.isText);
+      })
+      .catch(error => {
+        displayError(error.data.errors.image[0]);
+        imgPreview.src = '';
+        imgPreviewInput.value = '';
+        previewDialog.close();
+        isSendingImage = false;
+      });
+
+      return false;
+    }
+
     // バリデーションエラーメッセージの表示
     function displayError(message) {
       const error = document.getElementById('validation-error');
@@ -543,6 +588,13 @@
     function sendMessageWrapper() {
       if (!isSending) {
         sendMessage();
+      }
+      return false;
+    }
+
+    function sendImageWrapper(){
+      if (!isSendingImage) {
+        sendImage();
       }
       return false;
     }
@@ -589,13 +641,10 @@
   {{-- メッセージ修正 --}}
   {{-- ================================================ --}}
   <script>
-    let isModifySending = false;
+    let isModifying = false;
 
-    // -----------------------
-    // 関数定義
-    // -----------------------
     function modifyMessage(chatId) {
-      isModifySending = true;
+      isModifying = true;
       // 文字列は参照ではない
       let baseUrl = document.getElementById('values').dataset.chatupdate;
       let url = baseUrl.replace(':chatid', chatId);
@@ -605,7 +654,7 @@
 
       // フォームの内容を送信する処理
       if (!textarea.value) {
-        isModifySending = false;
+        isModifying = false;
         return false;
       }
 
@@ -626,10 +675,10 @@
         // 修正したチャットの表示
         modifyChatContent(data.chatId, data.modifiedMessage);
         // 送信中フラグを下げる
-        isModifySending = false;
+        isModifying = false;
       })
       .catch(error => {
-        isModifySending = false;
+        isModifying = false;
         console.log('Error:', error);
       });
 
@@ -637,7 +686,7 @@
     }
 
     function modifyMessageWrapper(chatId) {
-      if (!isModifySending) {
+      if (!isModifying) {
         modifyMessage(chatId);
       }
       return false;
@@ -652,12 +701,8 @@
     // イベント定義
     // -----------------------
     document.addEventListener('DOMContentLoaded', function() {
-
-      // ========================================================
-      // この二つをinputにすれば関数化は可能
       const modifyDialog = document.getElementById('modify');
       const modifyForm = document.getElementById('modify-form');
-      // ========================================================
 
       // dialog内の編集ボタンのイベント
       const updateSubmit = document.getElementById('modify-submit');
@@ -688,16 +733,10 @@
   {{-- メッセージ削除 --}}
   {{-- ================================================ --}}
   <script>
-    // -----------------------
-    // グローバル変数定義
-    // -----------------------
-    let isDeleteSending = false;
+    let isDeleting = false;
 
-    // -----------------------
-    // 関数定義
-    // -----------------------
     function deleteMessage(chatId) {
-      isDeleteSending = true;
+      isDeleting = true;
       let baseUrl = document.getElementById('values').dataset.chatdelete;
       let url = baseUrl.replace(':chatid', chatId);
 
@@ -716,12 +755,12 @@
       })
       .then(data => {
         // 削除したチャットの表示を変更
-        deleteChatContent(data.chatId);
+        deleteChatContent(data.chatId, data.isText);
         // 送信中フラグを下げる
-        isDeleteSending = false;
+        isDeleting = false;
       })
       .catch(error => {
-          isDeleteSending = false;
+          isDeleting = false;
           console.error('Error:', error)
         }
       );
@@ -730,16 +769,22 @@
     }
 
     function deleteMessageWrapper(chatId) {
-      if (!isDeleteSending) {
+      if (!isDeleting) {
         deleteMessage(chatId);
       }
       return false;
     }
 
-    // ★ここも修正が必要
     // 削除されたメッセージの表示を変更
-    function deleteChatContent(chatId) {
-      const targetMessage = document.querySelector(`.chat-content-list-message[data-chatid="${chatId}"]`);
+    function deleteChatContent(chatId, isText = 1) {
+      let targetMessage;
+      if (parseInt(isText)) {
+        // テキストの場合
+        targetMessage = document.querySelector(`.chat-content-list-message[data-chatid="${chatId}"]`);
+      } else {
+        // 画像の場合
+        targetMessage = document.querySelector(`.chat-content-list-image[data-chatid="${chatId}"]`);
+      }
 
       // 対象の要素の親要素を取得
       const parentElement = targetMessage.parentElement;
@@ -748,7 +793,12 @@
       const deletedMessage = document.createElement('p');
       deletedMessage.className = 'chat-content-list-message deleted';
       deletedMessage.setAttribute('data-chatid', chatId);
-      deletedMessage.textContent = 'このメッセージは削除されました';
+
+      if (parseInt(isText)) {
+        deletedMessage.textContent = 'このメッセージは削除されました';
+      } else {
+        deletedMessage.textContent = 'この画像は削除されました';
+      }
 
       // 削除対象のメッセージを置き換える
       parentElement.replaceChild(deletedMessage, targetMessage);
@@ -767,7 +817,7 @@
       const deleteContainer = document.getElementById('delete-container');
       const deleteContainerImage = document.getElementById('delete-container-image');
 
-      // dialog内の削除ボタンのイベント
+      // dialog内の削除ボタンのイベント（テキスト）
       const deleteSubmit = document.getElementById('delete-submit');
       deleteSubmit.addEventListener('click', function() {
         const chatId = deleteContainer.dataset.chatid;
@@ -775,10 +825,23 @@
         deleteDialog.close();
       });
 
+      // dialog内の削除ボタンのイベント（画像）
+      const deleteSubmitImage = document.getElementById('delete-submit-image');
+      deleteSubmitImage.addEventListener('click', function() {
+        const chatId = deleteContainerImage.dataset.chatid;
+        deleteMessageWrapper(chatId);
+        deleteImageDialog.close();
+      });
+
       // dialog内のキャンセルボタンのイベント
       const cancel = document.getElementById('delete-cancel');
       cancel.addEventListener('click', function() {
         deleteDialog.close();
+      });
+
+      const cancelImage = document.getElementById('delete-cancel-image');
+      cancelImage.addEventListener('click', function() {
+        deleteImageDialog.close();
       });
 
       const deleteLinks = document.querySelectorAll('.chat-content-list-edit-delete');
@@ -943,20 +1006,14 @@
   </script>
 
   {{-- ================================================ --}}
-  {{-- 画像送信 --}}
+  {{-- 画像プレビュー --}}
   {{-- ================================================ --}}
   <script>
-    let isImageSending = false;
-
-    // 画像プレビュー
     // DOM読み込み後に実行する
     function previewImage(e){
       const previewDialog = document.getElementById('img-preview');
       const imgPreview = document.getElementById('img-preview-img');
       const imgPreviewInput = document.getElementById('img-preview-input');
-
-      // preview.showModal();
-
       const file = e.target.files[0];
 
       if (file && file.type.startsWith('image/')) {
@@ -983,70 +1040,9 @@
       previewDialog.close();
     }
 
-    function sendImage(){
-      isSending = true;
-
-      const socketId = Echo.socketId();
-      const previewDialog = document.getElementById('img-preview');
-      const imgPreview = document.getElementById('img-preview-img');
-      const imgPreviewInput = document.getElementById('img-preview-input');
-      const form = document.getElementById('img-preview-form');
-      const input = document.getElementById('img-preview-input');
-      const data = new FormData(form);
-      // const error = document.getElementById('validation-error');
-      const url = document.getElementById('values').dataset.chatsendimage;
-
-      fetch(url, {
-        method: 'POST',
-        body: data,
-        headers: {
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-          'X-Socket-ID': socketId
-        }
-      })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(errorData => {
-            const error = new Error('Network response was not ok or validation error');
-            error.data = errorData;
-            throw error;
-          });
-        }
-        return response.json();
-      })
-      .then(data => {
-        // 送信したチャットの表示
-        renderChat(false, data);
-        // バリデーションエラーメッセージをクリア
-        hideError();
-        imgPreview.src = '';
-        imgPreviewInput.value = '';
-        previewDialog.close();
-        isSending = false;
-
-        // 最後に追加された画像要素を取得
-        const lastImage = document.querySelector('.chat-content ul li:last-child .chat-content-list-image');
-        // 画像が読み込まれたらスクロール
-        imageScrollToBottom(lastImage);
-      })
-      .catch(error => {
-        displayError(error.data.errors.image[0]);
-        imgPreview.src = '';
-        imgPreviewInput.value = '';
-        previewDialog.close();
-        isSending = false;
-      });
-
-      return false;
-    }
-
-    function sendImageWrapper(){
-      if (!isImageSending) {
-        sendImage();
-      }
-      return false;
-    }
-
+    // -----------------------
+    // イベント定義
+    // -----------------------
     document.getElementById('img-input').addEventListener('change', previewImage);
     document.getElementById('img-preview-cancel').addEventListener('click', closeModal);
 
